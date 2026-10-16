@@ -17,6 +17,7 @@ import re
 import select
 import shutil
 import socket
+import struct
 import sqlite3
 import subprocess
 import tarfile
@@ -861,6 +862,186 @@ def remote_audio():
                 remote_audio_busy = False
 
     return pcm()
+
+
+# Equipo: la radio duplicada en la PC (CX8ANM / Cóndor Tecnológico).
+# La pantalla la copia la GUI (src/mirror.c) en MIRROR_JPEG mientras MIRROR_FLAG
+# esté fresco: se toca en cada pedido. Las teclas y perillas de la página se
+# escriben en /dev/input/eventN, como si fueran las del frente: la GUI no ve
+# ninguna diferencia, así anda en todas las pantallas y apps.
+
+MIRROR_FLAG = "/tmp/x6100-mirror"
+MIRROR_JPEG = "/tmp/x6100-screen.jpg"
+EV_SYN, EV_KEY, EV_REL = 0, 1, 2
+BTN_TRIGGER_HAPPY1 = 0x2c0
+# Nombre en la página -> BTN_TRIGGER_HAPPYn (src/keypad.c)
+MIRROR_KEYS = {"GEN": 1, "KEY": 2, "DFN": 3, "PTT": 4, "BAND_DOWN": 5, "BAND_UP": 6, "APP": 7, "MSG": 8,
+               "DFL": 9, "AM": 10, "CW": 11, "SSB": 12, "F1": 13, "F2": 14, "F3": 15, "AB": 16, "PRE": 17,
+               "ATU": 18, "F4": 19, "F5": 20, "VOL_PUSH": 21, "VM": 22, "AGC": 23, "FST": 24, "LOCK": 25,
+               "MFK_PUSH": 27}
+MIRROR_KEYPADS = ["/dev/input/event0", "/dev/input/event4"]
+MIRROR_KNOBS = {"main": "/dev/input/event1", "vol": "/dev/input/event2", "mfk": "/dev/input/event3"}
+MIRROR_PTT_MAX_S = 180   # PTT apretado desde la web: se suelta solo a los 3 minutos
+mirror_lock = threading.Lock()
+mirror_key_dev = {}      # código -> /dev/input/eventN que lo tiene
+mirror_ptt_timer = None
+
+
+def mirror_touch():
+    try:
+        with open(MIRROR_FLAG, "a"):
+            pass
+        os.utime(MIRROR_FLAG)
+    except OSError:
+        pass
+
+
+def evdev_bits(path, ev, nbits):
+    """Los códigos que un dispositivo de entrada tiene (EVIOCGBIT)"""
+    import fcntl
+    size = (nbits + 7) // 8
+    buf = bytearray(size)
+    req = (2 << 30) | (size << 16) | (ord("E") << 8) | (0x20 + ev)
+    fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
+    try:
+        fcntl.ioctl(fd, req, buf, True)
+    finally:
+        os.close(fd)
+    return {i for i in range(nbits) if buf[i // 8] >> (i % 8) & 1}
+
+
+def evdev_write(path, events):
+    """Eventos (tipo, código, valor) al dispositivo, y un SYN al final"""
+    now = time.time()
+    sec, usec = int(now), int((now % 1) * 1e6)
+    data = b"".join(struct.pack("@llHHi", sec, usec, t, c, v) for t, c, v in events + [(EV_SYN, 0, 0)])
+    fd = os.open(path, os.O_WRONLY | os.O_NONBLOCK)
+    try:
+        os.write(fd, data)
+    finally:
+        os.close(fd)
+
+
+def mirror_key_path(code):
+    if code not in mirror_key_dev:
+        for path in MIRROR_KEYPADS:
+            try:
+                if code in evdev_bits(path, EV_KEY, 0x300):
+                    mirror_key_dev[code] = path
+                    break
+            except OSError:
+                continue
+        else:
+            return None
+    return mirror_key_dev[code]
+
+
+def mirror_key(name, down):
+    global mirror_ptt_timer
+    code = BTN_TRIGGER_HAPPY1 + MIRROR_KEYS[name] - 1
+    path = mirror_key_path(code)
+    if not path:
+        raise OSError("tecla no encontrada")
+    with mirror_lock:
+        evdev_write(path, [(EV_KEY, code, 1 if down else 0)])
+        if name == "PTT":
+            if mirror_ptt_timer:
+                mirror_ptt_timer.cancel()
+                mirror_ptt_timer = None
+            if down:
+                mirror_ptt_timer = threading.Timer(MIRROR_PTT_MAX_S, mirror_key, ("PTT", False))
+                mirror_ptt_timer.daemon = True
+                mirror_ptt_timer.start()
+
+
+def mirror_knob(name, steps):
+    path = MIRROR_KNOBS[name]
+    rel = sorted(evdev_bits(path, EV_REL, 16))
+    with mirror_lock:
+        evdev_write(path, [(EV_REL, rel[0] if rel else 0, steps)])
+
+
+@app.route('/equipo')
+def equipo():
+    return bottle.template('equipo')
+
+
+@app.get('/api/equipo/pantalla.jpg')
+def equipo_frame():
+    """La pantalla de la radio, una vez"""
+    mirror_touch()
+    for _ in range(30):   # la primera vez la GUI tarda un poco
+        try:
+            with open(MIRROR_JPEG, "rb") as f:
+                data = f.read()
+            if data:
+                bottle.response.content_type = "image/jpeg"
+                bottle.response.set_header("Cache-Control", "no-store")
+                return data
+        except OSError:
+            pass
+        time.sleep(0.1)
+    return api_error(503, "La radio no manda la pantalla")
+
+
+@app.get('/api/equipo/pantalla.mjpg')
+def equipo_stream():
+    """La pantalla en vivo (MJPEG): una imagen nueva cada vez que la GUI escribe una"""
+    bottle.response.content_type = "multipart/x-mixed-replace; boundary=x6100frame"
+    bottle.response.set_header("Cache-Control", "no-store")
+
+    def frames():
+        last, sent, touched = None, 0, 0
+        deadline = time.time() + 6 * 3600
+        while time.time() < deadline:
+            now = time.time()
+            if now - touched > 1:
+                mirror_touch()
+                touched = now
+            try:
+                st = os.stat(MIRROR_JPEG)
+                stamp = (st.st_mtime_ns, st.st_size)
+            except OSError:
+                stamp = None
+            if stamp and (stamp != last or now - sent > 3):
+                try:
+                    with open(MIRROR_JPEG, "rb") as f:
+                        data = f.read()
+                except OSError:
+                    data = b""
+                if data:
+                    last, sent = stamp, now
+                    yield (b"--x6100frame\r\nContent-Type: image/jpeg\r\nContent-Length: " +
+                           str(len(data)).encode() + b"\r\n\r\n" + data + b"\r\n")
+            time.sleep(0.04)
+
+    return frames()
+
+
+@app.post('/api/equipo/tecla')
+def equipo_key():
+    data = bottle.request.json
+    if not isinstance(data, dict) or data.get("tecla") not in MIRROR_KEYS or data.get("estado") not in (0, 1):
+        return api_error(400, "Pedido inválido")
+    try:
+        mirror_key(data["tecla"], data["estado"] == 1)
+    except OSError as e:
+        return api_error(503, "No se pudo enviar la tecla: %s" % e)
+    return {"status": "OK"}
+
+
+@app.post('/api/equipo/perilla')
+def equipo_knob():
+    data = bottle.request.json
+    steps = data.get("pasos") if isinstance(data, dict) else None
+    if not isinstance(data, dict) or data.get("perilla") not in MIRROR_KNOBS or \
+            not isinstance(steps, int) or isinstance(steps, bool) or not -50 <= steps <= 50 or steps == 0:
+        return api_error(400, "Pedido inválido")
+    try:
+        mirror_knob(data["perilla"], steps)
+    except OSError as e:
+        return api_error(503, "No se pudo mover la perilla: %s" % e)
+    return {"status": "OK"}
 
 
 # Memories: MEM button slots (params.db, table `memory`) and named channels

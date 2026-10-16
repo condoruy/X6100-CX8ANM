@@ -96,6 +96,7 @@ static uint32_t             *wf_shadow;     /* portrait copy of the primary plan
 static rects_t              frame[2];       /* this frame, previous frame */
 static int                  cur;
 static bool                 portrait_mode;  /* LVGL renders 480x800: turned 180, not 90 */
+static volatile uint32_t    frame_seq;      /* +1 for every frame shown (screen mirror) */
 
 /**********************
  *   STATIC FUNCTIONS
@@ -593,6 +594,9 @@ void drm_commit(void) {
         flip_pending = ret == 0;
     }
 
+    if (!ret) {
+        frame_seq++;
+    }
     if (ret) {
         if (!failed) {
             err("%s: %s", crtc_set ? "commit" : "set crtc", strerror(errno));
@@ -658,6 +662,50 @@ void drm_blend_under(uint32_t *dst, const uint32_t *top, const uint32_t *bottom,
             dst[i] = 0xff000000 | (r << 16) | (g << 8) | bl;
         }
     }
+}
+
+uint32_t drm_frame_seq(void) {
+    return frame_seq;
+}
+
+/* What the panel shows, the way LVGL draws it: 800x480 landscape (or 480x800 in
+ * portrait), the GUI over the waterfall, XRGB. For the screen mirror (web page). */
+bool drm_capture(uint32_t *out, int32_t *w, int32_t *h) {
+    if (!shadow) {
+        return false;
+    }
+    if (portrait_mode) {
+        *w = PANEL_W;
+        *h = PANEL_H;
+        for (int32_t y = 0; y < PANEL_H; y++) {
+            const int32_t   py  = PANEL_H - 1 - y;
+            const uint32_t *top = shadow + py * PANEL_W;
+            const uint32_t *bot = planes ? wf_shadow + py * PANEL_W : NULL;
+            uint32_t       *row = out + y * PANEL_W;
+
+            for (int32_t x = 0; x < PANEL_W; x++) {
+                const int32_t px = PANEL_W - 1 - x;
+                row[x] = top[px];
+                if (bot) drm_blend_under(&row[x], &row[x], &bot[px], 1);
+            }
+        }
+        return true;
+    }
+    *w = LAND_W;
+    *h = LAND_H;
+    for (int32_t x = 0; x < LAND_W; x++) {
+        /* landscape column x is portrait row LAND_W - 1 - x */
+        const uint32_t *top = shadow + (LAND_W - 1 - x) * PANEL_W;
+        const uint32_t *bot = planes ? wf_shadow + (LAND_W - 1 - x) * PANEL_W : NULL;
+        uint32_t        col[PANEL_W];
+
+        if (bot) drm_blend_under(col, top, bot, PANEL_W);
+        else memcpy(col, top, sizeof(col));
+        for (int32_t y = 0; y < LAND_H; y++) {
+            out[y * LAND_W + x] = col[y];
+        }
+    }
+    return true;
 }
 
 const uint32_t * drm_wf_pixels(void) {

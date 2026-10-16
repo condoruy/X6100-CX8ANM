@@ -22,6 +22,7 @@
 #include "main.h"
 #include "main_screen.h"
 #include "screen_rec.h"
+#include "mirror.h"
 #include "styles.h"
 #include "fonts/font_select.h"
 #include "radio.h"
@@ -170,6 +171,7 @@ int main(void) {
 
     keyboard_init();
 
+    mirror_init();      /* pantalla para la página web "Equipo" */
     keypad_init("/dev/input/event0");
     keypad_init("/dev/input/event4");
 

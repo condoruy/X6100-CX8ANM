@@ -1,0 +1,376 @@
+% rebase('base.html', title='Equipo')
+<style>
+main:has(#eq){max-width:1320px}
+#eq{--key:#1a2638;--key-hi:#24344d;--key-on:#ffb020;--face:#0e1726}
+.eq-rig{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start;background:linear-gradient(180deg,#141f31,#0c1422);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
+.eq-screen{position:relative;background:#000;border-radius:10px;border:3px solid #050a12;aspect-ratio:800/480;overflow:hidden}
+.eq-screen.portrait{aspect-ratio:480/800;max-width:420px;margin:0 auto}
+.eq-screen img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:auto}
+.eq-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:15px;text-align:center;padding:20px}
+.eq-wait[hidden]{display:none}
+.eq-fkeys{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+.eq-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.eq-row .gap{flex:0 0 10px}
+.eq-key{appearance:none;border:1px solid #31445e;background:linear-gradient(180deg,var(--key-hi),var(--key));color:var(--text);border-radius:8px;padding:10px 6px;min-width:58px;font:600 13px/1.1 system-ui,sans-serif;letter-spacing:.5px;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none;box-shadow:0 2px 0 #050a12}
+.eq-key small{display:block;font-weight:500;font-size:10px;color:var(--dim);margin-top:3px;letter-spacing:0}
+.eq-key:hover{border-color:#4a6588}
+.eq-key.down{background:var(--key-on);color:#111;transform:translateY(2px);box-shadow:none}
+.eq-key.down small{color:#3a2a00}
+.eq-key.ptt{background:linear-gradient(180deg,#5a1f24,#3a1216);border-color:#7a2a30;width:100%;padding:14px;font-size:15px}
+.eq-key.ptt.down{background:#ff4d4d;color:#fff}
+.eq-side{display:flex;flex-direction:column;gap:16px}
+.eq-knobs{display:flex;justify-content:space-around;gap:10px}
+.eq-knob{display:flex;flex-direction:column;align-items:center;gap:6px}
+.eq-knob .dial{--a:0deg;position:relative;border-radius:50%;background:radial-gradient(circle at 35% 30%,#3a4b63,#151f2e 70%);border:2px solid #2c3d55;box-shadow:inset 0 -6px 12px rgba(0,0,0,.5),0 4px 10px rgba(0,0,0,.5);cursor:grab;touch-action:none;user-select:none}
+.eq-knob .dial:active{cursor:grabbing}
+.eq-knob .dial::after{content:"";position:absolute;left:50%;top:8%;width:4px;height:22%;margin-left:-2px;border-radius:2px;background:var(--accent);transform-origin:50% 190%;transform:rotate(var(--a))}
+.eq-knob.small .dial{width:86px;height:86px}
+.eq-knob.small .dial::after{transform-origin:50% 182%}
+.eq-knob.big .dial{width:190px;height:190px;background:radial-gradient(circle at 35% 30%,#46597a,#141e2c 72%)}
+.eq-knob.big .dial::after{top:6%;height:14%;width:6px;margin-left:-3px;transform-origin:50% 314%}
+.eq-knob label{margin:0;font-weight:700;color:var(--text);font-size:13px;letter-spacing:1px}
+.eq-knob .mini{display:flex;gap:6px}
+.eq-knob .mini .eq-key{min-width:40px;padding:6px 8px}
+.eq-six{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.eq-step{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.eq-step button{appearance:none;border:1px solid #31445e;background:#121c2b;color:var(--dim);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer}
+.eq-step button.on{background:var(--accent);color:#111;border-color:var(--accent)}
+.eq-bar{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:16px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.eq-bar .grow{flex:1}
+.eq-bar input[type=range]{width:140px}
+.eq-status{color:var(--dim);font-size:13px}
+.eq-status.err{color:var(--err)}
+.eq-help{margin-top:14px;color:var(--dim);font-size:13px}
+.eq-help kbd{background:#1b2a40;border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:12px;color:var(--text)}
+@media (max-width:900px){.eq-rig{grid-template-columns:1fr}.eq-knob.big .dial{width:150px;height:150px}}
+</style>
+
+<div id="eq">
+<h2><svg class="i"><use href="#i-monitor"/></svg>Equipo</h2>
+<p class="sub">La radio en esta pantalla: lo que muestra el equipo, en vivo, con todas sus teclas y perillas. Un toque corto es una pulsación; mantener apretado es una pulsación larga.</p>
+
+<div class="eq-rig">
+  <div>
+    <div class="eq-screen" id="eq-screen">
+      <img id="eq-img" alt="Pantalla de la radio">
+      <div class="eq-wait" id="eq-wait">Conectando con la pantalla de la radio...</div>
+    </div>
+    <div class="eq-fkeys">
+      <button class="eq-key" data-k="F1">F1</button>
+      <button class="eq-key" data-k="F2">F2</button>
+      <button class="eq-key" data-k="F3">F3</button>
+      <button class="eq-key" data-k="F4">F4</button>
+      <button class="eq-key" data-k="F5">F5</button>
+    </div>
+    <div class="eq-row">
+      <button class="eq-key" data-k="BAND_DOWN">BANDA ▼</button>
+      <button class="eq-key" data-k="BAND_UP">BANDA ▲</button>
+      <span class="gap"></span>
+      <button class="eq-key" data-k="AM">AM</button>
+      <button class="eq-key" data-k="CW">CW</button>
+      <button class="eq-key" data-k="SSB">SSB</button>
+      <span class="gap"></span>
+      <button class="eq-key" data-k="AB">A/B</button>
+      <button class="eq-key" data-k="PRE">PRE</button>
+      <button class="eq-key" data-k="ATU">ATU</button>
+      <button class="eq-key" data-k="VM">V/M</button>
+      <button class="eq-key" data-k="AGC">AGC</button>
+      <button class="eq-key" data-k="FST">FST</button>
+      <button class="eq-key" data-k="LOCK">LOCK</button>
+    </div>
+  </div>
+
+  <div class="eq-side">
+    <div class="eq-knobs">
+      <div class="eq-knob small">
+        <div class="dial" data-knob="vol" title="VOL: rueda del mouse o arrastrar"></div>
+        <label>VOL</label>
+        <div class="mini">
+          <button class="eq-key" data-step="vol:-1">−</button>
+          <button class="eq-key" data-k="VOL_PUSH" title="Pulsar la perilla VOL">●</button>
+          <button class="eq-key" data-step="vol:1">+</button>
+        </div>
+      </div>
+      <div class="eq-knob small">
+        <div class="dial" data-knob="mfk" title="MFK: rueda del mouse o arrastrar"></div>
+        <label>MFK</label>
+        <div class="mini">
+          <button class="eq-key" data-step="mfk:-1">−</button>
+          <button class="eq-key" data-k="MFK_PUSH" title="Pulsar la perilla MFK">●</button>
+          <button class="eq-key" data-step="mfk:1">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="eq-six">
+      <button class="eq-key" data-k="GEN">GEN</button>
+      <button class="eq-key" data-k="APP">APP</button>
+      <button class="eq-key" data-k="KEY">KEY</button>
+      <button class="eq-key" data-k="MSG">MSG</button>
+      <button class="eq-key" data-k="DFN">DFN</button>
+      <button class="eq-key" data-k="DFL">DFL</button>
+    </div>
+
+    <div class="eq-knob big">
+      <div class="dial" data-knob="main" title="Sintonía: rueda del mouse o arrastrar"></div>
+      <label>SINTONÍA</label>
+      <div class="mini">
+        <button class="eq-key" data-step="main:-1">◀</button>
+        <button class="eq-key" data-step="main:1">▶</button>
+      </div>
+      <div class="eq-step" id="eq-mult" title="Pasos por movimiento de la rueda">
+        <button data-m="1" class="on">×1</button><button data-m="5">×5</button><button data-m="20">×20</button>
+      </div>
+    </div>
+
+    <button class="eq-key ptt" data-k="PTT" title="Transmite mientras está apretado (máximo 3 minutos)">PTT · mantener para transmitir</button>
+  </div>
+</div>
+
+<div class="eq-bar">
+  <button class="primary" id="eq-listen">🔊 Escuchar</button>
+  <div><label for="eq-vol">Volumen en la PC</label><input type="range" id="eq-vol" min="0" max="200" value="100"></div>
+  <div class="grow"></div>
+  <span class="eq-status" id="eq-status">Conectando...</span>
+</div>
+<p class="eq-help" id="eq-https" hidden>Para escuchar el audio la página tiene que abrirse con <b>https</b>: <a id="eq-https-link"></a> (el navegador avisa del certificado de la radio: aceptarlo una vez).</p>
+
+<p class="eq-help">
+  Teclado: <kbd>F1</kbd>–<kbd>F5</kbd> botones de abajo · <kbd>↑</kbd><kbd>↓</kbd> sintonía (con <kbd>Shift</kbd> ×10) ·
+  <kbd>RePág</kbd><kbd>AvPág</kbd> MFK · <kbd>Intro</kbd> pulsar MFK · <kbd>+</kbd><kbd>−</kbd> VOL · <kbd>Esc</kbd> pulsar VOL ·
+  <kbd>G</kbd> GEN · <kbd>A</kbd> APP · <kbd>K</kbd> KEY · <kbd>M</kbd> MSG · <kbd>D</kbd> DFN · <kbd>L</kbd> DFL.
+  El PTT no tiene tecla, a propósito.
+</p>
+</div>
+
+<script>
+(function() {
+const $st = $("#eq-status");
+function status(t, err) { $st.text(t).toggleClass("err", !!err); }
+
+/* Pedidos en orden: una tecla soltada nunca llega antes que apretada */
+let chain = Promise.resolve();
+function send(url, body) {
+  chain = chain.then(function() {
+    return fetch(url, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)})
+      .then(function(r) { return r.json().catch(function() { return {}; }).then(function(j) {
+        if (!r.ok) status(j.msg || ("Error " + r.status), true);
+      }); })
+      .catch(function() { status("Sin conexión con la radio", true); });
+  });
+  return chain;
+}
+
+/* Pantalla: MJPEG; si el navegador no lo muestra, una imagen cada 200 ms */
+const img = document.getElementById("eq-img");
+let polling = false, firstFrame = true;
+img.onload = function() {
+  if (firstFrame) { firstFrame = false; status("Conectado"); }
+  $("#eq-wait").prop("hidden", true);
+  $("#eq-screen").toggleClass("portrait", img.naturalHeight > img.naturalWidth);
+};
+img.onerror = function() {
+  if (!polling) { polling = true; setTimeout(poll, 500); return; }
+};
+function poll() {
+  const next = new Image();
+  next.onload = function() { img.src = next.src; setTimeout(poll, 200); };
+  next.onerror = function() { $("#eq-wait").prop("hidden", false).text("La radio no manda la pantalla. ¿Está encendida y conectada?"); setTimeout(poll, 2000); };
+  next.src = "/api/equipo/pantalla.jpg?t=" + Date.now();
+}
+img.src = "/api/equipo/pantalla.mjpg";
+setTimeout(function() { if (firstFrame && !polling) { polling = true; poll(); } }, 5000);
+
+/* Teclas: apretar y soltar como en el equipo (lo largo lo mide la radio) */
+const held = new Set();
+function key(k, down, el) {
+  if (down === held.has(k)) return;
+  if (down) held.add(k); else held.delete(k);
+  $(el || '.eq-key[data-k="' + k + '"]').toggleClass("down", down);
+  send("/api/equipo/tecla", {tecla: k, estado: down ? 1 : 0});
+}
+$(".eq-key[data-k]").each(function() {
+  const el = this, k = el.dataset.k;
+  el.addEventListener("pointerdown", function(e) { e.preventDefault(); el.setPointerCapture(e.pointerId); key(k, true, el); });
+  const up = function() { key(k, false, el); };
+  el.addEventListener("pointerup", up);
+  el.addEventListener("pointercancel", up);
+  el.addEventListener("lostpointercapture", up);
+  el.addEventListener("contextmenu", function(e) { e.preventDefault(); });
+});
+/* Nada queda apretado si la página pierde el foco */
+function releaseAll() { Array.from(held).forEach(function(k) { key(k, false); }); }
+window.addEventListener("blur", releaseAll);
+document.addEventListener("visibilitychange", function() { if (document.hidden) releaseAll(); });
+window.addEventListener("pagehide", releaseAll);
+
+/* Perillas: pasos juntados cada 60 ms */
+const pending = {main: 0, vol: 0, mfk: 0}, angle = {main: 0, vol: 0, mfk: 0};
+let mult = 1, flushTimer = null;
+function turn(knob, steps) {
+  pending[knob] += steps;
+  angle[knob] += steps * (knob == "main" ? 6 : 15);
+  $('.dial[data-knob="' + knob + '"]')[0].style.setProperty("--a", angle[knob] + "deg");
+  if (!flushTimer) flushTimer = setTimeout(flush, 60);
+}
+function flush() {
+  flushTimer = null;
+  for (const k in pending) {
+    let n = pending[k];
+    while (n) {
+      const s = Math.max(-50, Math.min(50, n));
+      send("/api/equipo/perilla", {perilla: k, pasos: s});
+      n -= s;
+    }
+    pending[k] = 0;
+  }
+}
+$(".dial").each(function() {
+  const el = this, knob = el.dataset.knob;
+  let acc = 0;
+  el.addEventListener("wheel", function(e) {
+    e.preventDefault();
+    acc += e.deltaY;
+    const unit = e.deltaMode ? 1 : 60;
+    while (Math.abs(acc) >= unit) {
+      const dir = acc < 0 ? 1 : -1;   /* rueda hacia arriba: subir */
+      turn(knob, dir * (knob == "main" ? mult : 1));
+      acc += dir * unit;
+    }
+  }, {passive: false});
+  /* Arrastrar en círculo: un paso cada 15 grados */
+  let last = null;
+  const ang = function(e) { const r = el.getBoundingClientRect(); return Math.atan2(e.clientY - r.top - r.height / 2, e.clientX - r.left - r.width / 2) * 180 / Math.PI; };
+  el.addEventListener("pointerdown", function(e) { el.setPointerCapture(e.pointerId); last = ang(e); });
+  el.addEventListener("pointermove", function(e) {
+    if (last === null) return;
+    let d = ang(e) - last;
+    if (d > 180) d -= 360;
+    if (d < -180) d += 360;
+    const per = knob == "main" ? 10 : 20;
+    if (Math.abs(d) >= per) {
+      const n = Math.trunc(d / per);
+      turn(knob, n * (knob == "main" ? mult : 1));
+      last += n * per;
+    }
+  });
+  const stop = function() { last = null; };
+  el.addEventListener("pointerup", stop);
+  el.addEventListener("pointercancel", stop);
+});
+$("[data-step]").on("click", function() {
+  const p = this.dataset.step.split(":");
+  turn(p[0], parseInt(p[1], 10) * (p[0] == "main" ? mult : 1));
+});
+$("#eq-mult button").on("click", function() {
+  mult = parseInt(this.dataset.m, 10);
+  $("#eq-mult button").removeClass("on");
+  $(this).addClass("on");
+});
+
+/* Teclado de la PC */
+const KEYS = {F1: "F1", F2: "F2", F3: "F3", F4: "F4", F5: "F5", Escape: "VOL_PUSH", Enter: "MFK_PUSH",
+              g: "GEN", a: "APP", k: "KEY", m: "MSG", d: "DFN", l: "DFL"};
+document.addEventListener("keydown", function(e) {
+  if (e.target.closest("input,select,textarea") || e.ctrlKey || e.altKey || e.metaKey) return;
+  const k = KEYS[e.key] || KEYS[e.key.toLowerCase && e.key.toLowerCase()];
+  if (k) { e.preventDefault(); if (!e.repeat) key(k, true); return; }
+  const n = e.shiftKey ? 10 : 1;
+  if (e.key == "ArrowUp") { e.preventDefault(); turn("main", n * mult); }
+  else if (e.key == "ArrowDown") { e.preventDefault(); turn("main", -n * mult); }
+  else if (e.key == "PageUp") { e.preventDefault(); turn("mfk", 1); }
+  else if (e.key == "PageDown") { e.preventDefault(); turn("mfk", -1); }
+  else if (e.key == "+") { e.preventDefault(); turn("vol", 1); }
+  else if (e.key == "-") { e.preventDefault(); turn("vol", -1); }
+});
+document.addEventListener("keyup", function(e) {
+  const k = KEYS[e.key] || KEYS[e.key.toLowerCase && e.key.toLowerCase()];
+  if (k) { e.preventDefault(); key(k, false); }
+});
+
+/* Audio de recepción: el mismo flujo que la página Remoto (16 bit, 12 kHz) */
+const AUDIO_RATE = 12000;
+const JITTER = `
+class Jitter {
+  constructor(outRate) {
+    this.buf = new Float32Array(${AUDIO_RATE} * 4);
+    this.r = 0; this.n = 0; this.pos = 0; this.playing = false;
+    this.step = ${AUDIO_RATE} / outRate;
+  }
+  push(s) {
+    const len = this.buf.length;
+    for (let i = 0; i < s.length && this.n < len; i++, this.n++) this.buf[(this.r + this.n) % len] = s[i];
+    if (this.n > ${AUDIO_RATE}) {
+      const drop = this.n - ${AUDIO_RATE} * 0.4;
+      this.r = (this.r + drop) % len;
+      this.n -= drop;
+    }
+  }
+  pull(out) {
+    const len = this.buf.length;
+    if (!this.playing && this.n < ${AUDIO_RATE} * 0.4) return out.fill(0);
+    this.playing = true;
+    for (let i = 0; i < out.length; i++) {
+      if (this.n < 2) { this.playing = false; return out.fill(0, i); }
+      const a = this.buf[this.r], b = this.buf[(this.r + 1) % len];
+      out[i] = a + (b - a) * this.pos;
+      this.pos += this.step;
+      while (this.pos >= 1) { this.pos -= 1; this.r = (this.r + 1) % len; this.n--; }
+    }
+  }
+}`;
+const WORKLET = JITTER + `
+class EquipoRx extends AudioWorkletProcessor {
+  constructor() { super(); this.j = new Jitter(sampleRate); this.port.onmessage = (e) => this.j.push(e.data); }
+  process(inputs, outputs) { this.j.pull(outputs[0][0]); return true; }
+}
+registerProcessor("equipo-rx", EquipoRx);`;
+
+let audio = null;
+function stopAudio() {
+  if (!audio) return;
+  audio.abort.abort();
+  audio.ctx.close();
+  audio = null;
+  $("#eq-listen").text("🔊 Escuchar");
+}
+async function startAudio() {
+  const a = audio = {abort: new AbortController(), ctx: new AudioContext()};
+  $("#eq-listen").text("■ Dejar de escuchar");
+  a.gain = a.ctx.createGain();
+  a.gain.gain.value = $("#eq-vol").val() / 100;
+  a.gain.connect(a.ctx.destination);
+  await a.ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], {type: "application/javascript"})));
+  const node = new AudioWorkletNode(a.ctx, "equipo-rx", {numberOfInputs: 0, outputChannelCount: [1]});
+  node.connect(a.gain);
+  const r = await fetch("/link/v2/audio", {signal: a.abort.signal, cache: "no-store"});
+  if (!r.ok) throw new Error(r.status == 409 ? "Ya hay otra página escuchando (una a la vez)" : "La radio no manda audio");
+  status("Escuchando");
+  const reader = r.body.getReader();
+  let odd = null;
+  while (true) {
+    const res = await reader.read();
+    if (res.done) break;
+    let b = res.value;
+    if (odd !== null) { const t = new Uint8Array(b.length + 1); t[0] = odd; t.set(b, 1); b = t; }
+    const n = b.length >> 1;
+    odd = b.length & 1 ? b[b.length - 1] : null;
+    const dv = new DataView(b.buffer, b.byteOffset, n * 2), f = new Float32Array(n);
+    for (let i = 0; i < n; i++) f[i] = dv.getInt16(i * 2, true) / 32768;
+    node.port.postMessage(f, [f.buffer]);
+  }
+  throw new Error("La radio cortó el audio");
+}
+$("#eq-listen").on("click", function() {
+  if (audio) return stopAudio();
+  startAudio().catch(function(e) { if (e.name == "AbortError") return; stopAudio(); status(e.message, true); });
+});
+$("#eq-vol").on("input", function() { if (audio) audio.gain.gain.value = this.value / 100; });
+if (!window.isSecureContext || !window.AudioWorkletNode) {
+  const url = "https://" + location.hostname + "/equipo";
+  $("#eq-https-link").attr("href", url).text(url);
+  $("#eq-https").prop("hidden", false);
+  $("#eq-listen").prop("disabled", true);
+}
+})();
+</script>

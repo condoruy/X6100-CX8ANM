@@ -1,0 +1,117 @@
+#!/bin/sh
+#
+# Punto de acceso WiFi del equipo (CX8ANM / Cóndor Tecnológico).
+# La radio arma su propia red WiFi: la PC o el teléfono se conectan directo,
+# sin router, y abren http://192.168.73.1 (control remoto, ajustes, galería).
+#
+#   x6100-hotspot on       enciende la red (corta la WiFi de casa mientras tanto)
+#   x6100-hotspot off      la apaga; la WiFi de casa vuelve sola
+#   x6100-hotspot status   imprime: on|off <ssid> <clave> <ip>
+#   (on y status aceptan el indicativo como segundo argumento, para el nombre)
+#
+# Nombre y clave: /mnt/hotspot.conf (SSID=..., PASS=...), se crea la primera vez.
+#
+
+CONF=/mnt/hotspot.conf
+CON=x6100-ap
+IP=192.168.73.1
+NET=192.168.73
+PIDFILE=/run/x6100-hotspot-dhcp.pid
+LEASES=/tmp/x6100-hotspot.leases
+
+CALL_ARG=$2
+
+callsign() {
+    # El indicativo: el que pasa la interfaz, o el guardado en Ajustes
+    c=$(echo "$CALL_ARG" | tr -cd 'A-Za-z0-9/' | tr 'a-z/' 'A-Z-')
+    [ -n "$c" ] && { echo "$c"; return; }
+    c=$(sqlite3 /mnt/params.db "SELECT val FROM params WHERE name='callsign'" 2>/dev/null | tr -cd 'A-Za-z0-9/' | tr 'a-z/' 'A-Z-')
+    [ -n "$c" ] && echo "$c" || echo "CX8ANM"
+}
+
+load_conf() {
+    if [ ! -f "$CONF" ]; then
+        cs=$(callsign)
+        # Clave de 8 caracteres o más (WPA2): el indicativo en minúsculas + "-73"
+        pass="$(echo "$cs" | tr 'A-Z' 'a-z')-73"
+        [ ${#pass} -lt 8 ] && pass="${pass}x6100"
+        printf 'SSID=X6100-%s\nPASS=%s\n' "$cs" "$pass" > "$CONF"
+    fi
+    SSID=$(sed -n 's/^SSID=//p' "$CONF" | head -n1)
+    PASS=$(sed -n 's/^PASS=//p' "$CONF" | head -n1)
+    [ -n "$SSID" ] || SSID="X6100-$(callsign)"
+    [ ${#PASS} -ge 8 ] || PASS="x6100-73"
+}
+
+wifi_dev() {
+    nmcli -t -f DEVICE,TYPE device 2>/dev/null | sed -n 's/:wifi$//p' | head -n1
+}
+
+is_on() {
+    nmcli -t -f NAME connection show --active 2>/dev/null | grep -qx "$CON"
+}
+
+dhcp_start() {
+    dev=$1
+    dhcp_stop
+    if command -v dnsmasq >/dev/null 2>&1; then
+        # Solo DHCP (--port=0: sin DNS), sin puerta de enlace: la PC sigue
+        # usando su cable o su otra red para internet
+        dnsmasq --port=0 --interface="$dev" --bind-interfaces \
+            --dhcp-range=$NET.10,$NET.60,255.255.255.0,12h \
+            --dhcp-option=3 --dhcp-option=6 \
+            --dhcp-leasefile=$LEASES --pid-file=$PIDFILE
+    elif command -v udhcpd >/dev/null 2>&1; then
+        cat > /tmp/x6100-udhcpd.conf <<EOF
+start $NET.10
+end $NET.60
+interface $dev
+pidfile $PIDFILE
+lease_file $LEASES
+option subnet 255.255.255.0
+EOF
+        touch $LEASES
+        udhcpd /tmp/x6100-udhcpd.conf
+    else
+        echo "sin servidor DHCP: configure la PC con IP $NET.2 / 255.255.255.0" >&2
+    fi
+}
+
+dhcp_stop() {
+    [ -f "$PIDFILE" ] && kill "$(cat $PIDFILE)" 2>/dev/null
+    rm -f "$PIDFILE"
+}
+
+case "$1" in
+  on)
+    load_conf
+    dev=$(wifi_dev)
+    if [ -z "$dev" ]; then
+        echo "no hay WiFi: encienda WiFi/BT" >&2
+        exit 1
+    fi
+    nmcli connection delete "$CON" >/dev/null 2>&1
+    nmcli connection add type wifi ifname "$dev" con-name "$CON" autoconnect no ssid "$SSID" \
+        802-11-wireless.mode ap 802-11-wireless.band bg 802-11-wireless.channel 6 \
+        wifi-sec.key-mgmt wpa-psk wifi-sec.psk "$PASS" \
+        wifi-sec.proto rsn wifi-sec.pairwise ccmp wifi-sec.group ccmp \
+        ipv4.method manual ipv4.addresses $IP/24 ipv6.method disabled >/dev/null || exit 1
+    nmcli connection up "$CON" >/dev/null || exit 1
+    dhcp_start "$dev"
+    echo "on $SSID $PASS $IP"
+    ;;
+  off)
+    dhcp_stop
+    nmcli connection down "$CON" >/dev/null 2>&1
+    nmcli connection delete "$CON" >/dev/null 2>&1
+    echo "off"
+    ;;
+  status)
+    load_conf
+    if is_on; then echo "on $SSID $PASS $IP"; else echo "off $SSID $PASS $IP"; fi
+    ;;
+  *)
+    echo "uso: $0 on|off|status" >&2
+    exit 2
+    ;;
+esac

@@ -17,6 +17,7 @@
 #include <vector>
 #include <thread>
 #include <string>
+#include <ctype.h>
 #include <cstdio>
 #include <cstring>
 #include <functional>
@@ -4553,6 +4554,122 @@ static void make_audio_page() {
 
 }
 
+/* Punto de acceso WiFi (x6100-hotspot): la radio arma su propia red y la PC
+ * se conecta directo, sin router, a la página web de la radio. */
+
+#define HOTSPOT_CMD "sh /usr/sbin/x6100-hotspot "
+
+static struct {
+    lv_obj_t *sw;
+    lv_obj_t *note;
+    lv_obj_t *ssid;
+    lv_obj_t *pass;
+    lv_obj_t *url;
+} ap;
+static int  ap_gen;     /* respuestas para una página ya cerrada: se ignoran */
+static bool ap_busy;
+
+/* El indicativo para el nombre de la red, solo letras, números y / */
+static std::string ap_cmd(const char *what) {
+    std::string cmd = std::string(HOTSPOT_CMD) + what + " ";
+    for (const char *c = params.callsign.x; *c; c++)
+        if (isalnum((unsigned char)*c) || *c == '/') cmd += *c;
+    return cmd;
+}
+
+/* "on|off <ssid> <clave> <ip>" */
+static void ap_show(const char *out) {
+    char state[8] = "", ssid[64] = "", pass[64] = "", ip[32] = "";
+
+    if (!ap.sw) return;
+    if (sscanf(out, "%7s %63s %63s %31s", state, ssid, pass, ip) < 1) return;
+    bool on = strcmp(state, "on") == 0;
+    if (on) lv_obj_add_state(ap.sw, LV_STATE_CHECKED);
+    else lv_obj_clear_state(ap.sw, LV_STATE_CHECKED);
+    lv_label_set_text(ap.note, on ? "on" : "off");
+    if (ssid[0]) lv_label_set_text(ap.ssid, ssid);
+    if (pass[0]) lv_label_set_text(ap.pass, pass);
+    if (ip[0]) lv_label_set_text_fmt(ap.url, "http://%s", ip);
+}
+
+static void ap_status_done(const char *out, int status, void *user) {
+    if ((intptr_t)user != ap_gen) return;
+    ap_show(out);
+}
+
+static void ap_set_done(const char *out, int status, void *user) {
+    char line[96];
+
+    ap_busy = false;
+    if (status != 0) {
+        snprintf(line, sizeof(line), "%s", out);
+        line[strcspn(line, "\n")] = '\0';
+        msg_update_text_fmt("Access point: %s", line[0] ? line : "error");
+        if ((intptr_t)user == ap_gen) sh_run(ap_cmd("status").c_str(), ap_status_done, user);
+        return;
+    }
+    msg_update_text_fmt(strncmp(out, "on", 2) == 0 ? "Access point on: connect the PC to it" : "Access point off");
+    if ((intptr_t)user == ap_gen) ap_show(out);
+}
+
+static void ap_switch_cb(lv_event_t *e) {
+    lv_obj_t *sw = lv_event_get_target(e);
+    bool      on = lv_obj_has_state(sw, LV_STATE_CHECKED);
+
+    if (ap_busy) return;
+    if (on && !params.wifi_enabled.x) {
+        lv_obj_clear_state(sw, LV_STATE_CHECKED);
+        msg_update_text_fmt("Turn on WiFi/BT power first");
+        return;
+    }
+    ap_busy = true;
+    lv_label_set_text(ap.note, on ? "starting" : "stopping");
+    sh_run(ap_cmd(on ? "on" : "off").c_str(), ap_set_done, (void *)(intptr_t)ap_gen);
+}
+
+static void ap_delete_cb(lv_event_t *e) {
+    ap = {};
+    ap_gen++;
+}
+
+static lv_obj_t * ap_value(uint8_t row, const char *label) {
+    lv_obj_t *obj = wl_label(grid, SF(22), theme_hex(TC_text_dim), 0);
+
+    lv_label_set_text(obj, label);
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_CENTER, row, 1);
+    obj = wl_label(grid, SF(22), theme_hex(TC_text), 0);
+    lv_label_set_text(obj, "-");
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 1, 6, LV_GRID_ALIGN_CENTER, row, 1);
+    return obj;
+}
+
+static uint8_t make_hotspot(uint8_t row) {
+    lv_obj_t *obj;
+
+    wl_row_label(row, "Access point");
+    ap.sw = bt_switch_cell(row, 1, false, ap_switch_cb);
+    lv_obj_add_event_cb(ap.sw, ap_delete_cb, LV_EVENT_DELETE, NULL);
+    ap.note = wl_note(row);
+    row++;
+
+    ap.ssid = ap_value(row++, "Network name");
+    ap.pass = ap_value(row++, "Password");
+    ap.url  = ap_value(row++, "Web page");
+    lv_label_set_text(ap.url, "http://192.168.73.1");
+
+    obj = wl_label(grid, SF(18), theme_hex(TC_text_dim), 0);
+    lv_label_set_long_mode(obj, LV_LABEL_LONG_WRAP);
+    lv_obj_set_width(obj, lv_pct(100));
+    lv_label_set_text(obj, "The radio makes its own WiFi network: connect the PC or phone to it and open the web page. "
+                           "No router needed. The home WiFi pauses while it is on.");
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 0, 7, LV_GRID_ALIGN_CENTER, row, 1);
+    row_dsc[row] = LV_GRID_CONTENT;
+    row++;
+
+    sh_run(ap_cmd("status").c_str(), ap_status_done, (void *)(intptr_t)ap_gen);
+    return row;
+}
+
 static void make_wireless_page() {
     grid_delete();
     grid_create();
@@ -4561,6 +4678,10 @@ static void make_wireless_page() {
     wl_tab = "Wireless";
     row = card_begin("WIFI");
     row = make_wifi(row);
+    card_end(row);
+
+    row = card_begin("ACCESS POINT");
+    row = make_hotspot(row);
     card_end(row);
 
     eth_info_t in;

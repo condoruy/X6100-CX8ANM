@@ -112,6 +112,16 @@ jobs:
         D=AetherX6100Buildroot/br2_external/board/X6100/linux/sun8i-r16-x6100_defconfig
         grep -q "^CONFIG_UHID=" $D || echo "CONFIG_UHID=m" >> $D
 
+    # Punto de acceso WiFi (x6100-hotspot): DHCP para la PC que se conecta
+    # directo a la radio, sin router
+    - name: Hotspot DHCP server
+      run: |
+        echo "BR2_PACKAGE_DNSMASQ=y" >> AetherX6100Buildroot/br2_external/configs/X6100_defconfig
+        # Antes que la GUI: su rootfs/etc/init.d/S80dnsmasq deja apagado el dnsmasq general
+        sed -i "/^X6100_GUI_DEPENDENCIES/s/$/ dnsmasq/" AetherX6100Buildroot/br2_external/package/x6100-gui/x6100_gui.mk
+        grep "^X6100_GUI_DEPENDENCIES" AetherX6100Buildroot/br2_external/package/x6100-gui/x6100_gui.mk
+        grep "^BR2_PACKAGE_DNSMASQ" AetherX6100Buildroot/br2_external/configs/X6100_defconfig
+
     - name: Custom boot logo
       run: |
         cp x6100_gui/boot/logo.png AetherX6100Buildroot/br2_external/board/X6100/linux/logo.png

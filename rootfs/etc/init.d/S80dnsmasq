@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# dnsmasq no corre siempre: lo arranca x6100-hotspot, solo para dar IP a la
+# PC conectada al punto de acceso WiFi de la radio. (Reemplaza el S80dnsmasq
+# del paquete dnsmasq.)
+#
+exit 0

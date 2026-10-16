@@ -52,6 +52,11 @@ void drm_wf_present_ring(const uint32_t *src, int32_t x, int32_t w, int32_t head
 void drm_commit(void);
 /* The screen as /dev/fb0 would hold it (480x800 BGRX) into path; false if not active */
 bool drm_dump(const char *path);
+/* +1 for every frame shown: the screen mirror sends a picture only when it changed */
+uint32_t drm_frame_seq(void);
+/* The screen as LVGL draws it (800x480, or 480x800 in portrait), XRGB, into out
+ * (800 * 480 pixels); false if DRM is not active. Call from the GUI thread. */
+bool drm_capture(uint32_t *out, int32_t *w, int32_t *h);
 /* dst = top (ARGB) over bottom (XRGB), n pixels */
 void drm_blend_under(uint32_t *dst, const uint32_t *top, const uint32_t *bottom, int32_t n);
 /* The primary plane, portrait 480x800 XRGB (NULL without planes) */
