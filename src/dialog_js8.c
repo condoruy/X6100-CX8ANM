@@ -9,6 +9,7 @@
  *  scheduler_put().
  */
 
+#include "auto_log.h"
 #include "dialog_js8.h"
 #include "js8_map.h"
 #include "main.h"
@@ -4387,6 +4388,11 @@ static void log_cb(button_data_t *btn) {
 /* A two-way QSO ended with 73 / SK. */
 static void log_offer(const char *call) {
     snprintf(log_pending, sizeof(log_pending), "%s", call);
+    if (auto_log_enabled()) {
+        log_prepare(call);
+        log_save();
+        return;
+    }
     if (!params.js8_log_prompt.x) {
         add_info_row("QSO with %s ended: Log QSO (page 5) to log it", call);
         return;

@@ -1263,3 +1263,8 @@
 { "type %06u and Enter on the keyboard", "escriba %06u e Intro en el teclado" },
 { "no DNS (WiFi?)", "sin DNS (¿WiFi?)" },
 { "Based on", "Basado en IU1WXY" },
+{ "Log QSOs automatically", "Guardar QSO solos" },
+{ "QSO not logged: set your callsign in Settings", "QSO no guardado: ponga su indicativo en Ajustes" },
+{ "QSO logged automatically: %s %s", "QSO guardado en el log: %s %s" },
+{ "73 sent: no callsign to log (Log QSO)", "73 enviado: no hay indicativo para anotar (Anotar QSO)" },
+{ "73 sent: no DX call to log (set it on the DX call button)", "73 enviado: falta el indicativo DX (botón Indicativo DX)" },

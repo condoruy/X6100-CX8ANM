@@ -21,6 +21,7 @@
  *  packed with the contest exchange forms, so "599 001" takes one frame.
  */
 
+#include "auto_log.h"
 #include "dialog_jtty.h"
 
 #include "lvgl/lvgl.h"
@@ -762,6 +763,7 @@ static void send_text(const char *text, int profile)
     }
     txt_line_t *l = txt_add(2, 0);
     snprintf(l->s, sizeof(l->s), "%s", canon);
+    auto_log_digi_sent(canon, "JTTY");   /* 73 / SK: el QSO al log */
     was_tx = true;
     draft_dirty = true;
     refresh_btn(&btn_status);

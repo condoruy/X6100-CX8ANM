@@ -6,6 +6,7 @@
  *  Without a keyboard a press of the MFK opens the on-screen one.
  */
 
+#include "auto_log.h"
 #include "dialog_cw_kbd.h"
 
 #include "buttons.h"
@@ -178,6 +179,7 @@ static void timer_cb(lv_timer_t *t) {
             snprintf(sending, sizeof(sending), "%s", queue);
             queue[0] = 0;
             cw_encoder_send(sending, false);
+            auto_log_cw_sent(sending);   /* 73 / SK: el QSO al log */
 
             cJSON *ev = cJSON_CreateObject();
             cJSON_AddStringToObject(ev, "t", "cw_tx");

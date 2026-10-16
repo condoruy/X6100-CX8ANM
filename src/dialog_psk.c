@@ -42,6 +42,7 @@
  *     frequency moves with it, as it does in fldigi.
  */
 
+#include "auto_log.h"
 #include "dialog_psk.h"
 
 #include "lvgl/lvgl.h"
@@ -1369,6 +1370,7 @@ static void send_text(const char *text)
 
     if (psk_tx_send(buf)) {
         msg_update_text_fmt("%s TX...", mode_name());
+        auto_log_digi_sent(text, mode_name());   /* 73 / SK: el QSO al log */
         was_tx = true;
         refresh_btn(&btn_status);
     } else {

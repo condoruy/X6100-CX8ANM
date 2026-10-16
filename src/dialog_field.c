@@ -1542,10 +1542,15 @@ bool dialog_field_qso_log(const char *text) {
 
 /* FT8, FT4 and JS8 QSOs into the day's log too, next to the phone's */
 void dialog_field_day_log(const qso_log_record_t *r) {
+    dialog_field_day_log_mode(r, r->mode == MODE_FT4 ? "FT4" : r->mode == MODE_JS8 ? "JS8" : r->mode == MODE_FT2 ? "FT2" : "FT8");
+}
+
+/* Con el modo por nombre (CW, PSK31, OLIVIA...: auto_log.c) */
+void dialog_field_day_log_mode(const qso_log_record_t *r, const char *mode) {
     field_qso_t q = {.t = r->time, .freq_hz = (int32_t)(r->freq_mhz * 1e6f + 0.5f)};
 
     snprintf(q.call, sizeof(q.call), "%s", r->remote_call);
-    snprintf(q.mode, sizeof(q.mode), "%s", r->mode == MODE_FT4 ? "FT4" : r->mode == MODE_JS8 ? "JS8" : r->mode == MODE_FT2 ? "FT2" : "FT8");
+    snprintf(q.mode, sizeof(q.mode), "%s", mode);
     snprintf(q.rst_s, sizeof(q.rst_s), "%d", r->rsts);
     snprintf(q.rst_r, sizeof(q.rst_r), "%d", r->rstr);
     snprintf(q.name, sizeof(q.name), "%s", r->name);

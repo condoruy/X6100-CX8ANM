@@ -68,6 +68,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     dialog_snake.c
     i18n.cpp
     mirror.c
+    auto_log.c
 )
 
 # Idiomas: todo texto que llega a LVGL pasa por tr() (i18n_hook.h)

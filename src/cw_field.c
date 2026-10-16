@@ -5,6 +5,7 @@
  *  sending wait in a queue, as in the CW keyboard app; the field hides when all is sent.
  */
 
+#include "auto_log.h"
 #include "cw_field.h"
 
 #include "band_plan.h"
@@ -111,6 +112,7 @@ static void timer_cb(lv_timer_t *t) {
             snprintf(sending, sizeof(sending), "%s", queue);
             queue[0] = 0;
             cw_encoder_send(sending, false);
+            auto_log_cw_sent(sending);   /* 73 / SK: el QSO al log */
 
             cJSON *ev = cJSON_CreateObject();   /* the X6100 Link CW tab's TX line */
             cJSON_AddStringToObject(ev, "t", "cw_tx");

@@ -4209,6 +4209,24 @@ static uint8_t make_zone(uint8_t row) {
     return row + 1;
 }
 
+/* QSO guardados solos (auto_log.c): CW, PSK, Olivia, JTTY y JS8 al mandar 73 / SK */
+static uint8_t make_auto_log(uint8_t row) {
+    lv_obj_t *obj = lv_label_create(grid);
+
+    lv_label_set_text(obj, "Log QSOs automatically");
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_CENTER, row, 1);
+
+    obj = lv_obj_create(grid);
+    lv_obj_set_size(obj, SMALL_3, ROW_H);
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 1, 3, LV_GRID_ALIGN_CENTER, row, 1);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_TRANSP, LV_PART_MAIN);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_center(obj);
+    obj = switch_bool(obj, &params.auto_log);
+    lv_obj_set_width(obj, SMALL_3 - 30);
+    return row + 1;
+}
+
 static void make_general_page() {
     grid_delete();
     grid_create();
@@ -4231,6 +4249,7 @@ static void make_general_page() {
     card_end(row);
 
     row = card_begin("CONTROLS");
+    row = make_auto_log(row);
     row = make_freq_accel(row);
     row = make_param_slider(row, "Accel. onset", &accel_onset_slider);
     row = make_charger(row);

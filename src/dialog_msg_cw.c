@@ -10,6 +10,7 @@
  *  voice keyer.
  */
 
+#include "auto_log.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -351,7 +352,11 @@ static void open_editor(edit_t what) {
 static void tx_btn_cb(button_data_t *btn) {
     (void)btn;
     if (sending()) cw_encoder_stop();
-    else if (sel_text()) cw_encoder_send(cw_encoder_expand(sel_text()), beacon_on);
+    else if (sel_text()) {
+        const char *txt = cw_encoder_expand(sel_text());
+        if (!beacon_on) auto_log_cw_sent(txt);   /* 73 / SK: el QSO al log (antes de enviarlo: el texto es suyo) */
+        cw_encoder_send(txt, beacon_on);
+    }
     timer_cb(NULL);
 }
 

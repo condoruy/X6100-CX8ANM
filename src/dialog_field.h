@@ -27,6 +27,7 @@ int  dialog_field_remote_state(char *buf, size_t size);
 bool dialog_field_qso_log(const char *text);
 /* A QSO of FT8, FT4 or JS8 into the day's log */
 void dialog_field_day_log(const qso_log_record_t *r);
+void dialog_field_day_log_mode(const qso_log_record_t *r, const char *mode);
 
 /* Shared with the Bands app: TEST DE <call> in CW; a typical frequency of the band (cluster_band_of()) */
 void dialog_field_test_beacon(void);

@@ -29,6 +29,7 @@
  *  also why there is no squelch here - without a lock there is no text.
  */
 
+#include "auto_log.h"
 #include "dialog_olivia.h"
 
 #include "lvgl/lvgl.h"
@@ -1034,6 +1035,7 @@ static void send_text(const char *text)
     if (olivia_tx_send(buf)) {
         msg_update_text_fmt("Olivia %s TX...",
                             olivia_tx_mode_name(olivia_tx_get_mode()));
+        auto_log_digi_sent(text, "OLIVIA");   /* 73 / SK: el QSO al log */
         refresh_btn(&btn_status);
     } else {
         msg_update_text_fmt("#%06x Olivia TX busy#", theme_hex(TC_err));
