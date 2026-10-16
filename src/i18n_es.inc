@@ -1268,3 +1268,5 @@
 { "QSO logged automatically: %s %s", "QSO guardado en el log: %s %s" },
 { "73 sent: no callsign to log (Log QSO)", "73 enviado: no hay indicativo para anotar (Anotar QSO)" },
 { "73 sent: no DX call to log (set it on the DX call button)", "73 enviado: falta el indicativo DX (botón Indicativo DX)" },
+{ "Notify spots on my band", "Avisar spots en mi banda" },
+{ "NEW SPOT ON YOUR BAND", "SPOT NUEVO EN SU BANDA" },

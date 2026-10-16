@@ -4373,6 +4373,23 @@ static lv_obj_t * cf_toggle(uint8_t row, int col, const char *text, bool on, lv_
     return obj;
 }
 
+/* Aviso cuando aparece un spot nuevo en la banda del VFO; MFK sintoniza (dialog_cluster.c) */
+static uint8_t make_band_notify(uint8_t row) {
+    lv_obj_t *obj = lv_label_create(grid);
+
+    lv_label_set_text(obj, "Notify spots on my band");
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_CENTER, row, 1);
+
+    obj = lv_obj_create(grid);
+    lv_obj_set_size(obj, SMALL_3, ROW_H);
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 1, 3, LV_GRID_ALIGN_CENTER, row, 1);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_TRANSP, LV_PART_MAIN);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_center(obj);
+    switch_bool(obj, &params.cluster_band_notify);
+    return row + 1;
+}
+
 static void make_cluster_page() {
     const cluster_filter_t *f = cluster_filter();
     uint8_t                 row;
@@ -4427,6 +4444,7 @@ static void make_cluster_page() {
     row = card_begin("CLUSTER VIEW");
     row = make_switch_row(row, "Newest first", cfg_sm.p_cluster_order);
     row = make_switch_row(row, "All bands", cfg_sm.p_cluster_all_bands);
+    row = make_band_notify(row);
     row = make_param_slider(row, "Spot snap hold", &snap_hold_slider);
     row = make_param_slider(row, "Spot snap speed", &snap_slow_slider);
     card_end(row);

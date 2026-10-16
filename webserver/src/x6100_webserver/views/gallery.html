@@ -28,11 +28,11 @@
 <script src="/static/js/mp4-muxer.js"></script>
 <script>
 const KIND_LABEL = {screenrec: "Grabación de pantalla", rec: "Grabación de RX", shots: "Captura", sstv: "SSTV recibida", sstv_tx: "SSTV para enviar",
-                    wefax: "WeFax recibido", wefax_tx: "WeFax para enviar", msg: "Mensaje de voz"};
+                    wefax: "WeFax recibido", wefax_tx: "WeFax para enviar", msg: "Mensaje de voz", navtex: "NAVTEX / DSC"};
 const FOLDER_LABEL = {all: "Todos los archivos", shots: "Capturas", screenrec: "Grabaciones de pantalla", rec: "Grabaciones de RX", sstv: "SSTV recibidas",
-                      sstv_tx: "SSTV para enviar", wefax: "WeFax recibidos", wefax_tx: "WeFax para enviar", msg: "Mensajes de voz"};
+                      sstv_tx: "SSTV para enviar", wefax: "WeFax recibidos", wefax_tx: "WeFax para enviar", msg: "Mensajes de voz", navtex: "NAVTEX / DSC recibidos"};
 const FOLDER_ICON = {all: "folder", shots: "image", screenrec: "monitor", rec: "speaker", sstv: "image", sstv_tx: "upload",
-                     wefax: "file", wefax_tx: "upload", msg: "speaker"};
+                     wefax: "file", wefax_tx: "upload", msg: "speaker", navtex: "file"};
 const UPLOAD_URL = {sstv_tx: "/api/sstv/tx_pics", wefax_tx: "/api/wefax/tx_pics"};
 const UPLOAD_FIT = {sstv_tx: [800, 640], wefax_tx: [1809, 4000]};   // largest size of a converted picture (the radio fits it)
 const UPLOAD_MAX = 4 * 1024 * 1024;
@@ -196,6 +196,7 @@ const makeCard = function(x) {
   });
   const thumb = $("<div class='thumb'>");
   if (x.kind == "rec" || x.kind == "msg") thumb.text("MP3");
+  else if (x.kind == "navtex") thumb.text("TXT");
   else if (isMp4) thumb.text("MP4");
   else thumb.append($("<img loading='lazy' alt=''>").attr("src", fileUrl(x, "thumb")).on("error", function() { $(this).remove(); thumb.text("AVI"); }));
   card.append(thumb);
@@ -206,7 +207,7 @@ const makeCard = function(x) {
   const note = $("<div class='meta note' hidden>");
   const actions = $("<div class='actions'>");
   if (!isAvi) actions.append($("<a class='btn' target='_blank'>").attr("href", fileUrl(x, "file")).text("Abrir"));
-  actions.append($("<a class='btn' download>").attr("href", fileUrl(x, "file") + "?dl=1").text(isMp4 ? "Download" : "Download original"));
+  actions.append($("<a class='btn' download>").attr("href", fileUrl(x, "file") + "?dl=1").text(isMp4 ? "Descargar" : "Descargar original"));
 
   if (x.kind == "screenrec" && isAvi) {
     if (canConvert()) {

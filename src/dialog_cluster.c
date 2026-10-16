@@ -221,7 +221,7 @@ static void alert_timer_cb(lv_timer_t *t) {
     }
 }
 
-static void alert_show(const cluster_spot_t *s) {
+static void alert_show(const cluster_spot_t *s, const char *title_text) {
     static const char *const mode_name[] = {"CW", "LSB", "USB", "DIG", "AM", "FM"};
 
     alert_hide();
@@ -240,7 +240,7 @@ static void alert_show(const cluster_spot_t *s) {
     lv_obj_t *title = lv_label_create(alert_box);
     lv_obj_set_style_text_font(title, VF(18), 0);
     lv_obj_set_style_text_color(title, lv_color_hex(COLOR_ALERT_TEXT), 0);
-    lv_label_set_text(title, "CLUSTER ALERT");
+    lv_label_set_text(title, title_text);
     lv_obj_set_pos(title, 14, 8);
 
     lv_obj_t *hint = lv_label_create(alert_box);
@@ -316,21 +316,36 @@ static void alert_scan(void) {
         bg_gen        = 0; /* alerts changed: look at the spots again */
     }
     int n = cluster_client_snapshot(bg_spots, CLUSTER_MAX_SPOTS, &bg_gen);
-    if (n <= 0 || f->alert_count == 0) return;
+    bool band_notify = params.cluster_band_notify.x;
+    if (n <= 0 || (f->alert_count == 0 && !band_notify)) return;
 
-    time_t   now = time(NULL);
-    uint16_t min = utc_now_min();
-    int      hit = -1;
+    time_t   now  = time(NULL);
+    uint16_t min  = utc_now_min();
+    int      hit  = -1, band_hit = -1;
+    int32_t  vfo  = cparam_i_get(cfg_fg_freq);
+    int      band = cluster_band_of(vfo);
     for (int i = 0; i < n; i++) {
-        int a = cluster_alert_match(f, &bg_spots[i]);
-        if (a < 0 || cluster_age_min(bg_spots[i].utc_min, min) > ALERT_NEW_MIN) continue;
-        if (!alert_is_new(&bg_spots[i], now)) continue;
-        hit = i;
-        write_last_hit(&bg_spots[i], f->alerts[a].pattern);
+        const cluster_spot_t *s = &bg_spots[i];
+        if (cluster_age_min(s->utc_min, min) > ALERT_NEW_MIN) continue;
+        int a = f->alert_count ? cluster_alert_match(f, s) : -1;
+        if (a >= 0) {
+            if (!alert_is_new(s, now)) continue;
+            hit = i;
+            write_last_hit(s, f->alerts[a].pattern);
+            continue;
+        }
+        /* CX8ANM: alguien activo en la banda donde estoy (con los filtros del cluster) */
+        if (!band_notify || band < 0 || cluster_band_of(s->freq_hz) != band) continue;
+        if (abs(s->freq_hz - vfo) < 1000) continue;            /* ya estoy ahí */
+        if (!strcasecmp(s->dx, params.callsign.x)) continue;   /* yo mismo */
+        if (!cluster_filter_pass(f, s, min)) continue;
+        if (!alert_is_new(s, now)) continue;
+        band_hit = i;
     }
     /* The newest one is shown; there is no speaker beep (nothing safe to reuse:
      * the speaker path is the TX audio path while transmitting). */
-    if (hit >= 0 && f->popup) alert_show(&bg_spots[hit]);
+    if (hit >= 0 && f->popup) alert_show(&bg_spots[hit], "CLUSTER ALERT");
+    else if (band_hit >= 0) alert_show(&bg_spots[band_hit], "NEW SPOT ON YOUR BAND");
 }
 
 static int vfo_band(void) {

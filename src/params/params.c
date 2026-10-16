@@ -119,6 +119,7 @@ params_t params = {
     .font                  = { .x = 2, .name="font"},     /* FONT_DEJAVU */
     .language              = { .x = 1, .name="language"}, /* LANG_ES */
     .auto_log              = { .x = true, .name="auto_log"},
+    .cluster_band_notify   = { .x = true, .name="cluster_band_notify"},
 };
 
 
@@ -302,6 +303,7 @@ static bool params_load() {
         if (params_load_uint8(&params.font, name, i)) continue;
         if (params_load_uint8(&params.language, name, i)) continue;
         if (params_load_bool(&params.auto_log, name, i)) continue;
+        if (params_load_bool(&params.cluster_band_notify, name, i)) continue;
     }
 
     sqlite3_finalize(stmt);
@@ -433,6 +435,7 @@ static void params_save() {
     params_save_uint8(&params.font);
     params_save_uint8(&params.language);
     params_save_bool(&params.auto_log);
+    params_save_bool(&params.cluster_band_notify);
 
     sql_query_exec("COMMIT");
 }

@@ -1616,7 +1616,8 @@ def files(filepath=""):
 GALLERY_DIRS = {"screenrec": ("screenrec", (".avi", ".mp4")), "rec": ("rec", (".mp3", ".wav")), "shots": ("", (".png",)),
                 "sstv": ("sstv", (".png",)), "sstv_tx": ("sstv/tx_pics", (".png",)),
                 "wefax": ("wefax", (".png",)), "wefax_tx": ("wefax/tx_pics", (".png",)),
-                "msg": ("msg", (".mp3",))}   # mensajes de voz (MSG > Voz)
+                "msg": ("msg", (".mp3",)),   # mensajes de voz (MSG > Voz)
+                "navtex": ("navtex", (".txt",))}   # NAVTEX y DSC recibidos, un archivo por día
 GALLERY_NAME = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._ -]*$')
 
 

@@ -613,6 +613,34 @@ static lv_obj_t *row_label(lv_obj_t *row, lv_coord_t x, lv_coord_t y, lv_coord_t
 }
 
 /* A row at the top of the list: time, category, MMSI, flag and country, detail */
+/* Todo lo recibido queda en /mnt/navtex, un archivo por día (UTC): navtex-AAAAMMDD.txt
+ * y dsc-AAAAMMDD.txt. Se descargan desde la web (Galería > NAVTEX, o Archivos). */
+static void autosave_append(const char *prefix, const char *text, size_t n)
+{
+    static int day_navtex = -1;
+    char       name[96];
+    time_t     now = time(NULL);
+    struct tm  tm;
+
+    if (!n)
+        return;
+    gmtime_r(&now, &tm);
+    mkdir(NAVTEX_SAVE_DIR, 0755);
+    snprintf(name, sizeof(name), NAVTEX_SAVE_DIR "/%s-%04d%02d%02d.txt", prefix, tm.tm_year + 1900, tm.tm_mon + 1,
+             tm.tm_mday);
+    FILE *f = fopen(name, "a");
+    if (!f)
+        return;
+    /* NAVTEX: una marca de hora al empezar cada día */
+    if (prefix[0] == 'n' && day_navtex != tm.tm_yday) {
+        fprintf(f, "\n--- %04d-%02d-%02d %02d:%02d UTC ---\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+                tm.tm_hour, tm.tm_min);
+        day_navtex = tm.tm_yday;
+    }
+    fwrite(text, 1, n, f);
+    fclose(f);
+}
+
 static void dsc_add_row(const dsc_call_t *c, const char *hms, int32_t freq)
 {
     static dsc_call_t last;
@@ -655,6 +683,7 @@ static void dsc_add_row(const dsc_call_t *c, const char *hms, int32_t freq)
         remote_event(o);
         snprintf(line, sizeof(line), "%s %-8s %s %s %s%s%s\n", hms, cat, c->from, country, plain, where[0] ? "  " : "",
                  where);
+        autosave_append("dsc", line, strlen(line));
     }
     if (!dsc_list)
         return;
@@ -761,8 +790,10 @@ static void ui_timer_cb(lv_timer_t *timer)
             dsc_add_row(&calls[i], hms, cparam_i_get(cfg_fg_freq) + 1000);
     }
 
-    if (n > 0)
+    if (n > 0) {
         remote_text("navtex_text", local, n);
+        autosave_append("navtex", local, n);
+    }
     if (n == 0 || !label)
         return;
 

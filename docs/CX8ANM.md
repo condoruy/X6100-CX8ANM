@@ -34,3 +34,15 @@ El audio necesita abrir la página con `https://` (aceptar el certificado una ve
 ## Logo de inicio
 
 `boot/logo.png` (800×480), fuente editable en `boot/logo.svg`.
+
+## Cluster: aviso de actividad en mi banda
+Ajustes > Cluster > VISTA DEL CLUSTER > "Avisar spots en mi banda" (activado por defecto).
+Cuando aparece un spot nuevo (menos de 5 minutos) en la banda donde está el VFO, sale el
+cartel "SPOT NUEVO EN SU BANDA" con el indicativo, la frecuencia y el modo. Apretando la
+perilla MFK mientras se ve el cartel, la radio va directo a esa frecuencia. Respeta los
+filtros de modos/actividad del cluster y no repite el mismo indicativo en 15 minutos.
+
+## NAVTEX y DSC guardados solos
+Todo lo que se recibe en la app NAVTEX queda en /mnt/navtex, un archivo por día (UTC):
+navtex-AAAAMMDD.txt y dsc-AAAAMMDD.txt. Se descargan desde la web: Galería > "NAVTEX / DSC
+recibidos" (o la página Archivos, carpeta navtex). El botón Guardar sigue funcionando igual.
