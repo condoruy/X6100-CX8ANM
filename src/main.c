@@ -23,6 +23,7 @@
 #include "main_screen.h"
 #include "screen_rec.h"
 #include "mirror.h"
+#include <strings.h>
 #include "styles.h"
 #include "fonts/font_select.h"
 #include "radio.h"
@@ -188,6 +189,8 @@ int main(void) {
     vol->state = VOL_STATE_EDIT;
 
     params_init();
+    if (strcasecmp(params.theme_name.x, "IU1WXY") == 0)
+        params_str_set(&params.theme_name, "CX8ANM");    /* el tema de fábrica cambió de nombre */
     sstv_resources_init();
     display_settings_check();
     audio_set_play_vol(params.play_gain_db_f.x);

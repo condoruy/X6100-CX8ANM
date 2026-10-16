@@ -475,12 +475,7 @@ $("#rm-vol").on("input", function() {
   if (audio) audio.gain.gain.value = this.value / 100;
 });
 
-// AudioWorklet and fetch streams need a secure page (HTTPS, or localhost)
-if (!window.isSecureContext) {
-  const url = "https://" + location.hostname + "/remote";
-  $("#rm-https-link").attr("href", url).text(url);
-  $("#rm-https").prop("hidden", false);
-  $("#rm-listen").prop("disabled", true);
-}
+// Por http no hay AudioWorklet: anda el reproductor clásico (ScriptProcessor)
+if (!window.AudioContext || !window.ReadableStream) $("#rm-listen").prop("disabled", true);
 })();
 </script>

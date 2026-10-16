@@ -23,7 +23,7 @@
 
 enum { B_IU1WXY, B_LEGACY, B_OUTDOOR, B_CLASSIC, B_OUTDOOR_NEG, B_VISION, B_BLACK_METAL, B_TOTAL_BLACK, B_COUNT };
 
-static const char *const builtin_names[B_COUNT] = {"IU1WXY", "Legacy", "Outdoor", "Classic", "Outdoor-Negative",
+static const char *const builtin_names[B_COUNT] = {"CX8ANM", "Legacy", "Outdoor", "Classic", "Outdoor-Negative",
                                                    "VISION", "Black Metal", "Total Black"};
 
 /* VISION: IU1WXY's colours made "warm anthracite": white digits on dark grey, orange for what is on,
@@ -144,6 +144,8 @@ static int builtin_index(const char *name) {
     for (int i = 0; i < B_COUNT; i++) {
         if (name && strcasecmp(name, builtin_names[i]) == 0) return i;
     }
+    /* El tema de fábrica se llamaba IU1WXY: los ajustes guardados con ese nombre siguen andando */
+    if (name && strcasecmp(name, "IU1WXY") == 0) return B_IU1WXY;
     return -1;
 }
 
@@ -483,7 +485,7 @@ void theme_init(const char *name) {
     if (b >= 0) {
         use_builtin(b);
     } else if (!name || !*name || !load_file(name)) {
-        if (name && *name) fprintf(stderr, "Theme %s not found, using IU1WXY\n", name);
+        if (name && *name) fprintf(stderr, "Theme %s not found, using CX8ANM\n", name);
         use_builtin(B_IU1WXY);
     }
     if (theme_shape.waterfall_n >= 2) make_palette();

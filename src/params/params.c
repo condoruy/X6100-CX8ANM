@@ -115,7 +115,7 @@ params_t params = {
     .wifi_enabled           = { .x = false, .name="wifi_enabled" },
 
     .theme                  = { .x = THEME_SIMPLE, .name="theme"},
-    .theme_name             = { .x = "IU1WXY", .max_len = 31, .name = "theme_name" },
+    .theme_name             = { .x = "CX8ANM", .max_len = 31, .name = "theme_name" },
     .font                  = { .x = 2, .name="font"},     /* FONT_DEJAVU */
     .language              = { .x = 1, .name="language"}, /* LANG_ES */
 };

@@ -219,7 +219,8 @@ function flush() {
     let n = pending[k];
     while (n) {
       const s = Math.max(-50, Math.min(50, n));
-      send("/api/equipo/perilla", {perilla: k, pasos: s});
+      /* VOL y MFK del equipo cuentan al revés que la rueda: se invierten acá */
+      send("/api/equipo/perilla", {perilla: k, pasos: k == "main" ? s : -s});
       n -= s;
     }
     pending[k] = 0;
@@ -340,11 +341,24 @@ async function startAudio() {
   a.gain = a.ctx.createGain();
   a.gain.gain.value = $("#eq-vol").val() / 100;
   a.gain.connect(a.ctx.destination);
-  await a.ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], {type: "application/javascript"})));
-  const node = new AudioWorkletNode(a.ctx, "equipo-rx", {numberOfInputs: 0, outputChannelCount: [1]});
-  node.connect(a.gain);
+  if (a.ctx.state == "suspended") await a.ctx.resume();
+  let push;
+  if (a.ctx.audioWorklet && window.AudioWorkletNode) {
+    await a.ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], {type: "application/javascript"})));
+    const node = new AudioWorkletNode(a.ctx, "equipo-rx", {numberOfInputs: 0, outputChannelCount: [1]});
+    node.connect(a.gain);
+    push = function(f) { node.port.postMessage(f, [f.buffer]); };
+  } else {
+    /* Página por http: sin AudioWorklet, el reproductor clásico (anda igual) */
+    const j = new (new Function(JITTER + "; return Jitter;")())(a.ctx.sampleRate);
+    const node = a.ctx.createScriptProcessor(4096, 1, 1);
+    node.onaudioprocess = function(e) { j.pull(e.outputBuffer.getChannelData(0)); };
+    node.connect(a.gain);
+    a.keep = node;
+    push = function(f) { j.push(f); };
+  }
   const r = await fetch("/link/v2/audio", {signal: a.abort.signal, cache: "no-store"});
-  if (!r.ok) throw new Error(r.status == 409 ? "Ya hay otra página escuchando (una a la vez)" : "La radio no manda audio");
+  if (!r.ok) throw new Error(r.status == 409 ? "Ya hay otra página escuchando (cierre la página Remoto u otra pestaña)" : "La radio no manda audio (error " + r.status + ")");
   status("Escuchando");
   const reader = r.body.getReader();
   let odd = null;
@@ -357,7 +371,7 @@ async function startAudio() {
     odd = b.length & 1 ? b[b.length - 1] : null;
     const dv = new DataView(b.buffer, b.byteOffset, n * 2), f = new Float32Array(n);
     for (let i = 0; i < n; i++) f[i] = dv.getInt16(i * 2, true) / 32768;
-    node.port.postMessage(f, [f.buffer]);
+    push(f);
   }
   throw new Error("La radio cortó el audio");
 }
@@ -366,10 +380,8 @@ $("#eq-listen").on("click", function() {
   startAudio().catch(function(e) { if (e.name == "AbortError") return; stopAudio(); status(e.message, true); });
 });
 $("#eq-vol").on("input", function() { if (audio) audio.gain.gain.value = this.value / 100; });
-if (!window.isSecureContext || !window.AudioWorkletNode) {
-  const url = "https://" + location.hostname + "/equipo";
-  $("#eq-https-link").attr("href", url).text(url);
-  $("#eq-https").prop("hidden", false);
+if (!window.AudioContext || !window.ReadableStream) {
+  $("#eq-https").prop("hidden", false).text("Este navegador no puede reproducir el audio de la radio: use Chrome, Edge o Firefox actualizados.");
   $("#eq-listen").prop("disabled", true);
 }
 })();
