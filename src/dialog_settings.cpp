@@ -4130,7 +4130,25 @@ static uint8_t make_mic(uint8_t row, const char *label, ParamInt &param) {
 /* Time zone: POSIX TZ strings, applied at once (see clock_tz_set) */
 
 static const struct { const char *label; const char *posix; } zones[] = {
+    { "Uruguay (UTC-3)",                  "<-03>3" },
+    { "Argentina (UTC-3)",                "<-03>3" },
+    { "Brasil - Brasilia (UTC-3)",        "<-03>3" },
+    { "Paraguay (UTC-3)",                 "<-03>3" },
+    { "Chile (UTC-4/-3)",                 "<-04>4<-03>,M9.1.6/24,M4.1.6/24" },
+    { "Bolivia (UTC-4)",                  "<-04>4" },
+    { "Venezuela (UTC-4)",                "<-04>4" },
+    { "Brasil - Manaos (UTC-4)",          "<-04>4" },
+    { "R. Dominicana (UTC-4)",            "AST4" },
+    { "Puerto Rico (UTC-4)",              "AST4" },
+    { "Perú (UTC-5)",                     "<-05>5" },
+    { "Colombia (UTC-5)",                 "<-05>5" },
+    { "Ecuador (UTC-5)",                  "<-05>5" },
+    { "Panamá (UTC-5)",                   "EST5" },
+    { "Cuba (UTC-5/-4)",                  "CST5CDT,M3.2.0/0,M11.1.0/1" },
+    { "México (UTC-6)",                   "CST6" },
+    { "Centroamérica (UTC-6)",            "CST6" },
     { "UTC",                              "UTC0" },
+    { "España (CET/CEST)",                "CET-1CEST,M3.5.0,M10.5.0/3" },
     { "Europe/London (GMT/BST)",          "GMT0BST,M3.5.0/1,M10.5.0" },
     { "Europe/Rome (CET/CEST)",           "CET-1CEST,M3.5.0,M10.5.0/3" },
     { "Europe/Athens (EET/EEST)",         "EET-2EEST,M3.5.0/3,M10.5.0/4" },
@@ -4164,13 +4182,15 @@ static uint8_t make_zone(uint8_t row) {
     std::string  options;
     const char  *tz = getenv("TZ");
     uint16_t     sel = 0;
+    bool         found = false;
 
     wl_row_label(row, "Zone");
 
     for (size_t i = 0; i < ZONES_NUM; i++) {
         options += std::string(i ? "\n " : " ") + zones[i].label + " ";
-        if (tz && !strcmp(tz, zones[i].posix)) {
-            sel = i;
+        if (tz && !strcmp(tz, zones[i].posix) && !found) {
+            sel   = i;
+            found = true;
         }
     }
 

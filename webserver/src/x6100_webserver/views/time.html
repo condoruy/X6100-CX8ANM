@@ -52,6 +52,7 @@
 <script>
     // Some Constants
     const ntpServers = [
+        { value: "south-america.pool.ntp.org", label: "south-america.pool.ntp.org (Sudamérica)" },
         { value: "pool.ntp.org", label: "pool.ntp.org (global)" },
         { value: "time.windows.com", label: "time.windows.com (global)" },
         { value: "time.cloudflare.com", label: "time.cloudflare.com (global)" },
@@ -59,10 +60,32 @@
         { value: "cn.ntp.org.cn", label: "cn.ntp.org.cn (China)" },
         { value: "ntp1.aliyun.com", label: "ntp1.aliyun.com (China)" },
         { value: "ntp.tencent.com", label: "ntp.tencent.com (China)" },
-        { value: "custom", label: "Custom NTP Server..." }
+        { value: "custom", label: "Otro servidor NTP..." }
     ];
 
     const timezones = [
+        "America/Montevideo",
+        "America/Argentina/Buenos_Aires",
+        "America/Sao_Paulo",
+        "America/Asuncion",
+        "America/Santiago",
+        "America/La_Paz",
+        "America/Caracas",
+        "America/Manaus",
+        "America/Santo_Domingo",
+        "America/Puerto_Rico",
+        "America/Lima",
+        "America/Bogota",
+        "America/Guayaquil",
+        "America/Panama",
+        "America/Havana",
+        "America/Mexico_City",
+        "America/Costa_Rica",
+        "America/Guatemala",
+        "America/El_Salvador",
+        "America/Tegucigalpa",
+        "America/Managua",
+        "Europe/Madrid",
         "UTC",
         "America/Los_Angeles",
         "America/New_York",
@@ -221,7 +244,7 @@
     timezones.forEach(tz => {
         const option = document.createElement("option");
         option.value = tz;
-        option.textContent = tz === "custom" ? "Custom Timezone..." : tz;
+        option.textContent = tz === "custom" ? "Otra zona horaria..." : tz.replace(/_/g, " ");
         timezoneSelect.appendChild(option);
     });
 

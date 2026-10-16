@@ -36,6 +36,7 @@ static uint8_t          cap_bat;
 static bool             charging;
 
 static void check_time_sync_cb(lv_timer_t * t);
+static void tz_follow(void);
 static time_t get_last_sync_time();
 
 /* Time on top (seconds smaller), voltages below, both always shown. */
@@ -43,6 +44,7 @@ static void show_time() {
     time_t      now;
     struct tm   *t;
 
+    tz_follow();
     now = time(NULL);
     t = localtime(&now);
 
@@ -181,8 +183,15 @@ static time_t get_last_sync_time() {
 
 #define TZ_FILE "/mnt/tz.conf"
 
+#define TZ_DEFAULT "<-03>3"     /* sin zona elegida: hora de Uruguay (CX8ANM) */
+
+static time_t tz_mtime;
+
 void clock_tz_init() {
-    char  line[64] = "UTC0";
+    char        line[64] = TZ_DEFAULT;
+    struct stat st;
+
+    if (stat(TZ_FILE, &st) == 0) tz_mtime = st.st_mtime;
     FILE *f = fopen(TZ_FILE, "r");
 
     if (f) {
@@ -191,8 +200,17 @@ void clock_tz_init() {
         }
         fclose(f);
     }
-    setenv("TZ", line[0] ? line : "UTC0", 1);
+    setenv("TZ", line[0] ? line : TZ_DEFAULT, 1);
     tzset();
+}
+
+/* La página web (Hora) también escribe TZ_FILE: el reloj la sigue sin reiniciar */
+static void tz_follow(void) {
+    static uint8_t n;
+    struct stat    st;
+
+    if (++n % 20) return;      /* cada 10 s */
+    if (stat(TZ_FILE, &st) == 0 && st.st_mtime != tz_mtime) clock_tz_init();
 }
 
 void clock_tz_set(const char *posix) {

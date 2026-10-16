@@ -2392,6 +2392,16 @@ def set_timezone():
 
     try:
         subprocess.run(["ln", "-sf", target_tz, "/etc/localtime"], check=True)
+        # El reloj de la pantalla usa la regla POSIX de /mnt/tz.conf (src/clock.c):
+        # es la última línea del archivo de zoneinfo
+        try:
+            with open(target_tz, "rb") as f:
+                posix = f.read().rstrip(b"\n").rsplit(b"\n", 1)[-1].decode("ascii")
+            if posix and len(posix) < 64 and "\x00" not in posix:
+                with open("/mnt/tz.conf", "w") as f:
+                    f.write(posix + "\n")
+        except (OSError, UnicodeDecodeError):
+            pass
         return {"status": "success", "msg": "Timezone updated successfully"}
     except subprocess.CalledProcessError as e:
         bottle.response.status = 500
