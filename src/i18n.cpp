@@ -146,7 +146,7 @@ extern "C" const char *tr_static(const char *s) {
 }
 
 extern "C" void i18n_set_lang(uint8_t lang) {
-    cur_lang = lang < LANG_COUNT ? lang : LANG_EN;
+    cur_lang = lang < (uint8_t)LANG_COUNT ? lang : (uint8_t)LANG_EN;
 }
 
 extern "C" uint8_t i18n_get_lang(void) {

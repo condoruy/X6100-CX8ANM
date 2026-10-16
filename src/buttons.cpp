@@ -6,6 +6,7 @@
  *  Copyright (c) 2022-2023 Belousov Oleg aka R1CBU
  */
 #include "buttons.h"
+#include "i18n.h"
 
 #include "controls.h"
 #include "util.h"
@@ -1232,6 +1233,7 @@ static const lv_font_t *narrow_value_font(disp_btn_t *b, const char *text) {
 }
 
 static void set_btn_text(disp_btn_t *b, const char *text) {
+    text = tr(text);   /* idioma: antes de partir "Nombre:\nvalor" */
     const char *nl = strchr(text, '\n');
 
     if (nl && nl > text && nl[-1] == ':') {
