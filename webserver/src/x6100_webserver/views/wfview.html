@@ -1,24 +1,24 @@
 % rebase('base.html', title='wfview')
-<h2><svg class="i"><use href="#i-network"/></svg>wfview server</h2>
-<p class="sub">Lets <a href="https://wfview.org">wfview</a> on a PC control the radio over the network like an Icom IC-705 (CI-V, RX audio, waterfall). In wfview: radio IP, control port 50001, audio LPCM 1ch 16bit. The radio applies changes within a few seconds.</p>
+<h2><svg class="i"><use href="#i-network"/></svg>Servidor wfview</h2>
+<p class="sub">Permite que <a href="https://wfview.org">wfview</a> en una PC controle la radio por la red como un Icom IC-705 (CI-V, audio de RX, cascada). En wfview: IP de la radio, puerto de control 50001, audio LPCM 1ch 16bit. La radio aplica los cambios en unos segundos.</p>
 
 <form class="dp-card" id="conf">
-  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-server"/></svg></span><div><h3>Server</h3><p>Icom LAN server and its login</p></div></div>
+  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-server"/></svg></span><div><h3>Servidor</h3><p>Servidor LAN Icom y su usuario</p></div></div>
   <div class="dp-row">
-    <div class="dp-lbl"><b>Enabled</b><span>Listens for wfview on the network</span></div>
-    <div class="dp-ctl"><label class="sw" title="Enabled"><input id="enabled" type="checkbox" role="switch" aria-label="Enabled"><i></i></label></div>
+    <div class="dp-lbl"><b>Activado</b><span>Espera a wfview en la red</span></div>
+    <div class="dp-ctl"><label class="sw" title="Activado"><input id="enabled" type="checkbox" role="switch" aria-label="Activado"><i></i></label></div>
   </div>
   <div class="dp-row">
-    <div class="dp-lbl"><label for="user"><b>User</b></label><span>Up to 15 characters</span></div>
+    <div class="dp-lbl"><label for="user"><b>Usuario</b></label><span>Hasta 15 caracteres</span></div>
     <div class="dp-ctl"><input id="user" autocomplete="off" required maxlength="15" pattern="[ -<>-~]{1,15}"></div>
   </div>
   <div class="dp-row">
-    <div class="dp-lbl"><label for="pass"><b>Password</b></label><span>Up to 15 characters</span></div>
+    <div class="dp-lbl"><label for="pass"><b>Contraseña</b></label><span>Hasta 15 caracteres</span></div>
     <div class="dp-ctl"><input id="pass" type="password" autocomplete="off" required maxlength="15" pattern="[ -<>-~]{1,15}"></div>
   </div>
   <div class="dp-body" style="border-top:1px solid #1a283c">
     <div class="actions" style="margin-top:0">
-      <button type="submit" class="primary">Save</button>
+      <button type="submit" class="primary">Guardar</button>
       <span class="status" id="status"></span>
     </div>
   </div>
@@ -47,7 +47,7 @@ $("#conf").on("submit", function(e) {
     data: JSON.stringify({enabled: $("#enabled").prop("checked"), user: $("#user").val().trim(), pass: $("#pass").val()}),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    success: function(r) { render(r); showStatus("Saved"); },
+    success: function(r) { render(r); showStatus("Guardado"); },
     error: function(xhr) { showStatus(xhr.responseJSON ? xhr.responseJSON.msg : "Save failed", true); }
   });
 });

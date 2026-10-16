@@ -1,14 +1,14 @@
-% rebase('base.html', title='CW messages')
-<h2><svg class="i"><use href="#i-cw"/></svg>CW messages</h2>
-<p class="sub">The messages of MSG &rarr; CW on the radio, sent with TX or as a beacon. Up to 64 characters each; the radio shows the changes the next time MSG &rarr; CW opens.</p>
+% rebase('base.html', title='Mensajes CW')
+<h2><svg class="i"><use href="#i-cw"/></svg>Mensajes CW</h2>
+<p class="sub">Los mensajes de MSG &rarr; CW de la radio, enviados con TX o como baliza. Hasta 64 caracteres cada uno; la radio muestra los cambios la próxima vez que abre MSG &rarr; CW.</p>
 
 <section class="dp-card">
-<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-cw"/></svg></span><div><h3>Messages</h3><p>Up to 64 characters each</p></div><div class="dp-x"><button id="add" class="primary"><svg class="i"><use href="#i-plus"/></svg>Add</button></div></div>
+<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-cw"/></svg></span><div><h3>Mensajes</h3><p>Hasta 64 caracteres cada uno</p></div><div class="dp-x"><button id="add" class="primary"><svg class="i"><use href="#i-plus"/></svg>Agregar</button></div></div>
 <div class="dp-body tbl">
 <div class="table-wrap">
 <table id="messages">
   <thead>
-    <tr><th>Message</th><th></th></tr>
+    <tr><th>Mensaje</th><th></th></tr>
   </thead>
   <tbody></tbody>
 </table>
@@ -37,7 +37,7 @@ var call = function(type, url, payload) {
     data: payload ? JSON.stringify(payload) : undefined,
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    success: function(r) { render(r); showStatus("Saved"); },
+    success: function(r) { render(r); showStatus("Guardado"); },
     error: function(xhr) { showStatus(xhr.responseJSON ? xhr.responseJSON.msg : "Save failed", true); }
   });
 }

@@ -534,7 +534,7 @@ static void set_receiver_ui_listening(void)
 static void set_receiver_ui_decoding(const char *mode_name)
 {
     char status[96];
-    snprintf(status, sizeof(status), "Decoding %s", mode_name ? mode_name : "SSTV");
+    snprintf(status, sizeof(status), tr("Decoding %s"), mode_name ? mode_name : "SSTV");
     set_status(status);
     if (progress_bar) lv_obj_clear_flag(progress_bar, LV_OBJ_FLAG_HIDDEN);
     btn_start.label = "Halt\nDecoding";
@@ -1145,7 +1145,7 @@ static void ui_timer_cb(lv_timer_t *timer)
         char status[192];
         cont_lock_ui_pending = false;
         snprintf(status, sizeof(status),
-                 "SSTV Manual decoder is running\n\n%s line syncs found\n\nPress Stop Manual RX to render received picture",
+                 tr("SSTV Manual decoder is running\n\n%s line syncs found\n\nPress Stop Manual RX to render received picture"),
                  cont_mode_name(sstv_linesync_status(&cont_ls)->mode));
         if (cont_capturing) set_status(status);
     }
@@ -1189,7 +1189,7 @@ static void ui_timer_cb(lv_timer_t *timer)
     if (saved_overlay_pending) {
         char message[160];
         saved_overlay_pending = false;
-        snprintf(message, sizeof(message), "SSTV picture %s saved", saved_overlay_name);
+        snprintf(message, sizeof(message), tr("SSTV picture %s saved"), saved_overlay_name);
         msg_schedule_text_fmt("%s", message);
 
         cJSON *o = cJSON_CreateObject();
@@ -1216,7 +1216,7 @@ static void ui_timer_cb(lv_timer_t *timer)
             tx_progress = v;
             app_frame_bar(&frame, v, theme_hex(TC_tx));   /* red while transmitting, as in WSPR */
         }
-        if (tx_started) { char msg[96]; snprintf(msg,sizeof(msg),"Transmitting %s...",cont_mode_name(tx_mode)); set_status(msg); }
+        if (tx_started) { char msg[96]; snprintf(msg,sizeof(msg),tr("Transmitting %s..."),cont_mode_name(tx_mode)); set_status(msg); }
     } else if (tx_thread_valid) {
         pthread_join(tx_thread, NULL);
         tx_thread_valid = false;
@@ -1247,13 +1247,13 @@ static void ui_timer_cb(lv_timer_t *timer)
                             tx_last_width,tx_last_height,cont_mode_name(tx_last_mode));
                 }
                 char msg[96];
-                snprintf(msg,sizeof(msg),"SSTV %s TX complete",cont_mode_name(tx_mode));
+                snprintf(msg,sizeof(msg),tr("SSTV %s TX complete"),cont_mode_name(tx_mode));
                 msg_schedule_text_fmt("%s", msg);
             } else if (tx_result == -1) {
                 msg_schedule_text_fmt("SSTV TX halted");
             } else {
                 char msg[96];
-                snprintf(msg,sizeof(msg),"SSTV TX failed (%d)",tx_result);
+                snprintf(msg,sizeof(msg),tr("SSTV TX failed (%d)"),tx_result);
                 msg_schedule_text_fmt("%s", msg);
             }
 
@@ -1265,15 +1265,15 @@ static void ui_timer_cb(lv_timer_t *timer)
         } else {
             if (tx_result == 1) {
                 char msg[96];
-                snprintf(msg,sizeof(msg),"%s test TX complete.",cont_mode_name(tx_mode));
+                snprintf(msg,sizeof(msg),tr("%s test TX complete."),cont_mode_name(tx_mode));
                 set_status(msg);
-                snprintf(msg,sizeof(msg),"SSTV %s test TX complete",cont_mode_name(tx_mode));
+                snprintf(msg,sizeof(msg),tr("SSTV %s test TX complete"),cont_mode_name(tx_mode));
                 msg_schedule_text_fmt("%s", msg);
             } else if (tx_result == -1) {
                 set_status("SSTV test TX aborted.");
             } else {
                 char msg[96];
-                snprintf(msg,sizeof(msg),"SSTV test TX failed (%d).",tx_result);
+                snprintf(msg,sizeof(msg),tr("SSTV test TX failed (%d)."),tx_result);
                 set_status(msg);
             }
             tx_started=false;
@@ -1291,7 +1291,7 @@ static void ui_timer_cb(lv_timer_t *timer)
         cont_decoding = true;
         fprintf(stderr, "SSTV CONT: STOP - starting manual RAM decoder\n");
         char status[96];
-        snprintf(status, sizeof(status), "Decoding Cont %s",
+        snprintf(status, sizeof(status), tr("Decoding Cont %s"),
                  cont_decode_mode == SSTV_MODE_UNKNOWN ? "Auto" : cont_mode_name(cont_decode_mode));
         set_status(status);
         if (progress_bar) lv_obj_add_flag(progress_bar, LV_OBJ_FLAG_HIDDEN);
@@ -2721,7 +2721,7 @@ static bool tx_start_final_rf_mode(sstv_mode_t mode)
     if (status_label) lv_obj_clear_flag(status_label,LV_OBJ_FLAG_HIDDEN);
     {
         char msg[96];
-        snprintf(msg,sizeof(msg),"Preparing %s TX...",cont_mode_name(tx_mode));
+        snprintf(msg,sizeof(msg),tr("Preparing %s TX..."),cont_mode_name(tx_mode));
         set_status(msg);
     }
     if (progress_bar) {
@@ -3012,7 +3012,7 @@ static void tx_type_selector_build(void)
     char reply[64], replay[64];
     snprintf(reply,sizeof(reply),tx_target_callsign[0] ? "REPLY TO %s" : "REPLY TO...",
              tx_target_callsign);
-    snprintf(replay,sizeof(replay),tx_target_callsign[0] ? "REPLAY TO %s" : "REPLAY TO...",
+    snprintf(replay,sizeof(replay),tx_target_callsign[0] ? tr("REPLAY TO %s") : tr("REPLAY TO..."),
              tx_target_callsign);
     lv_table_set_cell_value(tx_type_table,0,0,"CALL CQ");
     lv_table_set_cell_value(tx_type_table,1,0,reply);
@@ -3747,10 +3747,10 @@ static void cont_start_cb(button_data_t *data)
     char status[192];
     if (cont_autodetect)
         snprintf(status, sizeof(status),
-                 "SSTV Manual decoder is running\n\nSearching the line syncs for the SSTV mode\n\nPress Stop Manual RX to render received picture");
+                 tr("SSTV Manual decoder is running\n\nSearching the line syncs for the SSTV mode\n\nPress Stop Manual RX to render received picture"));
     else
         snprintf(status, sizeof(status),
-                 "SSTV Manual decoder is running\n\nDecoding %s signal\n\nPress Stop Manual RX to render received picture",
+                 tr("SSTV Manual decoder is running\n\nDecoding %s signal\n\nPress Stop Manual RX to render received picture"),
                  cont_mode_name(cont_mode));
     set_status(status);
     if (progress_bar) lv_obj_add_flag(progress_bar, LV_OBJ_FLAG_HIDDEN);

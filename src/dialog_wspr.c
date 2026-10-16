@@ -469,18 +469,18 @@ static void timer_cb(lv_timer_t *t) {
 
     if (param_i_get(cfg_wspr_upload)) {
         if (!my_call[0]) {
-            snprintf(up, sizeof(up), "Upload: no callsign");
+            snprintf(up, sizeof(up), tr("Upload: no callsign"));
         } else if (atomic_load(&upload_failed)) {
-            snprintf(up, sizeof(up), "Uploaded %d, #%06x %d failed#", atomic_load(&uploaded), theme_hex(TC_err),
+            snprintf(up, sizeof(up), tr("Uploaded %d, #%06x %d failed#"), atomic_load(&uploaded), theme_hex(TC_err),
                      atomic_load(&upload_failed));
         } else {
-            snprintf(up, sizeof(up), "Uploaded %d", atomic_load(&uploaded));
+            snprintf(up, sizeof(up), tr("Uploaded %d"), atomic_load(&uploaded));
         }
     }
     char last[40] = "";
 
     if (last_n >= 0) {
-        snprintf(last, sizeof(last), "Last: %d spot%s (%.1f s)   ", last_n, last_n == 1 ? "" : "s", last_secs);
+        snprintf(last, sizeof(last), tr("Last: %d spot%s (%.1f s)   "), last_n, last_n == 1 ? "" : "s", last_secs);
     }
     lv_label_set_text_fmt(frame.status, "%sTX %d%% at %d Hz, %.1f W = %d dBm   %s", last, param_i_get(cfg_wspr_tx_pct),
                           param_i_get(cfg_wspr_tx_freq), pwr, wspr_dbm(pwr), up);

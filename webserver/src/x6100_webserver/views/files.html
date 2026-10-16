@@ -1,7 +1,7 @@
-% rebase('base.html', title='File browser')
-<h2><svg class="i"><use href="#i-sd"/></svg>Files</h2>
+% rebase('base.html', title='Explorador de archivos')
+<h2><svg class="i"><use href="#i-sd"/></svg>Archivos</h2>
 <p class="sub">Download files from the DATA partition of the SD card (ADI log, screenshots, recordings, etc).
-A <code>params.db</code> downloaded while the radio writes it may come out damaged (the radio's copy is not touched): open it with any SQLite3 tool to check.</p>
+A <code>params.db</code> descargado mientras la radio lo escribe puede salir dañado (la copia de la radio no se toca): ábralo con cualquier herramienta SQLite3 para revisarlo.</p>
 <section class="dp-card">
 <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-folder"/></svg></span><div><h3>{{request.path}}</h3><p>{{len(dirs)}} folders · {{len(files)}} files</p></div></div>
 <div class="dp-body tbl files">

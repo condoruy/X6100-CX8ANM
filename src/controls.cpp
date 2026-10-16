@@ -124,33 +124,33 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
     switch (ctrl) {
         case CTRL_VOL:
             i = radio_change_vol(diff);
-            snprintf(msg.data(), msg.capacity(), "Volume: %i", i);
+            snprintf(msg.data(), msg.capacity(), tr("Volume: %i"), i);
             break;
 
         case CTRL_RFG:
             i = update_param(cfg_sm.p_rfgain, diff);
-            snprintf(msg.data(), msg.capacity(), "RF gain: %i", i);
+            snprintf(msg.data(), msg.capacity(), tr("RF gain: %i"), i);
             break;
 
         case CTRL_WEFAX_ALIGN:
             i = update_param(cfg_sm.p_wefax_align, diff);
-            snprintf(msg.data(), msg.capacity(), "WEFAX Align: %i", i);
+            snprintf(msg.data(), msg.capacity(), tr("WEFAX Align: %i"), i);
             break;
 
         case CTRL_WEFAX_TILT:
             i = update_param(cfg_sm.p_wefax_tilt, diff);
-            snprintf(msg.data(), msg.capacity(), "WEFAX Tilt: %i", i);
+            snprintf(msg.data(), msg.capacity(), tr("WEFAX Tilt: %i"), i);
             break;
 
         case CTRL_SQL:
             i = update_param(cfg_sm.p_squelch, diff);
-            snprintf(msg.data(), msg.capacity(), "Voice SQL: %i", i);
+            snprintf(msg.data(), msg.capacity(), tr("Voice SQL: %i"), i);
             break;
 
         case CTRL_FILTER_LOW:
             // TODO: make step depending on freq
             i = update_param(cfg_sm.cp_cur_filter_low, diff, 10);
-            snprintf(msg.data(), msg.capacity(), "Filter low: %i Hz", i);
+            snprintf(msg.data(), msg.capacity(), tr("Filter low: %i Hz"), i);
             break;
 
         case CTRL_FILTER_HIGH:
@@ -169,22 +169,22 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
                 i = update_param(cfg_sm.cp_cur_filter_high, diff, freq_step);
             }
 
-            snprintf(msg.data(), msg.capacity(), "Filter high: %i Hz", i);
+            snprintf(msg.data(), msg.capacity(), tr("Filter high: %i Hz"), i);
             break;
 
         case CTRL_FILTER_BW:
             i = update_param(cfg_sm.cp_cur_filter_bw, diff, 20);
-            snprintf(msg.data(), msg.capacity(), "Filter bw: %i Hz", i);
+            snprintf(msg.data(), msg.capacity(), tr("Filter bw: %i Hz"), i);
             break;
 
         case CTRL_PWR:
             f = update_param(cfg_sm.p_pwr, diff, 0.1f);
-            snprintf(msg.data(), msg.capacity(), "Power: %0.1f W", f);
+            snprintf(msg.data(), msg.capacity(), tr("Power: %0.1f W"), f);
             break;
 
         case CTRL_MONI:
             i = update_param(cfg_sm.p_moni, diff);
-            snprintf(msg.data(), msg.capacity(), "Moni level: %i", i);
+            snprintf(msg.data(), msg.capacity(), tr("Moni level: %i"), i);
             break;
 
         case CTRL_SPECTRUM_FACTOR:
@@ -198,12 +198,12 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
                 cfg_sm.p_mode_zoom.set(i);
                 i = cfg_sm.p_mode_zoom.get();
             }
-            snprintf(msg.data(), msg.capacity(), "Zoom: x%i", i);
+            snprintf(msg.data(), msg.capacity(), tr("Zoom: x%i"), i);
             break;
 
         case CTRL_COMP:
             i = update_param(cfg_sm.p_comp, diff);
-            snprintf(msg.data(), msg.capacity(), "Compressor ratio: %s", params_comp_str_get(i));
+            snprintf(msg.data(), msg.capacity(), tr("Compressor ratio: %s"), params_comp_str_get(i));
             break;
 
         case CTRL_VOX_ON:
@@ -217,7 +217,7 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
 
         case CTRL_KEY_SPEED:
             i = update_param(cfg_sm.p_key_speed, diff);
-            snprintf(msg.data(), msg.capacity(), "Key speed: %i wpm", i);
+            snprintf(msg.data(), msg.capacity(), tr("Key speed: %i wpm"), i);
             break;
 
         case CTRL_KEY_MODE:
@@ -227,7 +227,7 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
                 cfg_sm.p_key_mode.set(i);
             }
             s = params_key_mode_str_get((x6100_key_mode_t)i);
-            snprintf(msg.data(), msg.capacity(), "Key mode: %s", s);
+            snprintf(msg.data(), msg.capacity(), tr("Key mode: %s"), s);
             break;
 
         case CTRL_IAMBIC_MODE:
@@ -237,17 +237,17 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
                 cfg_sm.p_iambic_mode.set(i);
             }
             s = params_iambic_mode_str_ger((x6100_iambic_mode_t)i);
-            snprintf(msg.data(), msg.capacity(), "Iambic mode: %s", s);
+            snprintf(msg.data(), msg.capacity(), tr("Iambic mode: %s"), s);
             break;
 
         case CTRL_KEY_TONE:
             i = update_param(cfg_sm.p_key_tone, diff, 10);
-            snprintf(msg.data(), msg.capacity(), "Key tone: %i Hz", i);
+            snprintf(msg.data(), msg.capacity(), tr("Key tone: %i Hz"), i);
             break;
 
         case CTRL_KEY_VOL:
             i = update_param(cfg_sm.p_key_vol, diff);
-            snprintf(msg.data(), msg.capacity(), "Key volume: %i", i);
+            snprintf(msg.data(), msg.capacity(), tr("Key volume: %i"), i);
             break;
 
         case CTRL_KEY_TRAIN:
@@ -256,17 +256,17 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
                 b = !b;
                 cfg_sm.p_key_train.set(b);
             }
-            snprintf(msg.data(), msg.capacity(), "Key train: %s", (b ? "On" : "Off"));
+            snprintf(msg.data(), msg.capacity(), tr("Key train: %s"), (b ? "On" : "Off"));
             break;
 
         case CTRL_QSK_TIME:
             i = update_param(cfg_sm.p_qsk_time, diff, 10);
-            snprintf(msg.data(), msg.capacity(), "QSK time: %i ms", i);
+            snprintf(msg.data(), msg.capacity(), tr("QSK time: %i ms"), i);
             break;
 
         case CTRL_KEY_RATIO:
             f = update_param(cfg_sm.p_key_ratio, diff, 0.1f);
-            snprintf(msg.data(), msg.capacity(), "Key ratio: %0.1f", f);
+            snprintf(msg.data(), msg.capacity(), tr("Key ratio: %0.1f"), f);
             break;
 
         case CTRL_CW_PEAK_ON:
@@ -275,12 +275,12 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
                 b = !b;
                 cfg_sm.p_cw_peak_on.set(b);
             }
-            snprintf(msg.data(), msg.capacity(), "CW peak: %s", (b ? "On" : "Off"));
+            snprintf(msg.data(), msg.capacity(), tr("CW peak: %s"), (b ? "On" : "Off"));
             break;
 
         case CTRL_CW_PEAK_Q:
             i = update_param(cfg_sm.p_cw_peak_q, diff);
-            snprintf(msg.data(), msg.capacity(), "CW peak Q: %i", i);
+            snprintf(msg.data(), msg.capacity(), tr("CW peak Q: %i"), i);
             break;
 
         case CTRL_RIT:
@@ -304,12 +304,12 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
 
         case CTRL_DNF_CENTER:
             i = update_param(cfg_sm.p_dnf_center, diff, 50);
-            snprintf(msg.data(), msg.capacity(), "DNF center: %i Hz", i);
+            snprintf(msg.data(), msg.capacity(), tr("DNF center: %i Hz"), i);
             break;
 
         case CTRL_DNF_WIDTH:
             i = update_param(cfg_sm.p_dnf_width, diff, 5);
-            snprintf(msg.data(), msg.capacity(), "DNF width: %i Hz", i);
+            snprintf(msg.data(), msg.capacity(), tr("DNF width: %i Hz"), i);
             break;
 
         case CTRL_DNF_AUTO:
@@ -318,7 +318,7 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
                 b = !b;
                 cfg_sm.p_dnf_auto.set(b);
             }
-            snprintf(msg.data(), msg.capacity(), "DNF auto: %s", (b ? "On" : "Off"));
+            snprintf(msg.data(), msg.capacity(), tr("DNF auto: %s"), (b ? "On" : "Off"));
             break;
 
         case CTRL_NB:
@@ -332,12 +332,12 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
 
         case CTRL_NB_LEVEL:
             i = update_param(cfg_sm.p_nb_level, diff, 5);
-            snprintf(msg.data(), msg.capacity(), "NB level: %i", i);
+            snprintf(msg.data(), msg.capacity(), tr("NB level: %i"), i);
             break;
 
         case CTRL_NB_WIDTH:
             i = update_param(cfg_sm.p_nb_width, diff, 5);
-            snprintf(msg.data(), msg.capacity(), "NB width: %i", i);
+            snprintf(msg.data(), msg.capacity(), tr("NB width: %i"), i);
             break;
 
         case CTRL_NR:
@@ -351,7 +351,7 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
 
         case CTRL_NR_LEVEL:
             i = update_param(cfg_sm.p_nr_level, diff, 5);
-            snprintf(msg.data(), msg.capacity(), "NR level: %i", i);
+            snprintf(msg.data(), msg.capacity(), tr("NR level: %i"), i);
             break;
 
         case CTRL_CW_DECODER:
@@ -360,7 +360,7 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
                 b = !b;
                 cfg_sm.p_cw_decoder.set(b);
             }
-            snprintf(msg.data(), msg.capacity(), "CW decoder: %s", (b ? "On" : "Off"));
+            snprintf(msg.data(), msg.capacity(), tr("CW decoder: %s"), (b ? "On" : "Off"));
             break;
 
         case CTRL_CW_TUNE:
@@ -369,37 +369,37 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
                 b = !b;
                 cfg_sm.p_cw_tune.set(b);
             }
-            snprintf(msg.data(), msg.capacity(), "CW tune: %s", (b ? "On" : "Off"));
+            snprintf(msg.data(), msg.capacity(), tr("CW tune: %s"), (b ? "On" : "Off"));
             break;
 
         case CTRL_CW_DECODER_SNR:
             f = update_param(cfg_sm.p_cw_decoder_snr, diff, 0.1f);
-            snprintf(msg.data(), msg.capacity(), "CW decoder SNR: %0.1f dB", f);
+            snprintf(msg.data(), msg.capacity(), tr("CW decoder SNR: %0.1f dB"), f);
             break;
 
         case CTRL_RTTY_RATE:
             f = rtty_change_rate(diff);
-            snprintf(msg.data(), msg.capacity(), "RTTY rate: %0.2f", f);
+            snprintf(msg.data(), msg.capacity(), tr("RTTY rate: %0.2f"), f);
             break;
 
         case CTRL_RTTY_SHIFT:
             i = rtty_change_shift(diff);
-            snprintf(msg.data(), msg.capacity(), "RTTY shift: %i Hz", i);
+            snprintf(msg.data(), msg.capacity(), tr("RTTY shift: %i Hz"), i);
             break;
 
         case CTRL_RTTY_CENTER:
             i = rtty_change_center(diff);
-            snprintf(msg.data(), msg.capacity(), "RTTY center: %i Hz", i);
+            snprintf(msg.data(), msg.capacity(), tr("RTTY center: %i Hz"), i);
             break;
 
         case CTRL_RTTY_REVERSE:
             b = rtty_change_reverse(diff);
-            snprintf(msg.data(), msg.capacity(), "RTTY reverse: %s", (b ? "On" : "Off"));
+            snprintf(msg.data(), msg.capacity(), tr("RTTY reverse: %s"), (b ? "On" : "Off"));
             break;
 
         case CTRL_WF_REF:
             i = update_param(cfg_sm.p_waterfall_ref, diff);
-            snprintf(msg.data(), msg.capacity(), "Waterfall ref: %+i dB", i);
+            snprintf(msg.data(), msg.capacity(), tr("Waterfall ref: %+i dB"), i);
             break;
 
         case CTRL_WF_MODE:
@@ -408,11 +408,11 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
                 i = !i;
                 cfg_sm.p_wf_mode.set(i);
             }
-            snprintf(msg.data(), msg.capacity(), "Waterfall: %s", i ? "Fixed" : "Centered");
+            snprintf(msg.data(), msg.capacity(), tr("Waterfall: %s"), i ? tr("Fixed") : tr("Centered"));
             break;
 
         case CTRL_CLUSTER:
-            snprintf(msg.data(), msg.capacity(), "Cluster: %s", cluster_column_move(diff));
+            snprintf(msg.data(), msg.capacity(), tr("Cluster: %s"), cluster_column_move(diff));
             knobs_set_mfk_param(CTRL_CLUSTER);  /* no subject: refresh the knob label */
             break;
 
@@ -422,7 +422,7 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
                 i = !i;
                 cfg_sm.p_cluster_order.set(i);
             }
-            snprintf(msg.data(), msg.capacity(), "Cluster order: %s", i ? "newest first" : "frequency");
+            snprintf(msg.data(), msg.capacity(), tr("Cluster order: %s"), i ? tr("newest first") : tr("frequency"));
             break;
 
         case CTRL_CLUSTER_BANDS:
@@ -431,7 +431,7 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
                 i = !i;
                 cfg_sm.p_cluster_all_bands.set(i);
             }
-            snprintf(msg.data(), msg.capacity(), "Cluster: %s", i ? "all bands" : "current band");
+            snprintf(msg.data(), msg.capacity(), tr("Cluster: %s"), i ? tr("all bands") : tr("current band"));
             break;
 
         case CTRL_IF_SHIFT:
@@ -439,7 +439,7 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
                 x6100_base_ver_t base_ver = x6100_control_get_base_ver();
                 if ((util_compare_version(base_ver, (x6100_base_ver_t){1, 1, 9, 0}) >= 0) || (base_ver.rev >= 8)) {
                     i = update_param(cfg_sm.p_band_if_shift, diff, 100);
-                    snprintf(msg.data(), msg.capacity(), "IF shift: %i Hz", i);
+                    snprintf(msg.data(), msg.capacity(), tr("IF shift: %i Hz"), i);
                 } else {
                     msg_update_text_fmt("IF shift is not supported");
                 }

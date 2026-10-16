@@ -1,14 +1,14 @@
 % rebase('base.html', title='DX Cluster')
 <h2><svg class="i"><use href="#i-globe"/></svg>DX Cluster</h2>
-<p class="sub">Servers the radio can use (APP → Cluster). The one in use is marked; the radio reconnects when you change it.</p>
+<p class="sub">Servidores que la radio puede usar (APP → Cluster). El que está en uso está marcado; la radio se reconecta al cambiarlo.</p>
 
 <section class="dp-card">
-  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-server"/></svg></span><div><h3>Servers</h3><p>Telnet servers; Use switches the radio to one</p></div></div>
+  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-server"/></svg></span><div><h3>Servidores</h3><p>Servidores telnet; Usar pasa la radio a uno</p></div></div>
   <div class="dp-body tbl">
 <div class="table-wrap">
 <table id="servers">
   <thead>
-    <tr><th>Name</th><th>Host</th><th>Port</th><th></th></tr>
+    <tr><th>Nombre</th><th>Servidor</th><th>Puerto</th><th></th></tr>
   </thead>
   <tbody></tbody>
 </table>
@@ -17,34 +17,34 @@
 </section>
 
 <form class="dp-card" id="add">
-  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-plus"/></svg></span><div><h3>Add server</h3><p>Name, host name and telnet port</p></div></div>
+  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-plus"/></svg></span><div><h3>Agregar servidor</h3><p>Nombre, servidor y puerto telnet</p></div></div>
   <div class="dp-body">
   <div class="grid" style="grid-template-columns:1fr 2fr 120px">
-    <div><label for="name">Name</label><input id="name" autocomplete="off" required maxlength="31" pattern="[^|]+"></div>
-    <div><label for="host">Host</label><input id="host" autocomplete="off" required pattern="[A-Za-z0-9.\-]{1,127}" maxlength="127"></div>
-    <div><label for="port">Port</label><input id="port" type="number" min="1" max="65535" value="23" required></div>
+    <div><label for="name">Nombre</label><input id="name" autocomplete="off" required maxlength="31" pattern="[^|]+"></div>
+    <div><label for="host">Servidor</label><input id="host" autocomplete="off" required pattern="[A-Za-z0-9.\-]{1,127}" maxlength="127"></div>
+    <div><label for="port">Puerto</label><input id="port" type="number" min="1" max="65535" value="23" required></div>
   </div>
   <div class="actions">
-    <button type="submit" class="primary"><svg class="i"><use href="#i-plus"/></svg>Add server</button>
+    <button type="submit" class="primary"><svg class="i"><use href="#i-plus"/></svg>Agregar servidor</button>
     <span class="status" id="status"></span>
   </div>
   </div>
 </form>
 
 <section class="dp-card">
-  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-filter"/></svg></span><div><h3>Filters</h3><p>Spots hidden here disappear from APP Cluster, the cluster column and the waterfall marks</p></div></div>
+  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-filter"/></svg></span><div><h3>Filtros</h3><p>Los spots ocultos acá desaparecen de APP Cluster, de la columna del cluster y de las marcas en la cascada</p></div></div>
   <div class="dp-body">
-  <p class="sub">Modes, bands and activity are also on the radio: Settings → Cluster.</p>
-  <label>Modes</label>
+  <p class="sub">Modos, bandas y actividad también están en la radio: Ajustes → Cluster.</p>
+  <label>Modos</label>
   <div class="chips" id="modes">
     <label><input type="checkbox" value="CW"> CW</label>
     <label><input type="checkbox" value="SSB"> SSB</label>
     <label><input type="checkbox" value="DIG"> Digital</label>
     <label><input type="checkbox" value="AMFM"> AM/FM</label>
   </div>
-  <label>Bands <small>(none ticked = all bands)</small></label>
+  <label>Bandas <small>(ninguna marcada = todas las bandas)</small></label>
   <div class="chips" id="fbands"></div>
-  <label>Activity <small>(none ticked = all spots)</small></label>
+  <label>Actividad <small>(ninguna marcada = todos los spots)</small></label>
   <div class="chips" id="activity">
     <label><input type="checkbox" value="POTA"> POTA</label>
     <label><input type="checkbox" value="SOTA"> SOTA</label>
@@ -52,39 +52,39 @@
     <label><input type="checkbox" value="HOTA"> HOTA</label>
   </div>
   <div class="grid" style="grid-template-columns:1fr 2fr">
-    <div><label for="max_age">Max age</label>
+    <div><label for="max_age">Antigüedad máxima</label>
       <select id="max_age">
-        <option value="0">Off</option>
+        <option value="0">No</option>
         <option value="10">10 min</option>
         <option value="15">15 min</option>
         <option value="30">30 min</option>
         <option value="60">60 min</option>
         <option value="120">120 min</option>
       </select></div>
-    <div><label for="skip">Skip spotters</label><input id="skip" autocomplete="off" maxlength="120" placeholder="e.g. K1TTT-# , *-3"></div>
+    <div><label for="skip">Ignorar spotters</label><input id="skip" autocomplete="off" maxlength="120" placeholder="ej. K1TTT-# , *-3"></div>
   </div>
   <div class="actions">
-    <button type="button" class="primary" id="save-filters">Save</button>
+    <button type="button" class="primary" id="save-filters">Guardar</button>
     <span class="status" id="fstatus"></span>
   </div>
   </div>
 </section>
 
 <section class="dp-card">
-  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-bell"/></svg></span><div><h3>Alerts</h3><p>Callsigns or prefixes you are looking for. <code>*</code> matches anything: VP8*, */P, 3Y0J.</p></div></div>
+  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-bell"/></svg></span><div><h3>Alertas</h3><p>Indicativos o prefijos que está buscando. <code>*</code> vale cualquier cosa: VP8*, */P, 3Y0J.</p></div></div>
   <div class="dp-row">
-    <div class="dp-lbl"><b>Popup on the radio</b><span>When a spot matches an alert</span></div>
-    <div class="dp-ctl"><label class="sw" title="Popup on the radio"><input type="checkbox" role="switch" id="popup" aria-label="Popup on the radio"><i></i></label></div>
+    <div class="dp-lbl"><b>Aviso en la radio</b><span>Cuando un spot coincide con una alerta</span></div>
+    <div class="dp-ctl"><label class="sw" title="Aviso en la radio"><input type="checkbox" role="switch" id="popup" aria-label="Aviso en la radio"><i></i></label></div>
   </div>
   <div class="dp-row">
-    <div class="dp-lbl"><b>Beep</b><span>When a spot matches an alert</span></div>
-    <div class="dp-ctl"><label class="sw" title="Beep"><input type="checkbox" role="switch" id="beep" aria-label="Beep"><i></i></label></div>
+    <div class="dp-lbl"><b>Pitido</b><span>Cuando un spot coincide con una alerta</span></div>
+    <div class="dp-ctl"><label class="sw" title="Pitido"><input type="checkbox" role="switch" id="beep" aria-label="Pitido"><i></i></label></div>
   </div>
   <div class="dp-body tbl" style="border-top:1px solid var(--line)">
   <div class="table-wrap">
   <table id="alerts">
     <thead>
-      <tr><th>Pattern</th><th>Only bands</th><th>Only mode</th><th>Last seen</th><th></th></tr>
+      <tr><th>Patrón</th><th>Solo bandas</th><th>Solo modo</th><th>Visto por última vez</th><th></th></tr>
     </thead>
     <tbody></tbody>
   </table>
@@ -93,19 +93,19 @@
   <div class="dp-body" style="border-top:1px solid var(--line)">
   <form id="add-alert">
     <div class="grid" style="grid-template-columns:2fr 2fr 1fr">
-      <div><label for="pattern">Pattern</label><input id="pattern" autocomplete="off" required maxlength="31" pattern="[A-Za-z0-9/*]+" placeholder="e.g. VP8*"></div>
-      <div><label for="bands">Only bands <small>(none = all)</small></label>
+      <div><label for="pattern">Patrón</label><input id="pattern" autocomplete="off" required maxlength="31" pattern="[A-Za-z0-9/*]+" placeholder="ej. VP8*"></div>
+      <div><label for="bands">Solo bandas <small>(ninguna = todas)</small></label>
         <select id="bands" multiple size="4"></select></div>
-      <div><label for="mode">Only mode</label>
+      <div><label for="mode">Solo modo</label>
         <select id="mode">
-          <option value="">Any</option>
+          <option value="">Cualquiera</option>
           <option value="CW">CW</option>
           <option value="SSB">SSB</option>
           <option value="DIG">DIG</option>
         </select></div>
     </div>
     <div class="actions">
-      <button type="submit" class="primary"><svg class="i"><use href="#i-plus"/></svg>Add</button>
+      <button type="submit" class="primary"><svg class="i"><use href="#i-plus"/></svg>Agregar</button>
       <span class="status" id="astatus"></span>
     </div>
   </form>
@@ -170,7 +170,7 @@ var call = function(type, url, payload, st="#status") {
     data: payload ? JSON.stringify(payload) : undefined,
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    success: function(r) { render(r); showStatus("Saved", false, st); },
+    success: function(r) { render(r); showStatus("Guardado", false, st); },
     error: function(xhr) { showStatus(xhr.responseJSON ? xhr.responseJSON.msg : "Save failed", true, st); }
   });
 }

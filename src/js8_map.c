@@ -327,7 +327,7 @@ static void label_selected(lv_obj_t *canvas, const spot_t *s, time_t now) {
     o += snprintf(line + o, sizeof(line) - o, "  %s%.0f km  az %.0f", s->guessed ? "~" : "", s->km, s->az);
     if (s->s.t) {
         long age = (long)(now - s->s.t);
-        snprintf(line + o, sizeof(line) - o, age < 60 ? "  now" : "  %ld min", age / 60);
+        snprintf(line + o, sizeof(line) - o, age < 60 ? tr("  now") : "  %ld min", age / 60);
     }
 
     lv_coord_t bw = text_w(line, &sony_22) + 12, bh = lv_font_get_line_height(&sony_22) + 6;
@@ -447,16 +447,16 @@ static void overlay(lv_obj_t *canvas, int sel) {
             hear_me += m.spots[i].s.heard_me;
             if (dx < 0 || m.spots[i].km > m.spots[dx].km) dx = i;
         }
-        int o = snprintf(head, sizeof(head), "%d heard  %d hear me", m.heard, hear_me);
+        int o = snprintf(head, sizeof(head), tr("%d heard  %d hear me"), m.heard, hear_me);
         if (dx >= 0) snprintf(head + o, sizeof(head) - o, "  DX %s %.0f km", m.spots[dx].s.call, m.spots[dx].km);
     } else {
-        snprintf(head, sizeof(head), "QSO map - %d station%s", m.n, m.n == 1 ? "" : "s");
+        snprintf(head, sizeof(head), tr("QSO map - %d station%s"), m.n, m.n == 1 ? "" : "s");
     }
     text(canvas, 8, 4, &sony_20, TC(text_head), head);
 
     char zoom[24];
-    if (m.zoom) snprintf(zoom, sizeof(zoom), view.z == 1 ? "World" : "x%d", view.z);
-    else snprintf(zoom, sizeof(zoom), view.z == 1 ? "Auto: world" : "Auto: x%d", view.z);
+    if (m.zoom) snprintf(zoom, sizeof(zoom), view.z == 1 ? tr("World") : "x%d", view.z);
+    else snprintf(zoom, sizeof(zoom), view.z == 1 ? tr("Auto: world") : "Auto: x%d", view.z);
     text(canvas, m.w - 8 - text_w(zoom, &sony_20), 4, &sony_20, TC(text_dim), zoom);
 
     legend(canvas);

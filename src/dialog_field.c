@@ -894,9 +894,9 @@ static void prog_info_update(void) {
     if (st.have_ref && st.ref.type == 'S' && st.prog == 'S')
         snprintf(alt, sizeof(alt), "#%06x ALT#  %d m     #%06x PTS#  %d\n", theme_hex(TC_text_dim), st.ref.alt_m,
                  theme_hex(TC_text_dim), st.ref.points);
-    snprintf(buf, sizeof(buf), "%s%s\n%s\n#%06x Position from %s%s#", alt, have_pos ? grid : "-",
-             have_pos ? deg : "GPS, phone or locator needed", theme_hex(TC_text_dim), have_pos ? src : "-",
-             have_pos && age > 60 ? " (old)" : "");
+    snprintf(buf, sizeof(buf), tr("%s%s\n%s\n#%06x Position from %s%s#"), alt, have_pos ? grid : "-",
+             have_pos ? deg : tr("GPS, phone or locator needed"), theme_hex(TC_text_dim), have_pos ? src : "-",
+             have_pos && age > 60 ? tr(" (old)") : "");
     lv_label_set_text(info_lines, buf);
     lv_obj_set_style_bg_color(info_dot, TC(err), 0);
     lv_label_set_text(info_state, "NOT ACTIVE");
@@ -988,7 +988,7 @@ static void build_act(void) {
     lv_coord_t h = body_h - STATUS_H - 10;
     char       t[48];
 
-    snprintf(t, sizeof(t), "%s - ACTIVATION (%s)", prog_name(), adif_mode());
+    snprintf(t, sizeof(t), tr("%s - ACTIVATION (%s)"), prog_name(), adif_mode());
     head_set(prog_icon(), t);
 
     lv_obj_t *p = panel(body, 8, 6, 584, h);
@@ -1092,9 +1092,9 @@ static void bands_fill(void) {
 
     p = snprintf(line, sizeof(line), "RBN %s.  ", field_rbn_state());
     if (!n)
-        p += snprintf(line + p, sizeof(line) - p, "Nobody heard you in the last 10 min: Test beacon (CW)");
+        p += snprintf(line + p, sizeof(line) - p, tr("Nobody heard you in the last 10 min: Test beacon (CW)"));
     else
-        p += snprintf(line + p, sizeof(line) - p, "Heard by ");
+        p += snprintf(line + p, sizeof(line) - p, tr("Heard by "));
     for (int k = 0; k < n && p < (int)sizeof(line); k++)
         p += snprintf(line + p, sizeof(line) - p, "%s %+d dB  ", hits[k].skimmer, hits[k].snr);
     lv_label_set_text(status, line);
@@ -1121,7 +1121,7 @@ static void build_log(void) {
     char                    row[120], t[48];
     struct tm               tm;
 
-    snprintf(t, sizeof(t), "%s LOGBOOK  %s", st.have_ref ? prog_name_of(st.ref.type) : "",
+    snprintf(t, sizeof(t), tr("%s LOGBOOK  %s"), st.have_ref ? prog_name_of(st.ref.type) : "",
              st.have_ref ? st.ref.ref : "");
     head_set("log", t);
     list_create(body, 8, 36, W - 16, body_h - STATUS_H - 40, widths, 6);

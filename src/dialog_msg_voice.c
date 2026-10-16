@@ -368,7 +368,7 @@ static void reap_worker(bool wait) {
 static void next_rec_name(char *dst) {
     char p[128];
     for (int n = count + 1;; n++) {
-        snprintf(dst, NAME_LEN + 1, "Message %i", n);
+        snprintf(dst, NAME_LEN + 1, tr("Message %i"), n);
         file_path(p, sizeof(p), dst);
         if (access(p, F_OK) != 0) return;
     }

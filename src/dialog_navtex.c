@@ -542,11 +542,11 @@ static void dsc_detail(const dsc_call_t *c, const char *arrow, char *out, size_t
     char        target[48];
 
     if (c->fmt == 112) {
-        snprintf(out, size, "%s%s", c->ecc_ok ? "" : "? ", nature[0] ? nature : "DISTRESS ALERT");
+        snprintf(out, size, "%s%s", c->ecc_ok ? "" : "? ", nature[0] ? nature : tr("DISTRESS ALERT"));
         return;
     }
     if (!strcmp(cat, "ack")) {
-        snprintf(out, size, "%s%s %s  distress ack", c->ecc_ok ? "" : "? ", arrow, c->dmmsi);
+        snprintf(out, size, tr("%s%s %s  distress ack"), c->ecc_ok ? "" : "? ", arrow, c->dmmsi);
         return;
     }
     if (c->fmt == 116)
@@ -554,7 +554,7 @@ static void dsc_detail(const dsc_call_t *c, const char *arrow, char *out, size_t
     else if (c->fmt == 102)
         snprintf(target, sizeof(target), "AREA %s", c->to);
     else if (c->fmt == 114)
-        snprintf(target, sizeof(target), "%s group %s", arrow, c->to);
+        snprintf(target, sizeof(target), tr("%s group %s"), arrow, c->to);
     else
         snprintf(target, sizeof(target), "%s %s", arrow, c->to);
     if (c->dmmsi[0])   /* distress relay */
@@ -570,7 +570,7 @@ static void dsc_where(const dsc_call_t *c, char *out, size_t size)
     out[0] = 0;
     if (!c->dmmsi[0] || !strcmp(dsc_cat_name(c), "ack"))
         return;
-    snprintf(out, size, "%s%s%s%s", c->pos[0] ? c->pos : "position unknown", c->utc[0] ? "  at " : "", c->utc,
+    snprintf(out, size, "%s%s%s%s", c->pos[0] ? c->pos : tr("position unknown"), c->utc[0] ? tr("  at ") : "", c->utc,
              c->utc[0] ? " UTC" : "");
 }
 
@@ -588,7 +588,7 @@ static const char *dsc_from_country(const char *mmsi, char *buf, size_t size, in
             break;
         }
     if (mmsi[0] == '0' && mmsi[1] == '0') {
-        snprintf(buf, size, "Coast, %s", name);
+        snprintf(buf, size, tr("Coast, %s"), name);
         return buf;
     }
     return name;

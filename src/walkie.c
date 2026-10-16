@@ -433,7 +433,7 @@ static void update_cb(lv_timer_t *t) {
         const channel_t *c = &wch[i];
 
         if (!c->freq)
-            snprintf(buf, sizeof(buf), "CH %02i - empty", i + 1);
+            snprintf(buf, sizeof(buf), tr("CH %02i - empty"), i + 1);
         else if (c->name[0])
             snprintf(buf, sizeof(buf), "CH %02i - %s", i + 1, c->name);
         else

@@ -1,37 +1,37 @@
 % rebase('base.html', title='Ethernet')
 <h2><svg class="i"><use href="#i-ethernet"/></svg>Ethernet</h2>
-<p class="sub">A USB Ethernet adapter on the radio: DHCP, or a fixed address for networks that need one. The same settings as Settings &rarr; Wireless &rarr; Ethernet on the radio. WiFi is not touched.</p>
+<p class="sub">Un adaptador Ethernet USB en la radio: DHCP, o una dirección fija para las redes que la necesitan. Los mismos ajustes que Ajustes &rarr; Inalámbrico &rarr; Ethernet en la radio. La WiFi no se toca.</p>
 
-<p id="none" hidden>No Ethernet adapter connected.</p>
+<p id="none" hidden>No hay un adaptador Ethernet conectado.</p>
 
 <form class="dp-card" id="conf" hidden>
-  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-ethernet"/></svg></span><div><h3>Adapter</h3><p id="iface">-</p></div></div>
+  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-ethernet"/></svg></span><div><h3>Adaptador</h3><p id="iface">-</p></div></div>
   <div class="dp-row">
-    <div class="dp-lbl"><b>Status</b><span id="inuse">-</span></div>
+    <div class="dp-lbl"><b>Estado</b><span id="inuse">-</span></div>
     <div class="dp-ctl"><span class="status" id="state"></span></div>
   </div>
   <div class="dp-row">
-    <div class="dp-lbl"><b>Mode</b><span>DHCP takes the address from the network</span></div>
-    <div class="dp-ctl"><div class="seg" id="mode"><button type="button" data-dhcp="1">DHCP</button><button type="button" data-dhcp="0">Static</button></div></div>
+    <div class="dp-lbl"><b>Modo</b><span>DHCP toma la dirección de la red</span></div>
+    <div class="dp-ctl"><div class="seg" id="mode"><button type="button" data-dhcp="1">DHCP</button><button type="button" data-dhcp="0">Fija</button></div></div>
   </div>
   <div class="dp-row">
-    <div class="dp-lbl"><label for="ip"><b>IP address</b></label><span>For example 192.168.1.20</span></div>
+    <div class="dp-lbl"><label for="ip"><b>Dirección IP</b></label><span>Por ejemplo 192.168.1.20</span></div>
     <div class="dp-ctl"><input id="ip" class="st" autocomplete="off" maxlength="15" inputmode="decimal"></div>
   </div>
   <div class="dp-row">
-    <div class="dp-lbl"><label for="mask"><b>Netmask</b></label><span>255.255.255.0 or /24</span></div>
+    <div class="dp-lbl"><label for="mask"><b>Máscara</b></label><span>255.255.255.0 o /24</span></div>
     <div class="dp-ctl"><input id="mask" class="st" autocomplete="off" maxlength="15"></div>
   </div>
   <div class="dp-row">
-    <div class="dp-lbl"><label for="gw"><b>Gateway</b></label><span>Optional. Leave it empty and internet stays on WiFi</span></div>
+    <div class="dp-lbl"><label for="gw"><b>Puerta de enlace</b></label><span>Opcional. Vacía, internet sigue por WiFi</span></div>
     <div class="dp-ctl"><input id="gw" class="st" autocomplete="off" maxlength="15" inputmode="decimal"></div>
   </div>
   <div class="dp-row">
-    <div class="dp-lbl"><label for="dns"><b>DNS</b></label><span>Optional</span></div>
+    <div class="dp-lbl"><label for="dns"><b>DNS</b></label><span>Opcional</span></div>
     <div class="dp-ctl"><input id="dns" class="st" autocomplete="off" maxlength="15" inputmode="decimal"></div>
   </div>
   <div class="dp-row">
-    <button type="submit" class="primary">Apply</button>
+    <button type="submit" class="primary">Aplicar</button>
     <span class="status" id="status"></span>
   </div>
 </form>
@@ -56,7 +56,7 @@ var renderState = function(d) {
   $("#conf").prop("hidden", !d.present);
   $("#iface").text(d.iface);
   showStatus($("#state"), d.state, !d.connected);
-  $("#inuse").text(d.addr ? "In use: " + d.addr + (d.gateway ? ", gateway " + d.gateway : "") : "No address in use");
+  $("#inuse").text(d.addr ? "En uso: " + d.addr + (d.gateway ? ", puerta de enlace " + d.gateway : "") : "Sin dirección en uso");
 }
 
 var render = function(d) {
@@ -71,7 +71,7 @@ var poll = function() {
 }
 
 $.get('/api/network', {}, render).fail(function(xhr) {
-  showStatus($("#status"), xhr.responseJSON ? xhr.responseJSON.msg : "Radio not reachable", true);
+  showStatus($("#status"), xhr.responseJSON ? xhr.responseJSON.msg : "La radio no responde", true);
 });
 setInterval(poll, 3000);
 

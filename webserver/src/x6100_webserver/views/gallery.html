@@ -1,27 +1,27 @@
-% rebase('base.html', title='Gallery')
-<h2><svg class="i"><use href="#i-image"/></svg>Gallery</h2>
-<p class="sub">Screen recordings (AVI), RX audio recordings, screenshots, SSTV and WeFax pictures stored on the radio. Tap files to select them, then download them as a ZIP or delete them together. Screen recordings can be converted to MP4 in this browser.</p>
-<div class="card" id="httpsnote" hidden><span class="meta">In-browser conversion needs a secure page. Open <a id="httpslink" href="#">the HTTPS version of this page</a>: the radio uses a self-signed certificate, so the browser shows a warning once. Accept it (Advanced, then Proceed) and the option appears.</span></div>
+% rebase('base.html', title='Galería')
+<h2><svg class="i"><use href="#i-image"/></svg>Galería</h2>
+<p class="sub">Grabaciones de pantalla (AVI), grabaciones de audio de RX, capturas, imágenes SSTV y WeFax guardadas en la radio. Toque los archivos para elegirlos y después descárguelos en un ZIP o bórrelos juntos. Las grabaciones de pantalla se pueden pasar a MP4 en este navegador.</p>
+<div class="card" id="httpsnote" hidden><span class="meta">La conversión en el navegador necesita una página segura. Abra <a id="httpslink" href="#">la versión HTTPS de esta página</a>: la radio usa un certificado propio, así que el navegador avisa una vez. Acéptelo (Avanzado, después Continuar) y aparece la opción.</span></div>
 
 <div class="folders" id="folders"></div>
 
 <div id="folderview" hidden>
-  <div class="crumb"><a href="#">Gallery</a> › <span id="crumbname"></span></div>
+  <div class="crumb"><a href="#">Galería</a> › <span id="crumbname"></span></div>
   <div class="card upload" id="upload" hidden>
-    <div class="drop" id="drop">Drop pictures here or <button class="primary" id="pickbtn"><svg class="i"><use href="#i-upload"/></svg>Choose files</button></div>
+    <div class="drop" id="drop">Suelte imágenes acá o <button class="primary" id="pickbtn"><svg class="i"><use href="#i-upload"/></svg>Elija archivos</button></div>
     <input type="file" id="pickfiles" accept="image/*" multiple hidden>
-    <p class="meta">PNG files up to 4 MB are sent as they are; JPEG and other pictures are converted to PNG in this browser. A file with the same name is kept: the new one gets -1, -2... at the end.</p>
+    <p class="meta">Los PNG de hasta 4 MB se mandan tal cual; JPEG y otras imágenes se pasan a PNG en este navegador. Si ya hay un archivo con ese nombre se conserva: al nuevo se le agrega -1, -2... al final.</p>
     <div id="uploads"></div>
   </div>
   <div class="card selbar">
-    <button id="selall">Select all</button>
-    <button id="selnone">None</button>
+    <button id="selall">Elegir todo</button>
+    <button id="selnone">Ninguno</button>
     <span class="meta" id="selinfo"></span>
-    <button class="primary" id="selzip"><svg class="i"><use href="#i-download"/></svg>Download ZIP</button>
-    <button class="remove" id="seldel">Delete</button>
+    <button class="primary" id="selzip"><svg class="i"><use href="#i-download"/></svg>Descargar ZIP</button>
+    <button class="remove" id="seldel">Borrar</button>
     <span class="status" id="status_gallery"></span>
   </div>
-  <div class="card" id="empty" hidden>This folder is empty.</div>
+  <div class="card" id="empty" hidden>Esta carpeta está vacía.</div>
   <div class="gallery" id="items"></div>
 </div>
 
@@ -82,7 +82,7 @@ const parseAvi = function(buf) {
     }
   };
   walk(12, buf.byteLength);
-  if (!avi.frames.length) throw new Error("No video frames");
+  if (!avi.frames.length) throw new Error("No hay cuadros de video");
   return avi;
 }
 
@@ -205,12 +205,12 @@ const makeCard = function(x) {
   const bar = $("<progress max='1' value='0' hidden>");
   const note = $("<div class='meta note' hidden>");
   const actions = $("<div class='actions'>");
-  if (!isAvi) actions.append($("<a class='btn' target='_blank'>").attr("href", fileUrl(x, "file")).text("Open"));
+  if (!isAvi) actions.append($("<a class='btn' target='_blank'>").attr("href", fileUrl(x, "file")).text("Abrir"));
   actions.append($("<a class='btn' download>").attr("href", fileUrl(x, "file") + "?dl=1").text(isMp4 ? "Download" : "Download original"));
 
   if (x.kind == "screenrec" && isAvi) {
     if (canConvert()) {
-      const conv = $("<button class='primary'>").text("Convert to MP4 (in browser)");
+      const conv = $("<button class='primary'>").text("Pasar a MP4 (en el navegador)");
       conv.on("click", async function() {
         conv.prop("disabled", true);
         bar.prop("hidden", false).val(0);
@@ -218,9 +218,9 @@ const makeCard = function(x) {
         try {
           const blob = await convert(x, function(v) { bar.val(v); }, function(t) { note.text(t).prop("hidden", false); });
           save(blob, x.name.replace(/\.avi$/i, ".mp4"));
-          showStatus("Converted " + x.name);
+          showStatus("Convertido " + x.name);
         } catch (e) {
-          note.text("Conversion failed: " + (e.message || e) + ". Download the AVI instead.").prop("hidden", false);
+          note.text("La conversión falló: " + (e.message || e) + ". Download the AVI instead.").prop("hidden", false);
         }
         bar.prop("hidden", true);
         conv.prop("disabled", false);
@@ -229,15 +229,15 @@ const makeCard = function(x) {
     }
   }
 
-  actions.append($("<button class='remove'>").text("Delete").on("click", function() {
-    if (!confirm("Delete " + x.name + "?")) return;
+  actions.append($("<button class='remove'>").text("Borrar").on("click", function() {
+    if (!confirm("Borrar " + x.name + "?")) return;
     $.ajax({url: "/api/gallery/" + x.kind + "/" + encodeURIComponent(x.name), method: "DELETE"})
       .done(function() {
         card.remove();
         all = all.filter(function(y) { return y !== x; }); shown = shown.filter(function(y) { return y !== x; });
-        selected.delete(key(x)); updateSel(); showStatus("Deleted " + x.name);
+        selected.delete(key(x)); updateSel(); showStatus("Borrado " + x.name);
       })
-      .fail(function() { showStatus("Delete failed", true); });
+      .fail(function() { showStatus("No se pudo borrar", true); });
   }));
   card.append(bar, note, actions);
   return card;
@@ -283,20 +283,20 @@ $("#selzip").on("click", function() {
   $("body").append(form);
   x6100PostForm(form[0]);
   form.remove();
-  showStatus("ZIP download started");
+  showStatus("Descarga del ZIP iniciada");
 });
 
 $("#seldel").on("click", function() {
   const sel = selList(), names = sel.map(function(x) { return x.name; });
-  if (!confirm("Delete " + sel.length + (sel.length == 1 ? " file" : " files") + " (" + humanSize(sumSize(sel)) + ")?\n\n" +
+  if (!confirm("Borrar " + sel.length + (sel.length == 1 ? " file" : " files") + " (" + humanSize(sumSize(sel)) + ")?\n\n" +
                names.slice(0, 10).join("\n") + (names.length > 10 ? "\n... and " + (names.length - 10) + " more" : ""))) return;
   $.ajax({url: "/api/gallery/delete", method: "POST", contentType: "application/json", data: JSON.stringify(selPayload(sel))})
     .done(function(r) {
-      showStatus("Deleted " + r.deleted.length + (r.failed.length ? ", " + r.failed.length + " failed" : ""), r.failed.length > 0);
+      showStatus("Borrado " + r.deleted.length + (r.failed.length ? ", " + r.failed.length + " failed" : ""), r.failed.length > 0);
       r.deleted.forEach(function(x) { selected.delete(key(x)); });
       loadList();
     })
-    .fail(function(r) { showStatus("Delete failed" + (r.responseJSON ? ": " + r.responseJSON.msg : ""), true); });
+    .fail(function(r) { showStatus("No se pudo borrar" + (r.responseJSON ? ": " + r.responseJSON.msg : ""), true); });
 });
 
 // Upload into the TX picture folders
@@ -352,25 +352,25 @@ const uploadFiles = async function(files) {
   const kind = folder;
   if (!UPLOAD_URL[kind] || !files.length) return;
   const rows = Array.from(files).map(function(f) {
-    const row = {file: f, bar: $("<progress max='1' value='0'>"), note: $("<span class='meta'>").text("waiting")};
+    const row = {file: f, bar: $("<progress max='1' value='0'>"), note: $("<span class='meta'>").text("esperando")};
     $("#uploads").append($("<div class='upl'>").append($("<span class='name'>").text(f.name), row.bar, row.note));
     return row;
   });
   let ok = 0;
   for (const row of rows) {
     try {
-      row.note.text("converting");
+      row.note.text("convirtiendo");
       const blob = await toPng(row.file, UPLOAD_FIT[kind]);
-      row.note.text("sending");
+      row.note.text("enviando");
       const r = await sendFile(blob, pngName(row.file.name), UPLOAD_URL[kind], row.bar);
       row.bar.val(1);
-      row.note.text("saved as " + r.name);
+      row.note.text("guardado como " + r.name);
       ok++;
     } catch (e) {
-      row.note.addClass("note").text("failed: " + (e.message || e));
+      row.note.addClass("note").text("falló: " + (e.message || e));
     }
   }
-  showStatus("Uploaded " + ok + " of " + rows.length, ok < rows.length);
+  showStatus("Subido " + ok + " of " + rows.length, ok < rows.length);
   loadList();
 }
 
@@ -410,7 +410,7 @@ const loadList = function() {
   $.getJSON("/api/gallery").done(function(list) {
     all = list;
     render();
-  }).fail(function() { showStatus("Can't read the list", true); });
+  }).fail(function() { showStatus("No se puede leer la lista", true); });
 }
 
 if (!window.isSecureContext) {

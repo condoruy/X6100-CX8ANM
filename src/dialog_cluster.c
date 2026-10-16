@@ -852,7 +852,7 @@ static void band_all_cb(button_data_t *data) {
 static const char *band_label(void) {
     static char label[24];
     int         band = vfo_band();
-    snprintf(label, sizeof(label), "Band /\n%s", showing_all() ? "All" : cluster_band_name(band));
+    snprintf(label, sizeof(label), "Band /\n%s", showing_all() ? tr("All") : cluster_band_name(band));
     return label;
 }
 

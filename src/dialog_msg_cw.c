@@ -198,7 +198,7 @@ static void update_status(void) {
             break;
         case CW_ENCODER_BEACON_IDLE: {
             char buf[32];
-            snprintf(buf, sizeof(buf), "BEACON %i s", cw_encoder_pause_left());
+            snprintf(buf, sizeof(buf), tr("BEACON %i s"), cw_encoder_pause_left());
             set_state(buf, theme_hex(TC_chip), theme_hex(TC_warn));
             lv_label_set_text(hint, "TX or PTT: stop");
             break;

@@ -1,50 +1,50 @@
-% rebase('base.html', title='Time Editor')
-<h2><svg class="i"><use href="#i-clock"/></svg>Time</h2>
-<p class="sub">Radio clock, timezone and time synchronisation.</p>
+% rebase('base.html', title='Editor de hora')
+<h2><svg class="i"><use href="#i-clock"/></svg>Hora</h2>
+<p class="sub">Reloj de la radio, zona horaria y sincronización.</p>
 
 <section class="dp-card">
-    <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-clock"/></svg></span><div><h3>Time information</h3><p>This browser's clock and the radio's</p></div></div>
+    <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-clock"/></svg></span><div><h3>Información de hora</h3><p>El reloj de este navegador y el de la radio</p></div></div>
     <div class="dp-body">
     <div class="time-now">
-        <section><label>Local time</label><div id="local-time">Loading Local Time...</div></section>
-        <section><label>Server time</label><div id="server-time">Fetching Server Time...</div></section>
-        <section><label>Server timezone</label><div id="server-timezone">Fetching Server Timezone...</div></section>
+        <section><label>Hora local</label><div id="local-time">Cargando la hora local...</div></section>
+        <section><label>Hora de la radio</label><div id="server-time">Leyendo la hora de la radio...</div></section>
+        <section><label>Zona horaria de la radio</label><div id="server-timezone">Leyendo la zona horaria de la radio...</div></section>
     </div>
-    <div class="actions"><button id="sync-local-time-btn" class="primary"><svg class="i"><use href="#i-sync"/></svg>Sync Local Time to Server</button></div>
+    <div class="actions"><button id="sync-local-time-btn" class="primary"><svg class="i"><use href="#i-sync"/></svg>Pasar la hora de esta PC a la radio</button></div>
     </div>
 </section>
 
 <section class="dp-card">
-    <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-edit"/></svg></span><div><h3>Manually update server time</h3><p>Sets the radio clock to the date and time you type</p></div></div>
+    <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-edit"/></svg></span><div><h3>Cambiar la hora de la radio a mano</h3><p>Pone el reloj de la radio en la fecha y hora que escriba</p></div></div>
     <div class="dp-body">
-    <label for="manual-time">Input time (format: YYYY-MM-DD HH:MM:SS)</label>
+    <label for="manual-time">Hora (formato: AAAA-MM-DD HH:MM:SS)</label>
     <div class="row">
-        <input id="manual-time" type="text" placeholder="Input Time">
-        <button id="manual-update-btn">Manually Update Time</button>
+        <input id="manual-time" type="text" placeholder="Hora">
+        <button id="manual-update-btn">Cambiar la hora</button>
     </div>
     </div>
 </section>
 
 <section class="dp-card">
-    <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-sync"/></svg></span><div><h3>Update server time by NTP</h3><p>Needs internet on the radio</p></div></div>
+    <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-sync"/></svg></span><div><h3>Poner la hora de la radio por NTP</h3><p>Necesita internet en la radio</p></div></div>
     <div class="dp-body">
-    <label for="ntp-servers">Select or input NTP server</label>
+    <label for="ntp-servers">Elija o escriba un servidor NTP</label>
     <div class="row">
         <select id="ntp-servers"></select>
-        <input id="custom-ntp" type="text" placeholder="Input Custom NTP Server Address" style="display: none;">
-        <button id="update-time-btn">Update Time</button>
+        <input id="custom-ntp" type="text" placeholder="Dirección de otro servidor NTP" style="display: none;">
+        <button id="update-time-btn">Poner la hora</button>
     </div>
     </div>
 </section>
 
 <section class="dp-card">
-    <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-globe"/></svg></span><div><h3>Set server timezone</h3><p>The radio's local time zone</p></div></div>
+    <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-globe"/></svg></span><div><h3>Zona horaria de la radio</h3><p>La zona horaria local de la radio</p></div></div>
     <div class="dp-body">
-    <label for="timezone-select">Select timezone or input custom timezone</label>
+    <label for="timezone-select">Elija o escriba una zona horaria</label>
     <div class="row">
         <select id="timezone-select"></select>
-        <input id="custom-timezone" type="text" placeholder="e.g., Asia/Shanghai" style="display: none;">
-        <button id="set-timezone-btn">Set Timezone</button>
+        <input id="custom-timezone" type="text" placeholder="ej. America/Montevideo" style="display: none;">
+        <button id="set-timezone-btn">Poner zona horaria</button>
     </div>
     </div>
 </section>
@@ -84,7 +84,7 @@
                 $("#server-timezone").text(response.timezone || "Unknown");
             },
             error: function () {
-                $("#server-timezone").text("Error fetching timezone");
+                $("#server-timezone").text("Error al leer la zona horaria");
             }
         });
     }
@@ -97,14 +97,14 @@
             data: JSON.stringify({ timezone: timezone }),
             success: function (response) {
                 if (response.status === "success") {
-                    alert("Timezone updated successfully!");
+                    alert("¡Zona horaria cambiada!");
                     fetchCurrentTimezone();
                 } else {
-                    alert("Failed to update timezone: " + response.msg);
+                    alert("No se pudo cambiar la zona horaria: " + response.msg);
                 }
             },
             error: function () {
-                alert("Failed to update timezone. Please try again.");
+                alert("No se pudo cambiar la zona horaria. Pruebe de nuevo.");
             }
         });
     }
@@ -143,11 +143,11 @@
                     serverTimeOffset = serverTime - localTime;
                     updateServerTime();
                 } else {
-                    $("#server-time").text("Server Time: Unfetched");
+                    $("#server-time").text("Hora de la radio: sin leer");
                 }
             },
             error: function () {
-                $("#server-time").text("Server Time: Unfetched");
+                $("#server-time").text("Hora de la radio: sin leer");
             },
         });
     }
@@ -160,14 +160,14 @@
             data: JSON.stringify({ update_mode: "ntp", server_address: ntpServer }),
             success: function (response) {
                 if (response.status === "success") {
-                    alert(`Update time successfully with ${ntpServer}`);
+                    alert(`Hora actualizada con ${ntpServer}`);
                     getServerTime();
                 } else {
-                    alert("Update time failed with " + response.msg);
+                    alert("No se pudo actualizar la hora con " + response.msg);
                 }
             },
             error: function () {
-                alert("Time update failed. Please check the NTP server address or network connection!");
+                alert("No se pudo actualizar la hora. ¡Revise el servidor NTP o la conexión!");
             },
         });
     }
@@ -180,14 +180,14 @@
             data: JSON.stringify({ update_mode: "manual", manual_time: manualTime }),
             success: function (response) {
                 if (response.status === "success") {
-                    alert("Server time updated manually.");
+                    alert("Hora de la radio cambiada a mano.");
                     getServerTime();
                 } else {
-                    alert("Manual time update failed: " + response.msg);
+                    alert("No se pudo cambiar la hora a mano: " + response.msg);
                 }
             },
             error: function () {
-                alert("Manual time update failed. Please check the time format and try again.");
+                alert("No se pudo cambiar la hora. Revise el formato y pruebe de nuevo.");
             }
         });
     }
@@ -243,7 +243,7 @@
         const timezone = selectedTimezone === "custom" ? customTimezone : selectedTimezone;
 
         if (!timezone) {
-            alert("Please select or input a timezone.");
+            alert("Elija o escriba una zona horaria.");
             return;
         }
 
@@ -258,7 +258,7 @@
         if (selectedNtp === "custom") {
             ntpServer = $("#custom-ntp").val().trim();
             if (!ntpServer) {
-                alert("Please input custom NTP server address!");
+                alert("¡Escriba la dirección del servidor NTP!");
                 return;
             }
         }
@@ -269,7 +269,7 @@
     $("#manual-update-btn").click(function () {
         const manualTime = $("#manual-time").val().trim();
         if (!manualTime) {
-            alert("Please input a valid time.");
+            alert("Escriba una hora válida.");
             return;
         }
         updateTimeManually(manualTime);

@@ -1,19 +1,19 @@
-% rebase('base.html', title='Bands editor')
-<h2><svg class="i"><use href="#i-bands"/></svg>Bands</h2>
-<p class="sub">Band edges and default modes shown on the radio. Active bands are reached with the band up/down buttons.</p>
+% rebase('base.html', title='Editor de bandas')
+<h2><svg class="i"><use href="#i-bands"/></svg>Bandas</h2>
+<p class="sub">Límites de banda y modos por defecto que muestra la radio. A las bandas activas se llega con los botones de banda arriba/abajo.</p>
 
 <section class="dp-card">
-<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-bands"/></svg></span><div><h3>Band list</h3><p>Name, edges, default mode and the Active flag</p></div><div class="dp-x"><button id="add_band" class="primary"><svg class="i"><use href="#i-plus"/></svg>Add band</button></div></div>
+<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-bands"/></svg></span><div><h3>Lista de bandas</h3><p>Nombre, límites, modo por defecto y si está activa</p></div><div class="dp-x"><button id="add_band" class="primary"><svg class="i"><use href="#i-plus"/></svg>Agregar banda</button></div></div>
 <div class="dp-body tbl">
 <div class="table-wrap">
 <table id="bands">
   <thead>
     <tr>
-      <th class="name hdr">Name</th>
-      <th class="freq hdr">Start, MHz</th>
-      <th class="freq hdr">Stop, MHz</th>
-      <th class="hdr">Mode</th>
-      <th class="hdr">Active</th>
+      <th class="name hdr">Nombre</th>
+      <th class="freq hdr">Inicio, MHz</th>
+      <th class="freq hdr">Fin, MHz</th>
+      <th class="hdr">Modo</th>
+      <th class="hdr">Activa</th>
       <th></th>
     </tr>
   </thead>
@@ -118,7 +118,7 @@ var closeEditMode = function(e) {
 var removeRow = function(e) {
   let row = $(e.currentTarget).parents("tr");
   let data = row.data();
-  if (confirm(`Remove band "${data.name}"?`) == true) {
+  if (confirm(`¿Quitar la banda "${data.name}"?`) == true) {
     if (data.id === null) {
       // Simple remove
       row.remove();

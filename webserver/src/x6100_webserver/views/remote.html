@@ -1,27 +1,27 @@
-% rebase('base.html', title='Remote')
-<h2><svg class="i"><use href="#i-knob"/></svg>Remote</h2>
-<p class="sub">Tunes the radio and plays its RX audio in this browser. Receive only: there is no transmit from the web in this version.</p>
+% rebase('base.html', title='Remoto')
+<h2><svg class="i"><use href="#i-knob"/></svg>Remoto</h2>
+<p class="sub">Sintoniza la radio y reproduce su audio de RX en este navegador. Solo recepción: desde esta página no se transmite.</p>
 
 <section class="dp-card">
-  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-knob"/></svg></span><div><h3>Tuning</h3><p>Frequency, mode and band of the radio</p></div></div>
+  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-knob"/></svg></span><div><h3>Sintonía</h3><p>Frecuencia, modo y banda de la radio</p></div></div>
   <div class="dp-body">
   <div class="rm-top">
     <div>
       <div class="rm-dim" id="rm-vfo">VFO-A</div>
-      <div class="rm-freq" id="rm-freq" title="Click to type a frequency">--.---.---</div>
+      <div class="rm-freq" id="rm-freq" title="Clic para escribir una frecuencia">--.---.---</div>
       <input id="rm-freq-in" class="rm-freq-in" hidden inputmode="decimal" autocomplete="off" placeholder="14.074 MHz">
     </div>
     <div class="rm-tune">
       <button id="rm-down">◀ 100 Hz</button>
       <button id="rm-up">▶ 100 Hz</button>
       <select id="rm-step">
-        <option value="10">Step 10 Hz</option>
-        <option value="100" selected>Step 100 Hz</option>
-        <option value="1000">Step 1 kHz</option>
-        <option value="5000">Step 5 kHz</option>
-        <option value="10000">Step 10 kHz</option>
+        <option value="10">Paso 10 Hz</option>
+        <option value="100" selected>Paso 100 Hz</option>
+        <option value="1000">Paso 1 kHz</option>
+        <option value="5000">Paso 5 kHz</option>
+        <option value="10000">Paso 10 kHz</option>
       </select>
-      <small class="rm-dim">or scroll on the waterfall</small>
+      <small class="rm-dim">o la rueda sobre la cascada</small>
     </div>
     <div class="rm-smeter">
       <div class="rm-dim">S-meter</div>
@@ -29,25 +29,25 @@
       <small id="rm-s">S0</small>
     </div>
   </div>
-  <div class="rm-row" id="rm-modes"><span class="rm-dim">Mode</span></div>
-  <div class="rm-row" id="rm-bands"><span class="rm-dim">Band</span></div>
+  <div class="rm-row" id="rm-modes"><span class="rm-dim">Modo</span></div>
+  <div class="rm-row" id="rm-bands"><span class="rm-dim">Banda</span></div>
   </div>
 </section>
 
 <section class="dp-card rm-scope">
-  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-waterfall"/></svg></span><div><h3>Spectrum and waterfall</h3><p>Scroll on the waterfall to tune</p></div></div>
+  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-waterfall"/></svg></span><div><h3>Espectro y cascada</h3><p>La rueda sobre la cascada sintoniza</p></div></div>
   <canvas id="rm-sp"></canvas>
   <canvas id="rm-wf"></canvas>
 </section>
 
 <section class="dp-card">
-  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-speaker"/></svg></span><div><h3>Audio and receiver</h3><p>RX audio in this browser, receive only</p></div></div>
+  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-speaker"/></svg></span><div><h3>Audio y receptor</h3><p>Audio de RX en este navegador, solo recepción</p></div></div>
   <div class="dp-body">
   <div class="rm-audio">
-    <button class="primary" id="rm-listen">🔊 Listen</button>
-    <div><label for="rm-vol">Browser volume</label><input type="range" id="rm-vol" min="0" max="200" value="100"></div>
-    <div><label for="rm-filter" id="rm-filter-l">Filter</label><input type="range" id="rm-filter" min="100" max="6000" step="50"></div>
-    <div><label for="rm-rfgain" id="rm-rfgain-l">RF gain</label><input type="range" id="rm-rfgain" min="0" max="100"></div>
+    <button class="primary" id="rm-listen">🔊 Escuchar</button>
+    <div><label for="rm-vol">Volumen del navegador</label><input type="range" id="rm-vol" min="0" max="200" value="100"></div>
+    <div><label for="rm-filter" id="rm-filter-l">Filtro</label><input type="range" id="rm-filter" min="100" max="6000" step="50"></div>
+    <div><label for="rm-rfgain" id="rm-rfgain-l">Ganancia RF</label><input type="range" id="rm-rfgain" min="0" max="100"></div>
   </div>
   <div class="rm-row">
     <button class="pill" data-toggle="pre">PRE</button>
@@ -55,10 +55,10 @@
     <button class="pill" id="rm-agc">AGC</button>
     <button class="pill" data-toggle="nb">NB</button>
     <button class="pill" data-toggle="nr">NR</button>
-    <button class="rm-ptt" disabled>PTT (not in this version)</button>
+    <button class="rm-ptt" disabled>PTT (en la página Equipo)</button>
   </div>
-  <p class="rm-dim" style="margin-top:12px">Audio delay ~0.5 s · 1 listener at a time</p>
-  <p class="rm-dim" id="rm-https" hidden>Audio needs <a id="rm-https-link" href="#"></a> (the radio's certificate is self-signed: accept it once in the browser).</p>
+  <p class="rm-dim" style="margin-top:12px">Retardo del audio ~0,5 s · un oyente a la vez</p>
+  <p class="rm-dim" id="rm-https" hidden>El audio necesita <a id="rm-https-link" href="#"></a> (el certificado de la radio es propio: acéptelo una vez en el navegador).</p>
   <div class="actions"><span class="status" id="rm-status"></span></div>
   </div>
 </section>
@@ -90,7 +90,7 @@ const send = function(cmd, val) {
     data: JSON.stringify({cmd: cmd, val: val}),
     contentType: "application/json; charset=utf-8",
     dataType: "json",
-    error: function(xhr) { showStatus(xhr.responseJSON ? xhr.responseJSON.msg : "Radio not reachable", true); }
+    error: function(xhr) { showStatus(xhr.responseJSON ? xhr.responseJSON.msg : "La radio no responde", true); }
   });
 }
 
@@ -161,7 +161,7 @@ $("#rm-filter").on("input", function() {
 });
 $("#rm-rfgain").on("input", function() {
   holdUntil.rfgain = Date.now() + 1500;
-  $("#rm-rfgain-l").text("RF gain " + this.value);
+  $("#rm-rfgain-l").text("Ganancia RF " + this.value);
   sendRfgain(parseInt(this.value));
 });
 
@@ -179,7 +179,7 @@ $("#rm-freq-in").on("keydown", function(e) {
   if (e.key != "Enter") return;
   const v = parseFloat(this.value.replace(",", "."));
   closeFreqInput();
-  if (!isFinite(v) || v <= 0) return showStatus("Invalid frequency", true);
+  if (!isFinite(v) || v <= 0) return showStatus("Frecuencia inválida", true);
   const f = Math.round(v < 100 ? v * 1e6 : v < 100000 ? v * 1e3 : v);
   $("#rm-freq").text(fmtFreq(f));
   send("freq", f);
@@ -208,7 +208,7 @@ const render = function(s) {
   }
   if (!(Date.now() < holdUntil.rfgain)) {
     $("#rm-rfgain").val(s.rfgain);
-    $("#rm-rfgain-l").text("RF gain " + s.rfgain);
+    $("#rm-rfgain-l").text("Ganancia RF " + s.rfgain);
   }
 }
 
@@ -343,7 +343,7 @@ const connect = function() {
     if (m.t == "state") {
       clearTimeout(lostTimer);
       lostTimer = null;
-      if (!st || (errorSince && Date.now() - errorSince > 4000)) showStatus("Connected");
+      if (!st || (errorSince && Date.now() - errorSince > 4000)) showStatus("Conectado");
       render(m);
     } else if (m.t == "spec") {
       addLine(m);
@@ -353,7 +353,7 @@ const connect = function() {
   };
   es.addEventListener("fail", function(e) { st = null; showStatus(e.data, true); });
   es.onerror = function() {   // the stream reconnects by itself (the server's socket timeout): lost only if it doesn't
-    if (st && !lostTimer) lostTimer = setTimeout(function() { lostTimer = null; showStatus("Connection lost, retrying", true); }, 3000);
+    if (st && !lostTimer) lostTimer = setTimeout(function() { lostTimer = null; showStatus("Conexión perdida, reintentando", true); }, 3000);
     st = null;
   };
 }
@@ -415,13 +415,13 @@ const stopAudio = function() {
   audio.abort.abort();
   audio.ctx.close();
   audio = null;
-  $("#rm-listen").text("🔊 Listen");
-  showStatus("Connected");
+  $("#rm-listen").text("🔊 Escuchar");
+  showStatus("Conectado");
 }
 
 const startAudio = async function() {
   const a = audio = {abort: new AbortController(), ctx: new AudioContext()};
-  $("#rm-listen").text("■ Stop");
+  $("#rm-listen").text("■ Detener");
   a.gain = a.ctx.createGain();
   a.gain.gain.value = $("#rm-vol").val() / 100;
   a.gain.connect(a.ctx.destination);
@@ -440,8 +440,8 @@ const startAudio = async function() {
     push = function(f) { j.push(f); };
   }
   const r = await fetch("/link/v2/audio", {signal: a.abort.signal, cache: "no-store"});
-  if (!r.ok) throw new Error(r.status == 409 ? "Another listener is connected (1 listener at a time)" : "No audio from the radio");
-  showStatus("Listening");
+  if (!r.ok) throw new Error(r.status == 409 ? "Ya hay otra página escuchando (una a la vez)" : "La radio no manda audio");
+  showStatus("Escuchando");
   const reader = r.body.getReader();
   let odd = null;
   while (true) {
@@ -460,7 +460,7 @@ const startAudio = async function() {
     for (let i = 0; i < n; i++) f[i] = dv.getInt16(i * 2, true) / 32768;
     push(f);
   }
-  throw new Error("Audio stopped by the radio");
+  throw new Error("La radio cortó el audio");
 }
 
 $("#rm-listen").on("click", function() {

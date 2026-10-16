@@ -107,9 +107,9 @@ static void fill(void) {
 
     p = snprintf(line, sizeof(line), "Spots: cluster 30 min / RBN 15 min.   ");
     if (!n)
-        p += snprintf(line + p, sizeof(line) - p, "Nobody heard you: Test beacon (CW)");
+        p += snprintf(line + p, sizeof(line) - p, tr("Nobody heard you: Test beacon (CW)"));
     else
-        p += snprintf(line + p, sizeof(line) - p, "Heard by");
+        p += snprintf(line + p, sizeof(line) - p, tr("Heard by"));
     for (int k = 0; k < n && p < (int)sizeof(line); k++)
         p += snprintf(line + p, sizeof(line) - p, "  %s %+d", hits[k].skimmer, hits[k].snr);
     lv_label_set_text(frame.status, line);

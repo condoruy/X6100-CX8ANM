@@ -1003,7 +1003,7 @@ static void freq_cb(struct button_data_t *btn_data) {
     lv_obj_set_style_bg_color(freq_list, TC(list), 0);
     lv_obj_set_style_border_color(freq_list, TC(text), 0);
     char line[64];
-    snprintf(line, sizeof(line), "%s frequencies - hold Freq to type", ftx_mode_name());
+    snprintf(line, sizeof(line), tr("%s frequencies - hold Freq to type"), ftx_mode_name());
     lv_obj_set_style_text_font(lv_list_add_text(freq_list, line), &sony_22, 0);
 
     lv_obj_t *cur = NULL;
@@ -1049,7 +1049,7 @@ static void freq_hold_cb(struct button_data_t *btn_data) {
 
 const char *cq_all_label_getter() {
     static char buf[32];
-    sprintf(buf, "Show:\n%s", param_i_get(cfg_ft8_show_all) ? "All": "CQ");
+    sprintf(buf, "Show:\n%s", param_i_get(cfg_ft8_show_all) ? tr("All"): "CQ");
     return buf;
 }
 
@@ -1061,25 +1061,25 @@ const char *protocol_label_getter() {
 
 const char *tx_cq_label_getter() {
     static char buf[32];
-    sprintf(buf, "TX CQ:\n%s", subject_i_get(cq_enabled) ? "Enabled": "Disabled");
+    sprintf(buf, "TX CQ:\n%s", subject_i_get(cq_enabled) ? tr("Enabled"): tr("Disabled"));
     return buf;
 }
 
 const char *tx_call_label_getter() {
     static char buf[32];
-    sprintf(buf, "TX Call:\n%s", subject_i_get(tx_enabled) ? "Enabled": "Disabled");
+    sprintf(buf, "TX Call:\n%s", subject_i_get(tx_enabled) ? tr("Enabled"): tr("Disabled"));
     return buf;
 }
 
 const char *hold_freq_label_getter() {
     static char buf[32];
-    sprintf(buf, "Hold Freq:\n%s", param_i_get(cfg_ft8_hold_freq) ? "Enabled": "Disabled");
+    sprintf(buf, "Hold Freq:\n%s", param_i_get(cfg_ft8_hold_freq) ? tr("Enabled"): tr("Disabled"));
     return buf;
 }
 
 const char *auto_label_getter() {
     static char buf[32];
-    sprintf(buf, "Auto:\n%s", param_i_get(cfg_ft8_auto) ? "Enabled": "Disabled");
+    sprintf(buf, "Auto:\n%s", param_i_get(cfg_ft8_auto) ? tr("Enabled"): tr("Disabled"));
     return buf;
 }
 
@@ -1264,7 +1264,7 @@ static void on_table_press(const cell_data_t *cell_data) {
         {
             cell_data_t cd;
             cd.cell_type = CELL_START_QSO;
-            snprintf(cd.text, sizeof(cd.text), "Start QSO with %s", cell_data->meta.call_de);
+            snprintf(cd.text, sizeof(cd.text), tr("Start QSO with %s"), cell_data->meta.call_de);
             scheduler_put(table_view_add_msg_cb, &cd, sizeof(cell_data_t));
         }
         msg_schedule_text_fmt("Next TX: %s", tx_msg.msg);
@@ -1383,7 +1383,7 @@ static void add_info(const char * fmt, ...) {
     cell_data.cell_type = CELL_RX_INFO;
 
     va_start(args, fmt);
-    vsnprintf(cell_data.text, sizeof(cell_data.text), fmt, args);
+    vsnprintf(cell_data.text, sizeof(cell_data.text), tr(fmt), args);
     va_end(args);
 
     scheduler_put(table_view_add_msg_cb, &cell_data, sizeof(cell_data_t));
@@ -1468,9 +1468,9 @@ static void hound_rx_text(const char *text, int snr, float freq_hz, bool odd) {
 static const char *hound_state(void) {
     static char buf[40];
     switch (hound.stage) {
-        case HOUND_CALLING: snprintf(buf, sizeof(buf), "calling %s", hound.fox); break;
-        case HOUND_REPORT:  snprintf(buf, sizeof(buf), "R%+03d to %s", hound.sent, hound.fox); break;
-        default:            snprintf(buf, sizeof(buf), "select the Fox"); break;
+        case HOUND_CALLING: snprintf(buf, sizeof(buf), tr("calling %s"), hound.fox); break;
+        case HOUND_REPORT:  snprintf(buf, sizeof(buf), tr("R%+03d to %s"), hound.sent, hound.fox); break;
+        default:            snprintf(buf, sizeof(buf), tr("select the Fox")); break;
     }
     return buf;
 }

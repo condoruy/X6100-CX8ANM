@@ -832,7 +832,7 @@ static void refresh_calls(void) {
     int  done = (st == ST_PLAYING || st == ST_LISTEN) ? call_no - 1 : call_no;
 
     lv_label_set_text_fmt(head, "CW TRAINER - #%06x Calls#", theme_hex(TC_text));
-    snprintf(buf, sizeof(buf), "Call %i/%i - %i WPM", call_no, CALLS_RUN, call_no ? call_wpm : next_wpm);
+    snprintf(buf, sizeof(buf), tr("Call %i/%i - %i WPM"), call_no, CALLS_RUN, call_no ? call_wpm : next_wpm);
     lv_label_set_text(head_right, buf);
 
     show(c_sent_cap, rev);
@@ -851,11 +851,11 @@ static void refresh_calls(void) {
 
     buf[0] = 0;
     if (rev) {
-        snprintf(buf, sizeof(buf), "%s - speed %i -> %i WPM", last_ok ? "Right" : "Wrong", prev_wpm, next_wpm);
+        snprintf(buf, sizeof(buf), tr("%s - speed %i -> %i WPM"), last_ok ? tr("Right") : tr("Wrong"), prev_wpm, next_wpm);
         if (run_done) {
             fmt_num(score, n1, sizeof(n1));
             size_t n = strlen(buf);
-            snprintf(buf + n, sizeof(buf) - n, "\n#%06x Run complete - final score %s#", theme_hex(TC_accent), n1);
+            snprintf(buf + n, sizeof(buf) - n, tr("\n#%06x Run complete - final score %s#"), theme_hex(TC_accent), n1);
         }
     }
     lv_obj_set_style_text_color(c_res, lv_color_hex(last_ok ? COLOR_OK : COLOR_BAD), 0);
@@ -865,7 +865,7 @@ static void refresh_calls(void) {
     fmt_num(score, n1, sizeof(n1));
     lv_label_set_text(c_score, n1);
     fmt_num(stats.best_score, n2, sizeof(n2));
-    snprintf(buf, sizeof(buf), "Right %i / %i\nBest speed %i WPM\nBest score %s", calls_right, done, stats.best_wpm, n2);
+    snprintf(buf, sizeof(buf), tr("Right %i / %i\nBest speed %i WPM\nBest score %s"), calls_right, done, stats.best_wpm, n2);
     lv_label_set_text(c_stats, buf);
 }
 
@@ -876,7 +876,7 @@ static void refresh_stats(void) {
     int  beg = end > HIST_N ? end - HIST_N : 0;
 
     lv_label_set_text_fmt(head, "CW TRAINER - #%06x Stats#", theme_hex(TC_text));
-    snprintf(buf, sizeof(buf), "Level %i - %i WPM", l, (int)param_i_get(cfg_key_speed));
+    snprintf(buf, sizeof(buf), tr("Level %i - %i WPM"), l, (int)param_i_get(cfg_key_speed));
     lv_label_set_text(head_right, buf);
 
     for (int t = 0; t < HIST_N; t++) {
@@ -898,7 +898,7 @@ static void refresh_stats(void) {
     lv_label_set_text(st_next_c, buf);
 
     roll_today();
-    snprintf(buf, sizeof(buf), "Today: %u tries, %u%% right, %u min", (unsigned)stats.tries,
+    snprintf(buf, sizeof(buf), tr("Today: %u tries, %u%% right, %u min"), (unsigned)stats.tries,
              stats.tries ? (unsigned)(stats.right * 100 / stats.tries) : 0u, (unsigned)((stats.ms + 30000) / 60000));
     lv_label_set_text(st_today, buf);
     lv_label_set_text(hint, "Last 20 tries per character. Weak ones (red, yellow) come up more often in Learn.");
@@ -950,7 +950,7 @@ static void refresh_ui(void) {
     }
     if (mode == MODE_PRACTICE) {
         lv_label_set_text_fmt(head, "CW TRAINER - #%06x Practice#", theme_hex(TC_text));
-        snprintf(buf, sizeof(buf), "%i WPM (keyer %i)", wpm_seen, wpm);
+        snprintf(buf, sizeof(buf), tr("%i WPM (keyer %i)"), wpm_seen, wpm);
         lv_label_set_text(head_right, buf);
         lv_label_set_text(text_lbl, text[0] ? text : "Key with the paddle: the text appears here");
         lv_obj_set_style_text_color(text_lbl, lv_color_hex(text[0] ? theme_hex(TC_text) : COLOR_DIM), 0);
@@ -961,7 +961,7 @@ static void refresh_ui(void) {
     }
 
     lv_label_set_text_fmt(head, "CW TRAINER - #%06x Learn (Koch)#", theme_hex(TC_text));
-    snprintf(buf, sizeof(buf), "%i WPM - group %i", wpm, (int)param_i_get(cfg_cwt_group));
+    snprintf(buf, sizeof(buf), tr("%i WPM - group %i"), wpm, (int)param_i_get(cfg_cwt_group));
     lv_label_set_text(head_right, buf);
 
     lv_label_set_text(line1, "");
@@ -978,7 +978,7 @@ static void refresh_ui(void) {
             lv_label_set_text(hint, "The radio keys the group (sidetone only)");
             /* The group stays on screen while playing and answering, to memorise it */
             morse_line(target, m1, sizeof(m1));
-            snprintf(buf, sizeof(buf), "Sent:   #%06x %s#   %s", theme_hex(TC_accent), target, m1);
+            snprintf(buf, sizeof(buf), tr("Sent:   #%06x %s#   %s"), theme_hex(TC_accent), target, m1);
             lv_label_set_text(line1, buf);
             lv_label_set_text(line2, "");
             break;
@@ -987,10 +987,10 @@ static void refresh_ui(void) {
             lv_obj_set_style_text_color(big, lv_color_hex(heard[0] ? theme_hex(TC_text) : COLOR_NEW), 0);
             lv_label_set_text(hint, "Key the group with the paddle. Replay: hear it again");
             morse_line(target, m1, sizeof(m1));
-            snprintf(buf, sizeof(buf), "Sent:   #%06x %s#   %s", theme_hex(TC_accent), target, m1);
+            snprintf(buf, sizeof(buf), tr("Sent:   #%06x %s#   %s"), theme_hex(TC_accent), target, m1);
             lv_label_set_text(line1, buf);
             morse_line(heard, m2, sizeof(m2));
-            snprintf(buf, sizeof(buf), "Heard: #%06x %s#   %s", theme_hex(TC_text), heard, m2);
+            snprintf(buf, sizeof(buf), tr("Heard: #%06x %s#   %s"), theme_hex(TC_text), heard, m2);
             lv_label_set_text(line2, heard[0] ? buf : "");
             break;
         case ST_RESULT:
@@ -998,9 +998,9 @@ static void refresh_ui(void) {
             lv_obj_set_style_text_color(big, lv_color_hex(last_ok ? COLOR_OK : COLOR_BAD), 0);
             morse_line(target, m1, sizeof(m1));
             morse_line(heard, m2, sizeof(m2));
-            snprintf(buf, sizeof(buf), "Sent:   #%06x %s#   %s", theme_hex(TC_accent), target, m1);
+            snprintf(buf, sizeof(buf), tr("Sent:   #%06x %s#   %s"), theme_hex(TC_accent), target, m1);
             lv_label_set_text(line1, buf);
-            snprintf(buf, sizeof(buf), "Heard: #%s %s#   %s", last_ok ? "60ff60" : "ff6060", heard, m2);
+            snprintf(buf, sizeof(buf), tr("Heard: #%s %s#   %s"), last_ok ? "60ff60" : "ff6060", heard, m2);
             lv_label_set_text(line2, buf);
             lv_label_set_text(hint, autoplay ? "Next group follows. Pause: stop after this one" : "Start: resume. Skip: another group");
             break;
@@ -1008,7 +1008,7 @@ static void refresh_ui(void) {
 
     int good = 0;
     for (int i = 0; i < hist_n; i++) good += hist[i];
-    snprintf(buf, sizeof(buf), "Score  %i / %i\nLast %i: %i / %i\nNext level at %i%%", right, tried, WINDOW, good, hist_n, PASS_PCT);
+    snprintf(buf, sizeof(buf), tr("Score  %i / %i\nLast %i: %i / %i\nNext level at %i%%"), right, tried, WINDOW, good, hist_n, PASS_PCT);
     lv_label_set_text(side_score, buf);
 
     /* Characters in use, the newest highlighted */
@@ -1020,7 +1020,7 @@ static void refresh_ui(void) {
     }
     *p = 0;
     char cbuf[200];
-    snprintf(cbuf, sizeof(cbuf), "Level %i\n%s", l, buf);
+    snprintf(cbuf, sizeof(cbuf), tr("Level %i\n%s"), l, buf);
     lv_label_set_text(side_chars, cbuf);
 }
 
@@ -1181,7 +1181,7 @@ static void construct_cb(lv_obj_t *parent) {
     lv_label_set_text(label(row, &sony_22, theme_hex(TC_text_value)), "Next new character:");
     st_next_c = label(row, &sony_30, COLOR_NEW);
     char tail[48];
-    snprintf(tail, sizeof(tail), "(at %i%% on the current set)", PASS_PCT);
+    snprintf(tail, sizeof(tail), tr("(at %i%% on the current set)"), PASS_PCT);
     lv_label_set_text(label(row, &sony_20, COLOR_DIM), tail);
     st_today = label(stats_cont, &sony_22, theme_hex(TC_text_value));
     lv_obj_set_pos(st_today, 0, 2 * TILE_H + TILE_GAP + 52);

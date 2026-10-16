@@ -25,3 +25,5 @@
 #define lv_draw_label(ctx, dsc, area, txt, hint)        lv_draw_label(ctx, dsc, area, tr(txt), hint)
 #define lv_canvas_draw_text(c, x, y, w, dsc, txt)       lv_canvas_draw_text(c, x, y, w, dsc, tr(txt))
 #define lv_txt_get_size(size, txt, font, ls, lsp, mw, f) lv_txt_get_size(size, tr(txt), font, ls, lsp, mw, f)
+#define lv_table_set_cell_value(obj, r, c, txt)         lv_table_set_cell_value(obj, r, c, tr(txt))
+#define lv_table_set_cell_value_fmt(obj, r, c, fmt, ...) lv_table_set_cell_value_fmt(obj, r, c, tr(fmt), ##__VA_ARGS__)

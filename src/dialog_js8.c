@@ -550,7 +550,7 @@ static void format_row(const js8_rx_msg_t *m, char *buf, size_t size) {
              m->low_confidence ? "[" : "",
              m->text,
              m->low_confidence ? "]" : "",
-             m->partial ? " ..." : m->checksum < 0 ? "  (bad checksum)" : "");
+             m->partial ? " ..." : m->checksum < 0 ? tr("  (bad checksum)") : "");
 }
 
 static bool auto_selecting; /* follow() is moving the selection, not the user */
@@ -613,7 +613,7 @@ static void add_info_row(const char *fmt, ...) {
     char    buf[128];
     va_list args;
     va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    vsnprintf(buf, sizeof(buf), tr(fmt), args);
     va_end(args);
 
     if (view_stations) return;
@@ -793,7 +793,7 @@ static void add_message(const js8_rx_msg_t *msg) {
 /* "4m" style age; "now" under a minute. */
 static void format_age(int64_t ms, char *buf, size_t size) {
     int64_t min = ms / 60000;
-    if (min <= 0) snprintf(buf, size, "now");
+    if (min <= 0) snprintf(buf, size, tr("now"));
     else if (min < 60) snprintf(buf, size, "%dm", (int)min);
     else snprintf(buf, size, "%dh", (int)(min / 60));
 }
@@ -818,9 +818,9 @@ static void station_fields(const js8_station_t *st, int64_t now, station_fields_
         char hage[8];
         format_age(now - st->heard_me_ms, hage, sizeof(hage));
         if (st->has_reported_snr) {
-            snprintf(heard, sizeof(f->heard), "heard you %+03d (%s)", st->reported_snr, hage);
+            snprintf(heard, sizeof(f->heard), tr("heard you %+03d (%s)"), st->reported_snr, hage);
         } else {
-            snprintf(heard, sizeof(f->heard), "heard you (%s)", hage);
+            snprintf(heard, sizeof(f->heard), tr("heard you (%s)"), hage);
         }
     }
     if (st->grid[0] && station_qth()[0]) {
@@ -1076,18 +1076,18 @@ static void update_status(void) {
     int64_t now_ms    = now_wall_ms();
     bool    any_auto  = params.js8_auto.x || params.js8_hb.x;
     if (any_auto && js8_auto_idle(autop, now_ms)) {
-        snprintf(flags, sizeof(flags), "AUTO/HB PAUSED (idle)  ");
+        snprintf(flags, sizeof(flags), tr("AUTO/HB PAUSED (idle)  "));
     } else {
         if (params.js8_auto.x) strcat(flags, "AUTO  ");
         if (params.js8_hb.x) {
             char hb[40];
             if (!js8_speed_heartbeats(cur_speed())) {
-                snprintf(hb, sizeof(hb), "HB paused (Turbo)  ");
+                snprintf(hb, sizeof(hb), tr("HB paused (Turbo)  "));
             } else if (hb_next_ms > now_ms) {
                 time_t    t = (time_t)(hb_next_ms / 1000);
                 struct tm nt;
                 gmtime_r(&t, &nt);
-                snprintf(hb, sizeof(hb), "HB %um next %02d:%02d  ", params.js8_hb_interval.x, nt.tm_hour, nt.tm_min);
+                snprintf(hb, sizeof(hb), tr("HB %um next %02d:%02d  "), params.js8_hb_interval.x, nt.tm_hour, nt.tm_min);
             } else {
                 snprintf(hb, sizeof(hb), "HB %um  ", params.js8_hb_interval.x);
             }
@@ -1104,7 +1104,7 @@ static void update_status(void) {
     /* JS8 runs off the radio's clock by this much (Time Sync). */
     char    drift[24] = "";
     int64_t d         = js8_drift_ms();
-    if (d) snprintf(drift, sizeof(drift), " drift %+.1fs", d / 1000.0);
+    if (d) snprintf(drift, sizeof(drift), tr(" drift %+.1fs"), d / 1000.0);
     lv_label_set_text_fmt(status, "%s%s%s  %02d:%02d:%02dZ%s  total %u", flags, testing ? "TEST WAV  " : "",
                           where_label(), tm.tm_hour, tm.tm_min, tm.tm_sec, drift, hist_count);
 }
@@ -1470,14 +1470,14 @@ static void update_tx_bar(void) {
     uint16_t offset = params.js8_tx_freq.x;
 
     if (cq_adjusting && tx_status.state == JS8_TX_IDLE) {
-        snprintf(line, sizeof(line), "Auto CQ %u min after each CQ: turn the knob (%d-%d), press CQ when done",
+        snprintf(line, sizeof(line), tr("Auto CQ %u min after each CQ: turn the knob (%d-%d), press CQ when done"),
                  params.js8_cq_interval.x, CQ_MIN_INTERVAL, CQ_MAX_INTERVAL);
         lv_obj_set_style_bg_color(tx_bar, TC(warn_bg), 0);
         lv_label_set_text(tx_bar, line);
         return;
     }
     if (hb_adjusting && tx_status.state == JS8_TX_IDLE) {
-        snprintf(line, sizeof(line), "HB every %u min: turn the knob (5-30), press HB when done",
+        snprintf(line, sizeof(line), tr("HB every %u min: turn the knob (5-30), press HB when done"),
                  params.js8_hb_interval.x);
         lv_obj_set_style_bg_color(tx_bar, TC(warn_bg), 0);
         lv_label_set_text(tx_bar, line);
@@ -1492,21 +1492,21 @@ static void update_tx_bar(void) {
         /* Progress before the text: a long message only loses its end. */
         snprintf(line, sizeof(line), "TX %4.0f Hz %s  %d/%d %s %d s   %s", tx_status.offset_hz,
                  js8_speed_name(tx_status.speed), tx_status.frame, tx_status.frames,
-                 tx_status.frame == 1 ? "starts in" : "next in", secs, tx_status.text);
+                 tx_status.frame == 1 ? tr("starts in") : tr("next in"), secs, tx_status.text);
         lv_obj_set_style_bg_color(tx_bar, TC(warn_bg), 0);
         break;
     }
     case JS8_TX_KEYING:
-        snprintf(line, sizeof(line), "TX %4.0f Hz %s  sending %d/%d   %s", tx_status.offset_hz,
+        snprintf(line, sizeof(line), tr("TX %4.0f Hz %s  sending %d/%d   %s"), tx_status.offset_hz,
                  js8_speed_name(tx_status.speed), tx_status.frame, tx_status.frames, tx_status.text);
         lv_obj_set_style_bg_color(tx_bar, TC(tx_bg), 0);
         break;
     default:
-        snprintf(line, sizeof(line), "TX %4u Hz %s   ready%s%s", offset, js8_speed_name(cur_speed()),
-                 params.callsign.x[0] ? "" : "  (set your callsign: Settings > General)",
-                 sel_call[0] ? "      selected: " : "");
+        snprintf(line, sizeof(line), tr("TX %4u Hz %s   ready%s%s"), offset, js8_speed_name(cur_speed()),
+                 params.callsign.x[0] ? "" : tr("  (set your callsign: Settings > General)"),
+                 sel_call[0] ? tr("      selected: ") : "");
         if (sel_call[0]) strncat(line, sel_call, sizeof(line) - strlen(line) - 1);
-        if (auto_cq) strncat(line, "      auto CQ", sizeof(line) - strlen(line) - 1);
+        if (auto_cq) strncat(line, tr("      auto CQ"), sizeof(line) - strlen(line) - 1);
         lv_obj_set_style_bg_color(tx_bar, TC(list), 0);
         break;
     }
@@ -2888,8 +2888,8 @@ static void query_open(void) {
     bool  have = selected_station(call, sizeof(call), &freq, &snr);
 
     char title[40];
-    if (have) snprintf(title, sizeof(title), "To %s (%+d dB)", call, snr);
-    else snprintf(title, sizeof(title), "No station selected");
+    if (have) snprintf(title, sizeof(title), tr("To %s (%+d dB)"), call, snr);
+    else snprintf(title, sizeof(title), tr("No station selected"));
     query_list = query_list_create(300, title);
 
     lv_obj_t *first = NULL;
@@ -3081,7 +3081,7 @@ static void saved_open(int focus) {
             macros_fill(saved_msgs[i], false, text, sizeof(text)); /* as desktop's menu shows them */
             snprintf(label, sizeof(label), "%d  %s", i + 1, text);
         } else {
-            snprintf(label, sizeof(label), "%d  (empty)", i + 1);
+            snprintf(label, sizeof(label), tr("%d  (empty)"), i + 1);
         }
         lv_obj_t *b = items[i] = list_add_item(query_list, label);
         lv_label_set_long_mode(lv_obj_get_child(b, -1), LV_LABEL_LONG_DOT); /* one line, never scrolling */
@@ -3176,14 +3176,14 @@ static void hb_pause(const char *why) {
 
 static void qso_started(const char *call) {
     char why[JS8_RX_CALL_LEN + 12];
-    snprintf(why, sizeof(why), "QSO with %s", call);
+    snprintf(why, sizeof(why), tr("QSO with %s"), call);
     hb_pause(why);
 }
 
 static void handle_incoming(const js8_rx_msg_t *m) {
     if (js8_starts_qso(m)) {
         char why[JS8_RX_CALL_LEN + 12];
-        snprintf(why, sizeof(why), "%s answered", m->from);
+        snprintf(why, sizeof(why), tr("%s answered"), m->from);
         auto_cq_stop(why);
         qso_started(m->from);
     }
@@ -3513,12 +3513,12 @@ static void texts_cb(button_data_t *btn) {
     lv_obj_set_style_text_font(title, &sony_22, 0);
 
     char label[TEXT_MAX + 16];
-    snprintf(label, sizeof(label), "INFO: %s", info_text[0] ? info_text : "(not set)");
+    snprintf(label, sizeof(label), "INFO: %s", info_text[0] ? info_text : tr("(not set)"));
     lv_obj_t *first = settings_add(label, EDIT_INFO);
-    snprintf(label, sizeof(label), "STATUS: %s", status_text[0] ? status_text : "(not set)");
+    snprintf(label, sizeof(label), "STATUS: %s", status_text[0] ? status_text : tr("(not set)"));
     settings_add(label, EDIT_STATUS);
     settings_add(relay_label(), SETTINGS_RELAY);
-    snprintf(label, sizeof(label), "Groups: %s", groups_text[0] ? groups_text : "(none)");
+    snprintf(label, sizeof(label), tr("Groups: %s"), groups_text[0] ? groups_text : tr("(none)"));
     settings_add(label, EDIT_GROUPS);
 
     lv_obj_t *close = list_add_item(texts_list, "Close");
@@ -3931,26 +3931,26 @@ static void spot_label(spot_item_t item, char *line, size_t size) {
     char mhz[16];
     switch (item) {
     case SP_SEND:
-        snprintf(line, size, "Send spot");
+        snprintf(line, size, tr("Send spot"));
         break;
     case SP_REF:
-        if (spot_sota) snprintf(line, size, "Summit: %s", last_sota[0] ? last_sota : "(type it)");
-        else snprintf(line, size, "Park: %s", last_pota[0] ? last_pota : "(type it)");
+        if (spot_sota) snprintf(line, size, tr("Summit: %s"), last_sota[0] ? last_sota : tr("(type it)"));
+        else snprintf(line, size, tr("Park: %s"), last_pota[0] ? last_pota : tr("(type it)"));
         break;
     case SP_FREQ:
         format_mhz(spot_hz(), mhz, sizeof(mhz));
-        snprintf(line, size, "Frequency: %s MHz (%s)", mhz, spot_use_typed && spot_typed_hz ? "typed" : "JS8 dial");
+        snprintf(line, size, tr("Frequency: %s MHz (%s)"), mhz, spot_use_typed && spot_typed_hz ? tr("typed") : tr("JS8 dial"));
         break;
     case SP_MODE:
-        snprintf(line, size, "Mode: %s", spot_mode_now());
+        snprintf(line, size, tr("Mode: %s"), spot_mode_now());
         break;
     case SP_NOTE:
-        if (spot_note[0]) snprintf(line, size, "Comment: %s", spot_note);
-        else if (spot_comment()[0]) snprintf(line, size, "Comment: %s (auto)", spot_comment());
-        else snprintf(line, size, "Comment: (none)");
+        if (spot_note[0]) snprintf(line, size, tr("Comment: %s"), spot_note);
+        else if (spot_comment()[0]) snprintf(line, size, tr("Comment: %s (auto)"), spot_comment());
+        else snprintf(line, size, tr("Comment: (none)"));
         break;
     case SP_CLOSE:
-        snprintf(line, size, "Close");
+        snprintf(line, size, tr("Close"));
         break;
     default:
         line[0] = '\0';
@@ -4216,7 +4216,7 @@ static lv_obj_t *log_add(log_item_t item, const char *label) {
 }
 
 static void log_reports_line(char *line, size_t size) {
-    snprintf(line, size, "Sent %s  Rcvd %s  %.3f MHz  %.0f W", log_entry.rst_sent[0] ? log_entry.rst_sent : "-",
+    snprintf(line, size, tr("Sent %s  Rcvd %s  %.3f MHz  %.0f W"), log_entry.rst_sent[0] ? log_entry.rst_sent : "-",
              log_entry.rst_rcvd[0] ? log_entry.rst_rcvd : "-", log_entry.freq_hz / 1e6, log_entry.tx_pwr_w);
 }
 
@@ -4231,7 +4231,7 @@ static void log_refresh(void) {
     lv_label_set_text(log_reports, line);
     if (!log_grid_typed && q.grid[0] && strcmp(q.grid, log_entry.grid) != 0) {
         snprintf(log_entry.grid, sizeof(log_entry.grid), "%s", q.grid);
-        snprintf(line, sizeof(line), "Grid: %s", log_entry.grid);
+        snprintf(line, sizeof(line), tr("Grid: %s"), log_entry.grid);
         lv_label_set_text(lv_obj_get_child(log_grid_btn, 0), line);
     }
 }
@@ -4251,7 +4251,7 @@ static void log_list_open(log_item_t focus) {
     struct tm tm;
     strftime(on, sizeof(on), "%H:%M", gmtime_r(&t_on, &tm));
     strftime(off, sizeof(off), "%H:%M", gmtime_r(&t_off, &tm));
-    snprintf(line, sizeof(line), "Log %s  %s  %s-%s UTC", log_entry.call, js8_log_band(log_entry.freq_hz), on, off);
+    snprintf(line, sizeof(line), tr("Log %s  %s  %s-%s UTC"), log_entry.call, js8_log_band(log_entry.freq_hz), on, off);
     lv_obj_t *t = lv_list_add_text(log_list, line);
     lv_obj_set_style_text_font(t, &sony_22, 0);
     log_reports_line(line, sizeof(line));
@@ -4261,14 +4261,14 @@ static void log_list_open(log_item_t focus) {
     lv_obj_t *items[LOG_CANCEL + 1];
     items[LOG_SAVE] = log_add(LOG_SAVE, "Save to log");
     lv_obj_set_style_text_color(items[LOG_SAVE], TC(ok), 0);
-    snprintf(line, sizeof(line), "Grid: %s", log_entry.grid[0] ? log_entry.grid : "(none)");
+    snprintf(line, sizeof(line), tr("Grid: %s"), log_entry.grid[0] ? log_entry.grid : tr("(none)"));
     log_grid_btn = items[LOG_GRID] = log_add(LOG_GRID, line);
-    snprintf(line, sizeof(line), "Name: %s", log_entry.name[0] ? log_entry.name : "(none)");
+    snprintf(line, sizeof(line), tr("Name: %s"), log_entry.name[0] ? log_entry.name : tr("(none)"));
     items[LOG_NAME] = log_add(LOG_NAME, line);
-    snprintf(line, sizeof(line), "Comment: %s", log_entry.comment[0] ? log_entry.comment : "(none)");
+    snprintf(line, sizeof(line), tr("Comment: %s"), log_entry.comment[0] ? log_entry.comment : tr("(none)"));
     items[LOG_NOTE] = log_add(LOG_NOTE, line);
     if (log_entry.pota_ref[0] || log_entry.sota_ref[0]) {
-        snprintf(line, sizeof(line), "Activating %s %s", log_entry.pota_ref[0] ? "POTA" : "SOTA",
+        snprintf(line, sizeof(line), tr("Activating %s %s"), log_entry.pota_ref[0] ? "POTA" : "SOTA",
                  log_entry.pota_ref[0] ? log_entry.pota_ref : log_entry.sota_ref);
         t = lv_list_add_text(log_list, line);
         lv_obj_set_style_text_font(t, &sony_22, 0);
@@ -4420,10 +4420,10 @@ static const char *act_label_getter(void) {
     static char label[40];
     switch (params.js8_log_activation.x) {
     case 1:
-        snprintf(label, sizeof(label), "POTA\n%s", last_pota[0] ? last_pota : "(hold: set)");
+        snprintf(label, sizeof(label), "POTA\n%s", last_pota[0] ? last_pota : tr("(hold: set)"));
         break;
     case 2:
-        snprintf(label, sizeof(label), "SOTA\n%s", last_sota[0] ? last_sota : "(hold: set)");
+        snprintf(label, sizeof(label), "SOTA\n%s", last_sota[0] ? last_sota : tr("(hold: set)"));
         break;
     default:
         snprintf(label, sizeof(label), "Activ.:\nOff");
@@ -4477,8 +4477,8 @@ static void inbox_refresh_button(void) {
 static const char *inbox_label_getter(void) {
     static char label[24];
     int         unread = js8_inbox_unread(inbox);
-    if (unread) snprintf(label, sizeof(label), "Inbox\n%d new", unread);
-    else snprintf(label, sizeof(label), "Inbox");
+    if (unread) snprintf(label, sizeof(label), tr("Inbox\n%d new"), unread);
+    else snprintf(label, sizeof(label), tr("Inbox"));
     return label;
 }
 
@@ -4731,7 +4731,7 @@ static void inbox_show(int id) {
         char when[32], from[JS8_PATH_LEN + 16];
         utc_label(m.utc_ms, when, sizeof(when), "%d %b %H:%M UTC");
         js8_path_display(m.path, from, sizeof(from));
-        snprintf(line, sizeof(line), "For %s from %s  %s", m.to, from, when);
+        snprintf(line, sizeof(line), tr("For %s from %s  %s"), m.to, from, when);
         lv_obj_t *t = lv_list_add_text(inbox_list, line);
         lv_obj_set_style_text_font(t, &sony_22, 0);
         lv_obj_t *body = lv_list_add_text(inbox_list, m.text);
@@ -4740,8 +4740,8 @@ static void inbox_show(int id) {
         lv_obj_set_style_text_color(body, TC(text), 0);
         lv_obj_set_style_pad_ver(body, 8, 0);
         if (m.group)
-            snprintf(line, sizeof(line), "For any %s member to fetch for 2 days; fetched by %d", m.to, m.got);
-        else snprintf(line, sizeof(line), m.delivered ? "Delivered to %s" : "Waiting for %s to ask (QUERY MSGS)", m.to);
+            snprintf(line, sizeof(line), tr("For any %s member to fetch for 2 days; fetched by %d"), m.to, m.got);
+        else snprintf(line, sizeof(line), m.delivered ? tr("Delivered to %s") : tr("Waiting for %s to ask (QUERY MSGS)"), m.to);
         t = lv_list_add_text(inbox_list, line);
         lv_obj_set_style_text_font(t, &sony_22, 0);
         first = inbox_add("Delete", INBOX_DELETE);
@@ -4761,8 +4761,8 @@ static void inbox_show(int id) {
         char when[32], from[JS8_PATH_LEN + 16];
         utc_label(m.utc_ms, when, sizeof(when), "%d %b %H:%M UTC");
         js8_path_display(m.path[0] ? m.path : m.from, from, sizeof(from));
-        if (m.to[0] == '@') snprintf(line, sizeof(line), "From %s to %s  %s", from, m.to, when);
-        else snprintf(line, sizeof(line), "From %s  %s", from, when);
+        if (m.to[0] == '@') snprintf(line, sizeof(line), tr("From %s to %s  %s"), from, m.to, when);
+        else snprintf(line, sizeof(line), tr("From %s  %s"), from, when);
         lv_obj_t *t = lv_list_add_text(inbox_list, line);
         lv_obj_set_style_text_font(t, &sony_22, 0);
         lv_obj_t *body = lv_list_add_text(inbox_list, m.text);
@@ -4779,20 +4779,20 @@ static void inbox_show(int id) {
         bool        signed_ = js8_delivered_signature(m.text, orig, sizeof(orig), &next) && orig[0] != '@';
         if (strcmp(path, "APRS") == 0) {
             if (aprs_sender(m.text, aprs_from, sizeof(aprs_from))) {
-                snprintf(line, sizeof(line), "Reply by APRS to %s", aprs_from);
+                snprintf(line, sizeof(line), tr("Reply by APRS to %s"), aprs_from);
                 first = inbox_add(line, INBOX_REPLY_APRS);
             }
         } else {
-            snprintf(line, sizeof(line), "Reply: MSG to %s", from);
+            snprintf(line, sizeof(line), tr("Reply: MSG to %s"), from);
             first = inbox_add(line, INBOX_REPLY);
             if (signed_ && strcmp(orig, path) != 0) {
-                snprintf(line, sizeof(line), "Reply to %s via %s (MSG TO:)", orig, from);
+                snprintf(line, sizeof(line), tr("Reply to %s via %s (MSG TO:)"), orig, from);
                 inbox_add(line, INBOX_REPLY_VIA);
-                snprintf(line, sizeof(line), "Reply to %s", orig);
+                snprintf(line, sizeof(line), tr("Reply to %s"), orig);
                 inbox_add(line, INBOX_REPLY_ORIG);
             }
             if (next > 0) {
-                snprintf(line, sizeof(line), "Fetch the next: QUERY MSG %d", next);
+                snprintf(line, sizeof(line), tr("Fetch the next: QUERY MSG %d"), next);
                 inbox_add(line, INBOX_FETCH_NEXT);
             }
         }
@@ -4803,7 +4803,7 @@ static void inbox_show(int id) {
     } else {
         static js8_inbox_msg_t rows[INBOX_ROWS];
         int                    n = js8_inbox_list(inbox, rows, INBOX_ROWS);
-        snprintf(line, sizeof(line), "Inbox: %d message%s, %d new", js8_inbox_count(inbox),
+        snprintf(line, sizeof(line), tr("Inbox: %d message%s, %d new"), js8_inbox_count(inbox),
                  js8_inbox_count(inbox) == 1 ? "" : "s", js8_inbox_unread(inbox));
         lv_obj_t *t = lv_list_add_text(inbox_list, line);
         lv_obj_set_style_text_font(t, &sony_22, 0);
@@ -4811,8 +4811,8 @@ static void inbox_show(int id) {
         char  call[JS8_RX_CALL_LEN];
         float freq;
         int   snr;
-        if (selected_station(call, sizeof(call), &freq, &snr)) snprintf(line, sizeof(line), "New message to %s...", call);
-        else snprintf(line, sizeof(line), "New message...");
+        if (selected_station(call, sizeof(call), &freq, &snr)) snprintf(line, sizeof(line), tr("New message to %s..."), call);
+        else snprintf(line, sizeof(line), tr("New message..."));
         first = inbox_add(line, INBOX_NEW);
         lv_obj_set_style_text_color(first, TC(ok), 0);
 
@@ -4837,15 +4837,15 @@ static void inbox_show(int id) {
         static js8_held_msg_t held_rows[INBOX_ROWS];
         int                   nh = js8_held_list(held, held_rows, INBOX_ROWS);
         if (nh > 0) {
-            snprintf(line, sizeof(line), "Held for others: %d waiting", js8_held_waiting(held));
+            snprintf(line, sizeof(line), tr("Held for others: %d waiting"), js8_held_waiting(held));
             t = lv_list_add_text(inbox_list, line);
             lv_obj_set_style_text_font(t, &sony_22, 0);
         }
         for (int i = 0; i < nh; i++) {
             char from[JS8_PATH_LEN + 16], got[16] = "";
             js8_path_display(held_rows[i].path, from, sizeof(from));
-            if (held_rows[i].group) snprintf(got, sizeof(got), " (%d got it)", held_rows[i].got);
-            snprintf(line, sizeof(line), "%sfor %s%s from %s  %s", held_rows[i].delivered ? "(sent) " : "",
+            if (held_rows[i].group) snprintf(got, sizeof(got), tr(" (%d got it)"), held_rows[i].got);
+            snprintf(line, sizeof(line), tr("%sfor %s%s from %s  %s"), held_rows[i].delivered ? tr("(sent) ") : "",
                      held_rows[i].to, got, from, held_rows[i].text);
             lv_obj_t *b = inbox_add(line, INBOX_HELD + held_rows[i].id);
             if (held_rows[i].delivered) lv_obj_set_style_text_color(b, TC(text_mute), 0);
@@ -5174,7 +5174,7 @@ static void alerts_show(void) {
         lv_obj_t *b = alerts_add((alerts_item_t)i, line);
         if (!first) first = b;
     }
-    snprintf(line, sizeof(line), "Alert words: %s", alert_words[0] ? alert_words : "(none)");
+    snprintf(line, sizeof(line), tr("Alert words: %s"), alert_words[0] ? alert_words : tr("(none)"));
     lv_obj_t *words = alerts_add(AL_WORDS, line);
     lv_obj_set_style_text_color(words, TC(row_alert_text), 0);
     alerts_add(AL_TEST, "Test beep");
@@ -5426,7 +5426,7 @@ static void freq_show(void) {
     lv_obj_set_style_bg_color(freq_list, TC(list), 0);
     lv_obj_set_style_border_color(freq_list, TC(text), 0);
     char line[64];
-    snprintf(line, sizeof(line), "Now: %s", where_label());
+    snprintf(line, sizeof(line), tr("Now: %s"), where_label());
     lv_obj_t *t = lv_list_add_text(freq_list, line);
     lv_obj_set_style_text_font(t, &sony_22, 0);
 
@@ -5436,9 +5436,9 @@ static void freq_show(void) {
     char      khz[16];
     if (params.js8_custom_hz.x) {
         format_khz(params.js8_custom_hz.x, khz, sizeof(khz));
-        snprintf(line, sizeof(line), "Custom kHz... (last %s)", khz);
+        snprintf(line, sizeof(line), tr("Custom kHz... (last %s)"), khz);
     } else {
-        snprintf(line, sizeof(line), "Custom kHz...");
+        snprintf(line, sizeof(line), tr("Custom kHz..."));
     }
     lv_obj_t *cu    = freq_add(FQ_CUSTOM, line);
     lv_obj_t *close = freq_add(FQ_CLOSE, "Close");

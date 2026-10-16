@@ -1,34 +1,34 @@
-% rebase('base.html', title='Backup')
-<h2><svg class="i"><use href="#i-archive"/></svg>Backup</h2>
-<p class="sub">Save the radio settings to your computer, and put them back after flashing a new image.</p>
+% rebase('base.html', title='Respaldo')
+<h2><svg class="i"><use href="#i-archive"/></svg>Respaldo</h2>
+<p class="sub">Guarde los ajustes de la radio en su computadora y repóngalos después de grabar una imagen nueva.</p>
 
 <section class="dp-card">
-<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-download"/></svg></span><div><h3>Download backup</h3><p>Tick the parts to save in the file</p></div></div>
+<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-download"/></svg></span><div><h3>Descargar respaldo</h3><p>Marque las partes a guardar en el archivo</p></div></div>
 <div class="dp-body">
 <div class="grid checks" id="parts"></div>
 <div class="actions">
-  <button id="download" class="primary"><svg class="i"><use href="#i-download"/></svg>Download backup</button>
+  <button id="download" class="primary"><svg class="i"><use href="#i-download"/></svg>Descargar respaldo</button>
   <span class="status" id="status_download"></span>
 </div>
 </div>
 </section>
 
 <section class="dp-card">
-<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-upload"/></svg></span><div><h3>Restore</h3><p>Puts a backup file back on the radio</p></div></div>
+<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-upload"/></svg></span><div><h3>Restaurar</h3><p>Vuelve a poner un respaldo en la radio</p></div></div>
 <div class="dp-body">
-<p>Choose a backup file. You can pick which parts to restore; the radio screen restarts (about 5 s) when settings are replaced.</p>
+<p>Elija un archivo de respaldo. Puede elegir qué partes restaurar; la pantalla de la radio se reinicia (unos 5 s) cuando se reemplazan ajustes.</p>
 <input type="file" id="file" accept=".tar,.gz,.tgz,application/gzip,application/x-tar">
 <div id="restore" hidden>
   <div class="table-wrap" style="margin-top:14px">
   <table id="compare">
     <thead>
-      <tr><th></th><th>Part</th><th>In the file</th><th>On the radio now</th></tr>
+      <tr><th></th><th>Parte</th><th>En el archivo</th><th>En la radio ahora</th></tr>
     </thead>
     <tbody></tbody>
   </table>
   </div>
   <div class="actions">
-    <button id="restore_btn" class="primary"><svg class="i"><use href="#i-upload"/></svg>Restore selected</button>
+    <button id="restore_btn" class="primary"><svg class="i"><use href="#i-upload"/></svg>Restaurar lo elegido</button>
   </div>
 </div>
 <div class="actions"><span class="status" id="status_restore"></span></div>
@@ -38,14 +38,14 @@
 <script>
 // key, label, note, checked by default; keys are the parts of the server
 const PARTS = [
-  ["settings", "Settings", "(params.db: bands, filters, keys, display…)", true],
-  ["memories", "Memories and channels", "", true],
-  ["cluster", "Cluster servers, filters and alerts", "", true],
-  ["wfview", "wfview configuration", "", true],
-  ["qso", "QSO log", "", true],
-  ["voice", "Voice keyer messages", "", true],
-  ["cw", "CW trainer progress", "", false],
-  ["wifi", "WiFi networks and passwords", "", false],
+  ["settings", "Ajustes", "(params.db: bandas, filtros, teclas, pantalla…)", true],
+  ["memories", "Memorias y canales", "", true],
+  ["cluster", "Servidores, filtros y alertas del cluster", "", true],
+  ["wfview", "Configuración de wfview", "", true],
+  ["qso", "Log de QSO", "", true],
+  ["voice", "Mensajes de voz", "", true],
+  ["cw", "Progreso de la práctica CW", "", false],
+  ["wifi", "Redes WiFi y contraseñas", "", false],
 ];
 
 var showStatus = function(kind, text, error=false) {
@@ -74,13 +74,13 @@ var loadNow = function() {
       if (have && p[0] == "voice") label.append(" ", $("<small>").text("(" + data.parts.voice + ")"));
       box.append(label);
     });
-  }).fail(function(xhr) { showStatus("download", errorText(xhr, "Can't read the radio"), true); });
+  }).fail(function(xhr) { showStatus("download", errorText(xhr, "No se puede leer la radio"), true); });
 }
 
 $("#download").on("click", function() {
   const parts = $("#parts input:checked").map(function() { return this.value; }).get();
-  if (!parts.length) { showStatus("download", "Select at least one part", true); return; }
-  showStatus("download", "Preparing the backup…");
+  if (!parts.length) { showStatus("download", "Elija al menos una parte", true); return; }
+  showStatus("download", "Preparando el respaldo…");
   x6100Get("/api/backup/download?parts=" + parts.join(","));
 });
 
@@ -88,7 +88,7 @@ $("#file").on("change", function() {
   const file = this.files[0];
   $("#restore").prop("hidden", true);
   if (!file) return;
-  showStatus("restore", "Reading " + file.name + "…");
+  showStatus("restore", "Leyendo " + file.name + "…");
   $.ajax({
     url: "/api/backup/upload", type: "POST", data: file, processData: false,
     contentType: "application/octet-stream", dataType: "json",
@@ -100,20 +100,20 @@ $("#file").on("change", function() {
         row.append($("<td>").append($("<input type='checkbox'>").attr("value", p[0]).prop("checked", p[3])));
         row.append($("<td>").text(p[1]));
         row.append($("<td>").text(r.parts[p[0]].file));
-        row.append($("<td>").text(r.parts[p[0]].now || "none"));
+        row.append($("<td>").text(r.parts[p[0]].now || "nada"));
         body.append(row);
       });
       $("#restore").prop("hidden", false);
-      showStatus("restore", "Backup of " + (r.callsign ? r.callsign + ", " : "") + r.date);
+      showStatus("restore", "Respaldo de " + (r.callsign ? r.callsign + ", " : "") + r.date);
     },
-    error: function(xhr) { showStatus("restore", errorText(xhr, "Upload failed"), true); }
+    error: function(xhr) { showStatus("restore", errorText(xhr, "No se pudo subir"), true); }
   });
 });
 
 $("#restore_btn").on("click", function() {
   const parts = $("#compare input:checked").map(function() { return this.value; }).get();
-  if (!parts.length) { showStatus("restore", "Select at least one part", true); return; }
-  if (!confirm("Replace the selected parts on the radio? A copy of the current files is kept in /mnt/backup_before_restore.")) return;
+  if (!parts.length) { showStatus("restore", "Elija al menos una parte", true); return; }
+  if (!confirm("¿Reemplazar las partes elegidas en la radio? Se guarda una copia de los archivos actuales en /mnt/backup_before_restore.")) return;
   $("#restore_btn").prop("disabled", true);
   showStatus("restore", "Restoring…");
   $.ajax({

@@ -1,6 +1,6 @@
-% rebase('base.html', title='Display')
-<h2><svg class="i"><use href="#i-monitor"/></svg>Display</h2>
-<p class="sub">How the radio's screen looks: the same options as Settings &rarr; Display, applied on the radio as you change them.</p>
+% rebase('base.html', title='Pantalla')
+<h2><svg class="i"><use href="#i-monitor"/></svg>Pantalla</h2>
+<p class="sub">Cómo se ve la pantalla de la radio: las mismas opciones que Ajustes &rarr; Pantalla, se aplican en la radio al cambiarlas.</p>
 
 <style>
 .dp-grid{columns:2 430px;column-gap:18px}
@@ -31,45 +31,45 @@ const ICONS = {
  * kind: sw (on/off), seg (labels), sel (labels), range ([min, max, step, scale, unit]), theme,
  * color (0xRRGGBB, -1 the theme's; extra: the label of -1) */
 const CARDS = [
-  ["look", "Theme", "Colours, buttons and fonts of every screen", [
-    ["theme", "Theme", "The radio's screen restarts with the new one", "theme"]]],
-  ["meter", "S-meter", "The signal meter in the top bar", [
-    ["smeter_needle", "S-meter type", "Bars, or a needle on a dial", "seg", ["Bars", "Needle"]],
-    ["smeter_color", "Colours", "Theme as it is, or green → yellow → red along the scale or with the signal", "seg", ["Theme", "Scale", "Level"]],
-    ["smeter_lamp", "Needle lamp", "An amber dial lit from behind, as the old analog meters", "sw"],
-    ["smeter_bar_color", "Meter colour", "With the theme colours: the bars or the needle scale up to S9", "color", "Theme"],
-    ["swr_color", "SWR colour", "The SWR bar while transmitting; yellow and red above 2 and 3 stay", "color", "Theme"]], "preview"],
-  ["wf", "Spectrum and waterfall", "How the waterfall moves and reads", [
-    ["spectrum_show", "Spectrum", "The spectrum above the waterfall; the radio's screen restarts", "sw"],
-    ["spectrum_filled", "Spectrum fill", "The area under the trace filled", "sw"],
-    ["spectrum_peak", "Spectrum peaks", "The peaks held for a moment", "sw"],
-    ["spectrum_height", "Spectrum height", "Taller spectrum, shorter waterfall; the radio's screen restarts", "range", [60, 160, 4, 1, " px"]],
-    ["spectrum_line_color", "Trace colour", "The theme's, or your own", "color", "Theme"],
-    ["spectrum_fill_color", "Fill colour", "As the trace, or your own", "color", "As trace"],
-    ["spectrum_fill_gradient", "Fill gradient", "The fill fading to the background at the bottom", "sw"],
-    ["wf_palette", "Waterfall colours", "The theme's, or one of these", "sel", ["Theme", "Classic", "Gauss", "Grey", "Fire", "Ice", "Rainbow"]],
-    ["wf_mode", "Mode", "Centered keeps the VFO in the middle, Fixed keeps the span", "seg", ["Centered", "Fixed"]],
-    ["wf_speed", "Speed", "Lines a second, slow to fast", "range", [1, 5, 1, 1, ""]],
-    ["auto_level", "Auto level", "Follows the noise floor by itself", "sw"],
-    ["auto_level_offset", "Auto level offset", "Darker or brighter than the noise", "range", [-150, 150, 5, 10, " dB"]],
-    ["wf_center_line", "Center line", "A line on the VFO", "sw"],
-    ["wf_zoom", "Zoom", "Zoom with the waterfall instead of the span", "sw"],
-    ["wf_smooth", "Smooth scroll", "Scrolls by pixels instead of lines", "sw"]]],
-  ["layers", "On the waterfall", "What is drawn over it", [
-    ["band_plan", "Band plan", "The IARU segments on top", "sw"],
-    ["cluster_spots_wf", "Cluster spots", "The calls at their frequencies", "sw"],
-    ["cluster_column", "Cluster column", "The spot list on the right", "sw"]]],
-  ["sun", "Backlight", "Screen and button lights", [
-    ["bright_normal", "Brightness", "", "range", [-1, 9, 1, 1, ""]],
-    ["bright_idle", "Brightness when idle", "", "range", [-1, 9, 1, 1, ""]],
-    ["bright_timeout", "Idle after", "Seconds without a key or the knob", "range", [5, 120, 5, 1, " s"]],
-    ["bright_buttons", "Button lights", "", "sel", ["Always off", "Always on", "Temporarily on"]]]],
-  ["text", "Text and info", "What the screen shows bigger", [
-    ["knob_info", "Knob info", "The value shown while a knob turns", "sw"],
-    ["digi_text_compact", "Decoder text", "CW and RTTY text: large, or compact with more lines", "seg", ["Large", "Compact"]],
-    ["mag_freq", "Magnify frequency", "Big frequency while tuning", "sw"],
-    ["mag_info", "Magnify info", "Big value of the control being changed", "sw"],
-    ["mag_alc", "Magnify ALC", "Big ALC reading while transmitting", "sw"]]]
+  ["look", "Tema", "Colores, botones y fuentes de todas las pantallas", [
+    ["theme", "Tema", "La pantalla de la radio se reinicia con el nuevo", "theme"]]],
+  ["meter", "S-meter", "El medidor de señal de la barra de arriba", [
+    ["smeter_needle", "Tipo de S-meter", "Barras, o una aguja en un cuadrante", "seg", ["Barras", "Aguja"]],
+    ["smeter_color", "Colores", "El tema tal cual, o verde → amarillo → rojo a lo largo de la escala o con la señal", "seg", ["Tema", "Escala", "Nivel"]],
+    ["smeter_lamp", "Luz de la aguja", "Un cuadrante ámbar iluminado por detrás, como los medidores analógicos", "sw"],
+    ["smeter_bar_color", "Color del medidor", "Con los colores del tema: las barras o la escala de la aguja hasta S9", "color", "Tema"],
+    ["swr_color", "Color de ROE", "La barra de ROE al transmitir; el amarillo y rojo arriba de 2 y 3 quedan", "color", "Tema"]], "preview"],
+  ["wf", "Espectro y cascada", "Cómo se mueve y se lee la cascada", [
+    ["spectrum_show", "Espectro", "El espectro arriba de la cascada; la pantalla de la radio se reinicia", "sw"],
+    ["spectrum_filled", "Relleno del espectro", "El área bajo la traza rellena", "sw"],
+    ["spectrum_peak", "Picos del espectro", "Los picos retenidos un momento", "sw"],
+    ["spectrum_height", "Altura del espectro", "Espectro más alto, cascada más baja; la pantalla de la radio se reinicia", "range", [60, 160, 4, 1, " px"]],
+    ["spectrum_line_color", "Color de la traza", "El del tema, o uno propio", "color", "Tema"],
+    ["spectrum_fill_color", "Color del relleno", "Como la traza, o uno propio", "color", "Como la traza"],
+    ["spectrum_fill_gradient", "Relleno degradado", "El relleno se desvanece hacia abajo", "sw"],
+    ["wf_palette", "Colores de la cascada", "Los del tema, o uno de estos", "sel", ["Tema", "Clásico", "Gauss", "Gris", "Fuego", "Hielo", "Arco iris"]],
+    ["wf_mode", "Modo", "Centrada deja el VFO en el medio, Fija mantiene el ancho", "seg", ["Centrada", "Fija"]],
+    ["wf_speed", "Velocidad", "Líneas por segundo, de lento a rápido", "range", [1, 5, 1, 1, ""]],
+    ["auto_level", "Nivel automático", "Sigue el piso de ruido solo", "sw"],
+    ["auto_level_offset", "Ajuste del nivel automático", "Más oscuro o más claro que el ruido", "range", [-150, 150, 5, 10, " dB"]],
+    ["wf_center_line", "Línea central", "Una línea en el VFO", "sw"],
+    ["wf_zoom", "Zoom", "Zoom con la cascada en lugar del ancho", "sw"],
+    ["wf_smooth", "Desplazamiento suave", "Se mueve por píxeles en lugar de líneas", "sw"]]],
+  ["layers", "Sobre la cascada", "Lo que se dibuja encima", [
+    ["band_plan", "Plan de bandas", "Los segmentos IARU arriba", "sw"],
+    ["cluster_spots_wf", "Spots del cluster", "Los indicativos en sus frecuencias", "sw"],
+    ["cluster_column", "Columna del cluster", "La lista de spots a la derecha", "sw"]]],
+  ["sun", "Iluminación", "Luz de pantalla y botones", [
+    ["bright_normal", "Brillo", "", "range", [-1, 9, 1, 1, ""]],
+    ["bright_idle", "Brillo en reposo", "", "range", [-1, 9, 1, 1, ""]],
+    ["bright_timeout", "Reposo después de", "Segundos sin tocar teclas ni perillas", "range", [5, 120, 5, 1, " s"]],
+    ["bright_buttons", "Luz de botones", "", "sel", ["Siempre apagada", "Siempre encendida", "Encendida un rato"]]]],
+  ["text", "Texto e info", "Lo que la pantalla muestra más grande", [
+    ["knob_info", "Info de perillas", "El valor que se ve al girar una perilla", "sw"],
+    ["digi_text_compact", "Texto decodificado", "Texto de CW y RTTY: grande, o compacto con más líneas", "seg", ["Grande", "Compacto"]],
+    ["mag_freq", "Ampliar frecuencia", "Frecuencia grande al sintonizar", "sw"],
+    ["mag_info", "Ampliar info", "Valor grande del control que se cambia", "sw"],
+    ["mag_alc", "Ampliar ALC", "Lectura de ALC grande al transmitir", "sw"]]]
 ];
 
 let D = {};
@@ -85,7 +85,7 @@ var send = function(payload, done) {
     url: "/api/display", type: "POST", data: JSON.stringify(payload),
     contentType: "application/json; charset=utf-8", dataType: "json",
     success: function() {
-      showStatus(payload.name === "theme" ? "Theme set: the radio's screen is restarting" : "Saved on the radio");
+      showStatus(payload.name === "theme" ? "Tema elegido: la pantalla de la radio se reinicia" : "Guardado en la radio");
       if (done) done();
     },
     error: function(xhr) { showStatus(xhr.responseJSON ? xhr.responseJSON.msg : "Not saved", true); }
@@ -211,9 +211,9 @@ var render = function() {
     cards.append(card);
   });
   refresh();
-  showStatus("Read from the radio");
+  showStatus("Leído de la radio");
 }
 
 $.ajax({url: "/api/display", dataType: "json", success: function(d) { D = d; render(); },
-  error: function(xhr) { showStatus(xhr.responseJSON ? xhr.responseJSON.msg : "Radio not reachable", true); }});
+  error: function(xhr) { showStatus(xhr.responseJSON ? xhr.responseJSON.msg : "La radio no responde", true); }});
 </script>

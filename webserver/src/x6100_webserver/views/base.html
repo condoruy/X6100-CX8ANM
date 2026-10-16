@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,13 +50,13 @@
       /* A GET download (a link, a URL) and a POST one (a form) */
       function x6100Get(url) {
         if (!secureDownloads) { window.location = url; return; }
-        x6100Download(url).catch(function(e) { alert("Download failed: " + e.message); });
+        x6100Download(url).catch(function(e) { alert("La descarga falló: " + e.message); });
       }
 
       function x6100PostForm(form) {
         if (!secureDownloads) { form.submit(); return; }
         x6100Download(form.action, {method: "POST", body: new URLSearchParams(new FormData(form))})
-          .catch(function(e) { alert("Download failed: " + e.message); });
+          .catch(function(e) { alert("La descarga falló: " + e.message); });
       }
 
       document.addEventListener("click", function(e) {
@@ -113,14 +113,14 @@
         <a class="brand" href="/">
           <svg width="30" height="30" viewBox="-40 -40 80 80" aria-hidden="true"><g fill="none" stroke="#ffb020" stroke-width="5" stroke-linecap="round"><path d="M-14 -20 A20 20 0 0 0 -14 8"/><path d="M14 -20 A20 20 0 0 1 14 8"/><path d="M-26 -32 A36 36 0 0 0 -26 20" opacity=".6"/><path d="M26 -32 A36 36 0 0 1 26 20" opacity=".6"/></g><line x1="0" y1="-8" x2="0" y2="30" stroke="#e6edf5" stroke-width="5"/><circle cx="0" cy="-10" r="5" fill="#ffb020"/></svg>
           % call = callsign()
-          <div>X6100 <small>{{call + ' · ' if call else ''}}configurator</small> <small class="by">by IU1WXY</small></div>
+          <div>X6100 <small>{{call + ' · ' if call else ''}}configurador</small> <small class="by">de IU1WXY</small></div>
         </a>
         <nav>
           % menu = [('General', 'home', [('/', 'General', 'home')]),
-          %         ('Frequencies', 'wave', [('/bands', 'Bands', 'bands'), ('/digital_modes', 'Digital modes', 'pulse'), ('/memories', 'Memories', 'bookmark')]),
-          %         ('Operating', 'antenna', [('/equipo', 'Equipo', 'monitor'), ('/remote', 'Remote', 'knob'), ('/cluster', 'Cluster', 'globe'), ('/field', 'Field Ops', 'mountain'), ('/cw_messages', 'CW messages', 'cw'), ('/logs', 'Logs', 'book')]),
-          %         ('Files', 'folder', [('/files/', 'Files', 'sd'), ('/gallery', 'Gallery', 'image'), ('/backup', 'Backup', 'archive')]),
-          %         ('System', 'cpu', [('/display', 'Display', 'monitor'), ('/time', 'Time', 'clock'), ('/network', 'Ethernet', 'ethernet'), ('/wfview', 'wfview', 'network')])]
+          %         ('Frecuencias', 'wave', [('/bands', 'Bandas', 'bands'), ('/digital_modes', 'Modos digitales', 'pulse'), ('/memories', 'Memorias', 'bookmark')]),
+          %         ('Operación', 'antenna', [('/equipo', 'Equipo', 'monitor'), ('/remote', 'Remoto', 'knob'), ('/cluster', 'Cluster', 'globe'), ('/field', 'SOTA/POTA', 'mountain'), ('/cw_messages', 'Mensajes CW', 'cw'), ('/logs', 'Logs', 'book')]),
+          %         ('Archivos', 'folder', [('/files/', 'Archivos', 'sd'), ('/gallery', 'Galería', 'image'), ('/backup', 'Respaldo', 'archive')]),
+          %         ('Sistema', 'cpu', [('/display', 'Pantalla', 'monitor'), ('/time', 'Hora', 'clock'), ('/network', 'Ethernet', 'ethernet'), ('/wfview', 'wfview', 'network')])]
           % for group, gicon, items in menu:
           % here = [request.path == h or (h != '/' and request.path.startswith(h)) for h, _, _ in items]
           % if len(items) == 1:
@@ -144,7 +144,7 @@
       {{!base}}
     </main>
 
-    <footer>X6100 custom firmware by IU1WXY</footer>
+    <footer>Firmware X6100 de IU1WXY · versión CX8ANM / Cóndor Tecnológico</footer>
 
   </body>
   </html>

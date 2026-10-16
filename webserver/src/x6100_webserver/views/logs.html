@@ -1,21 +1,21 @@
 % rebase('base.html', title='Logs')
 <h2><svg class="i"><use href="#i-book"/></svg>Logs</h2>
-<p class="sub">Every QSO on the radio, day by day: the day's logs (FT8, FT4, JS8 and the phone's logger) and the POTA/SOTA activations. Edit a QSO in place, delete QSOs or whole days, export what the filter shows as ADIF or CSV.</p>
+<p class="sub">Todos los QSO de la radio, día por día: los logs del día (FT8, FT4, JS8 y el logger del teléfono) y las activaciones POTA/SOTA. Edite un QSO en el lugar, borre QSO o días enteros, exporte lo que muestra el filtro en ADIF o CSV.</p>
 
 <section class="dp-card">
-  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-search"/></svg></span><div><h3>Filter and export</h3><p>Export, and Delete shown, work on the QSOs the filter shows</p></div></div>
+  <div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-search"/></svg></span><div><h3>Filtrar y exportar</h3><p>Exportar y Borrar lo mostrado actúan sobre los QSO que muestra el filtro</p></div></div>
   <div class="dp-body">
   <div class="log-filters">
-    <input id="f-text" placeholder="Call, name, QTH, grid, reference…" autocomplete="off">
-    <select id="f-band"><option value="">All bands</option></select>
-    <select id="f-mode"><option value="">All modes</option></select>
-    <input id="f-from" type="date" title="From">
-    <input id="f-to" type="date" title="To">
+    <input id="f-text" placeholder="Indicativo, nombre, QTH, cuadrícula, referencia…" autocomplete="off">
+    <select id="f-band"><option value="">Todas las bandas</option></select>
+    <select id="f-mode"><option value="">Todos los modos</option></select>
+    <input id="f-from" type="date" title="Desde">
+    <input id="f-to" type="date" title="Hasta">
   </div>
   <div class="actions">
-    <button type="button" class="primary" id="exp-adi"><svg class="i"><use href="#i-download"/></svg>Export ADIF</button>
-    <button type="button" id="exp-csv"><svg class="i"><use href="#i-download"/></svg>Export CSV</button>
-    <button type="button" id="del-shown" class="remove">Delete shown</button>
+    <button type="button" class="primary" id="exp-adi"><svg class="i"><use href="#i-download"/></svg>Exportar ADIF</button>
+    <button type="button" id="exp-csv"><svg class="i"><use href="#i-download"/></svg>Exportar CSV</button>
+    <button type="button" id="del-shown" class="remove">Borrar lo mostrado</button>
     <span class="status" id="status"></span>
   </div>
   </div>
@@ -77,8 +77,8 @@ var render = function() {
     const rows = days[d];
     const files = [...new Set(rows.map(q => q.file))];
     const head = $("<h3>").text(d || "No date").append($("<span class='tag'>").text(rows.length + " QSO" + (rows.length == 1 ? "" : "s")));
-    files.forEach(f => head.append($("<a class='tag' download>").attr("href", "/field/logs/" + encodeURIComponent(f)).attr("title", "Download the file").text(f)));
-    const del = button("remove", "si-trash", "Delete this day's QSOs shown").on("click", () => deleteQsos(rows, `all ${rows.length} QSOs of ${d}`));
+    files.forEach(f => head.append($("<a class='tag' download>").attr("href", "/field/logs/" + encodeURIComponent(f)).attr("title", "Descargar el archivo").text(f)));
+    const del = button("remove", "si-trash", "Borrar los QSO mostrados de este día").on("click", () => deleteQsos(rows, `los ${rows.length} QSO del ${d}`));
     const tbody = $("<tbody>");
     rows.forEach(q => tbody.append(makeRow(q)));
     const thead = $("<tr>");
@@ -87,7 +87,7 @@ var render = function() {
     const top = $("<div class='dp-head'>").append($("<span class='dp-ico'>").html('<svg class="i"><use href="#i-book"/></svg>'), $("<div>").append(head), $("<div class='dp-x'>").append(del));
     box.append($("<section class='dp-card'>").append(top, $("<div class='dp-body tbl'>").append($("<div class='table-wrap'>").append($("<table class='log'>").append($("<thead>").append(thead), tbody)))));
   });
-  showStatus(`${list.length} of ${qsos.length} QSOs shown`);
+  showStatus(`${list.length} de ${qsos.length} QSO mostrados`);
 }
 
 var makeRow = function(q) {
@@ -123,8 +123,8 @@ var editRow = function(q) {
 
 // One by one, from the last of each file: deleting a QSO renumbers the ones after it
 var deleteQsos = function(list, what) {
-  if (list.some(q => q.file == active)) return showStatus("The activation running on the radio is in the list: end it first", true);
-  if (!list.length || !confirm(`Delete ${what}? This cannot be undone: export first if you still need them.`)) return;
+  if (list.some(q => q.file == active)) return showStatus("La activación en curso en la radio está en la lista: termínela primero", true);
+  if (!list.length || !confirm(`¿Borrar ${what}? No se puede deshacer: exporte antes si todavía los necesita.`)) return;
   const todo = list.slice().sort((a, b) => a.file == b.file ? b.n - a.n : a.file.localeCompare(b.file));
   const next = function() {
     if (!todo.length) return load(`Deleted ${list.length} QSO${list.length == 1 ? "" : "s"}`);
@@ -137,7 +137,7 @@ var deleteQsos = function(list, what) {
 
 var exportShown = function(fmt) {
   const list = shown();
-  if (!list.length) return showStatus("Nothing to export", true);
+  if (!list.length) return showStatus("Nada para exportar", true);
   $("#export [name=sel]").val(list.map(q => q.file + ":" + q.n).join(","));
   $("#export [name=fmt]").val(fmt);
   x6100PostForm($("#export")[0]);

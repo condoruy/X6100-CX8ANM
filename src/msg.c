@@ -105,6 +105,9 @@ static void msg_update_cb(lv_event_t * e) {
 static void create_msg(const char * fmt, enum msg_type_t type, uint16_t dur, va_list args) {
     delayed_message_t * msg = (delayed_message_t *) malloc(sizeof(delayed_message_t));
     vsnprintf(msg->text, sizeof(msg->text), tr(fmt), args);
+    /* El texto armado también: los avisos que llegan enteros por "%s" */
+    const char *t = tr(msg->text);
+    if (t != msg->text) snprintf(msg->text, sizeof(msg->text), "%s", t);
 
     cJSON *o = cJSON_CreateObject();
     cJSON_AddStringToObject(o, "t", "msg");

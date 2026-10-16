@@ -86,6 +86,8 @@ void msg_tiny_set_text_fmt(const char * fmt, ...) {
     va_start(args, fmt);
     vsnprintf(buf, sizeof(buf), tr(fmt), args);
     va_end(args);
+    const char *t = tr(buf);
+    if (t != buf) snprintf(buf, sizeof(buf), "%s", t);
 
     event_send(obj, EVENT_MSG_UPDATE, NULL);
 }

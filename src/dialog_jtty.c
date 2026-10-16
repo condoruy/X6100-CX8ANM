@@ -578,7 +578,7 @@ static const char *dial_label_getter(void)
     static char buf[32];
 
     if (dial_offset_hz == 0)
-        snprintf(buf, sizeof(buf), "Dial\nstandard");
+        snprintf(buf, sizeof(buf), tr("Dial\nstandard"));
     else
         snprintf(buf, sizeof(buf), "Dial\n%+d kHz", (int)(dial_offset_hz / 1000));
     return buf;

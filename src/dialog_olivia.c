@@ -813,7 +813,7 @@ static const char *dial_label_getter(void)
     static char buf[32];
 
     if (dial_offset_hz == 0)
-        snprintf(buf, sizeof(buf), "Dial\nstandard");
+        snprintf(buf, sizeof(buf), tr("Dial\nstandard"));
     else
         snprintf(buf, sizeof(buf), "Dial\n%+d kHz", (int)(dial_offset_hz / 1000));
     return buf;
@@ -901,7 +901,7 @@ static const char *status_label_getter(void)
     if (olivia_tx_is_on()) {
         snprintf(buf, sizeof(buf), "TX\n%u Hz", (unsigned)olivia_tx_get_center());
     } else if (!olivia_app_is_active()) {
-        snprintf(buf, sizeof(buf), "RX off");
+        snprintf(buf, sizeof(buf), tr("RX off"));
     } else if (olivia_app_locked()) {
         snprintf(buf, sizeof(buf), "LOCK %u%%\n%+.0f Hz",
                  (unsigned)olivia_app_quality(),

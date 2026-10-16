@@ -213,7 +213,7 @@ void table_view_push_ui(const cell_data_t *src) {
     truncate_oldest();
 
     uint16_t rows = lv_table_get_row_cnt(s_table);
-    if ((rows == 1) && (strcmp(lv_table_get_cell_value(s_table, 0, 0), WAIT_SYNC_TEXT) == 0)) {
+    if ((rows == 1) && (strcmp(lv_table_get_cell_value(s_table, 0, 0), tr(WAIT_SYNC_TEXT)) == 0)) {
         /* The single "Wait sync" placeholder is about to be replaced. */
         rows = 0;
     }

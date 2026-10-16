@@ -499,9 +499,9 @@ static void broadcast_overlay_save_channel(void) {
         char message[96];
 
         if (have_match && match.station[0]) {
-            snprintf(message, sizeof(message), "Saved channel %s", match.station);
+            snprintf(message, sizeof(message), tr("Saved channel %s"), match.station);
         } else {
-            snprintf(message, sizeof(message), "Saved channel");
+            snprintf(message, sizeof(message), tr("Saved channel"));
         }
 
         channel_overlay_show(message);

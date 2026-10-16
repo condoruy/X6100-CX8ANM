@@ -464,7 +464,7 @@ def set_field_key(name):
     """QRZ Logbook API key, cqhota.app integration key: <name>.conf, never shown back"""
     key = str((bottle.request.json or {}).get("key", "")).strip()
     if key and not re.fullmatch(r"[!-~]{1,128}", key):
-        return api_error(400, "Invalid key: 1-128 printable characters, no spaces")
+        return api_error(400, "Clave inválida: 1-128 caracteres imprimibles, sin espacios")
     path = field_path(name + ".conf")
     try:
         os.makedirs(settings.FIELD_DIR, exist_ok=True)
@@ -484,7 +484,7 @@ def set_field_key(name):
 def start_field_update():
     with field_lock:
         if field_update["running"]:
-            return api_error(409, "An update is already running")
+            return api_error(409, "Ya hay una actualización en marcha")
         field_update.update(running=True, result="")
     threading.Thread(target=run_field_update, daemon=True).start()
     return get_field()
@@ -493,7 +493,7 @@ def start_field_update():
 @app.get('/field/logs/<name>')
 def field_log_file(name):
     if not name.endswith(".adi"):
-        raise bottle.HTTPError(404, "Not found")
+        raise bottle.HTTPError(404, "No encontrado")
     return bottle.static_file(name, root=field_path("logs"), download=True, mimetype="text/plain")
 
 
@@ -545,17 +545,17 @@ def edit_qso(name, n, fn):
     """Applies fn to record n (0 = the first QSO of the file; records without CALL do not count):
     fn returns the new record, or None to delete it. Returns an error response or None."""
     if not name.endswith(".adi") or os.path.basename(name) != name:
-        return api_error(400, "Not a log")
+        return api_error(400, "No es un log")
     path = field_path("logs", name)
     try:
         with open(path, errors="replace") as f:
             text = f.read()
     except FileNotFoundError:
-        return api_error(404, "Not found")
+        return api_error(404, "No encontrado")
     head, parts = adif_split(text)
     recs = [i for i, p in enumerate(parts[:-1]) if re.search(r'<call:\d+', p, re.I)]
     if not 0 <= n < len(recs):
-        return api_error(404, "No such QSO")
+        return api_error(404, "No existe ese QSO")
     new = fn(parts[recs[n]])
     if new is None:
         del parts[recs[n]]
@@ -582,17 +582,17 @@ def put_qso(name, n):
     except ValueError:
         data = None
     if not isinstance(data, dict):
-        return api_error(400, "Invalid QSO")
+        return api_error(400, "QSO inválido")
     call = str(data.get("call", "")).strip().upper()
     rs, rr = str(data.get("rst_sent", "")).strip(), str(data.get("rst_rcvd", "")).strip()
     rst = r'[+-]?\d{1,3}'     # 59, 599, FT8 dB (-10)
     if not re.fullmatch(r'[A-Z0-9/]{3,15}', call) or not re.fullmatch(rst, rs) or not re.fullmatch(rst, rr):
-        return api_error(400, "Invalid QSO")
+        return api_error(400, "QSO inválido")
     ref = data.get("ref")
     if ref is not None:
         ref = str(ref).strip().upper()
         if ref and not (re.fullmatch(SOTA_REF, ref) or re.fullmatch(POTA_REF, ref)):
-            return api_error(400, "Invalid SOTA/POTA reference")
+            return api_error(400, "Referencia SOTA/POTA inválida")
 
     def change(rec):
         rec = adif_set(adif_set(adif_set(rec, "CALL", call), "RST_SENT", rs), "RST_RCVD", rr)
@@ -603,13 +603,13 @@ def put_qso(name, n):
 @app.delete('/api/field/logs/<name>')
 def delete_field_log(name):
     if not name.endswith(".adi") or os.path.basename(name) != name:
-        return api_error(400, "Not a log")
+        return api_error(400, "No es un log")
     if name == field_active_log():
-        return api_error(409, "This activation is still running: end it on the radio first")
+        return api_error(409, "Esta activación sigue en curso: termínela primero en la radio")
     try:
         os.remove(field_path("logs", name))
     except FileNotFoundError:
-        return api_error(404, "Not found")
+        return api_error(404, "No encontrado")
     return get_field()
 
 
@@ -668,7 +668,7 @@ def put_log_qso(name, n):
     except ValueError:
         data = None
     if not isinstance(data, dict) or not data:
-        return api_error(400, "Invalid QSO")
+        return api_error(400, "QSO inválido")
     clean = {}
     for k, v in data.items():
         v = str(v).strip()
@@ -771,14 +771,14 @@ def remote_command():
     except ValueError:
         data = None
     if not isinstance(data, dict) or data.get("cmd") not in REMOTE_CMDS:
-        return api_error(400, "Invalid command")
+        return api_error(400, "Comando inválido")
     val = data.get("val")
     # The GUI checks the values; keep the line short and plain
     if not (val is None or (isinstance(val, int) and not isinstance(val, bool)) or (isinstance(val, str) and len(val) <= 8)):
-        return api_error(400, "Invalid value")
+        return api_error(400, "Valor inválido")
     text = data.get("text")
     if not (text is None or (isinstance(text, str) and len(text) <= 200 and text.isascii() and text.isprintable())):
-        return api_error(400, "Invalid text")
+        return api_error(400, "Texto inválido")
     cmd = {"cmd": data["cmd"], "val": val}
     if text is not None:
         cmd["text"] = text
@@ -787,7 +787,7 @@ def remote_command():
             sock.sendall(json.dumps(cmd).encode() + b"\n")
             reply = json.loads(f.readline() or b"{}")
     except (OSError, ValueError):
-        return api_error(503, "Radio GUI not reachable")
+        return api_error(503, "La interfaz de la radio no responde")
     if reply.get("t") != "ok":
         return api_error(409, reply.get("err", "Rejected by the radio"))
     return {"status": "OK"}
@@ -1063,7 +1063,7 @@ def parse_entry(data, named):
     if isinstance(freq, bool) or not isinstance(freq, int) or not FREQ_MIN <= freq <= FREQ_MAX:
         raise ValueError("Frequency must be between 0.5 and 56 MHz")
     if data.get("mode") not in MODES:
-        raise ValueError("Invalid mode")
+        raise ValueError("Modo inválido")
     if data.get("agc") not in AGCS:
         raise ValueError("Invalid AGC")
     for key in ("pre", "att"):
@@ -1116,7 +1116,7 @@ def get_memories(dbcon):
 @app.put('/api/memories/<id:int>')
 def set_memory(dbcon, id):
     if id not in MEM_SLOTS:
-        return api_error(404, "No such slot")
+        return api_error(404, "No existe esa memoria")
     try:
         e = parse_entry(bottle.request.json, False)
     except ValueError as ex:
@@ -1136,7 +1136,7 @@ def set_memory(dbcon, id):
 @app.delete('/api/memories/<id:int>')
 def clear_memory(dbcon, id):
     if id not in MEM_SLOTS:
-        return api_error(404, "No such slot")
+        return api_error(404, "No existe esa memoria")
     try:
         with dbcon:
             dbcon.execute("DELETE FROM memory WHERE id = ?", (id,))
@@ -1171,7 +1171,7 @@ def display():
 def display_get():
     reply = display_call({"cmd": "disp_get"})
     if not reply or reply.get("t") != "disp":
-        return api_error(503, "Radio GUI not reachable")
+        return api_error(503, "La interfaz de la radio no responde")
     reply.pop("t", None)
     return reply
 
@@ -1183,20 +1183,20 @@ def display_set():
     except ValueError:
         data = None
     if not isinstance(data, dict) or not isinstance(data.get("name"), str) or len(data["name"]) > 23:
-        return api_error(400, "Invalid option")
+        return api_error(400, "Opción inválida")
     cmd = {"cmd": "disp_set", "text": data["name"]}
     if data["name"] == "theme":
         if not isinstance(data.get("theme"), str) or len(data["theme"]) > 31:
-            return api_error(400, "Invalid theme")
+            return api_error(400, "Tema inválido")
         cmd["theme"] = data["theme"]
     else:
         val = data.get("val")
         if not isinstance(val, int) or isinstance(val, bool):
-            return api_error(400, "Invalid value")
+            return api_error(400, "Valor inválido")
         cmd["val"] = val
     reply = display_call(cmd)
     if reply is None:
-        return api_error(503, "Radio GUI not reachable")
+        return api_error(503, "La interfaz de la radio no responde")
     if reply.get("t") != "ok":
         return api_error(409, reply.get("err", "Rejected by the radio"))
     return {"status": "OK"}
@@ -1217,7 +1217,7 @@ def network():
 def network_get():
     reply = display_call({"cmd": "eth_get"})
     if not reply or reply.get("t") != "eth":
-        return api_error(503, "Radio GUI not reachable")
+        return api_error(503, "La interfaz de la radio no responde")
     reply.pop("t", None)
     return reply
 
@@ -1229,16 +1229,16 @@ def network_set():
     except ValueError:
         data = None
     if not isinstance(data, dict) or not isinstance(data.get("dhcp"), bool):
-        return api_error(400, "Invalid mode")
+        return api_error(400, "Modo inválido")
     cmd = {"cmd": "eth_set", "dhcp": data["dhcp"]}
     for k in ETH_FIELDS:
         v = data.get(k, "")
         if not isinstance(v, str) or len(v) > 15:
-            return api_error(400, "Invalid value")
+            return api_error(400, "Valor inválido")
         cmd[k] = v.strip()
     reply = display_call(cmd)
     if reply is None:
-        return api_error(503, "Radio GUI not reachable")
+        return api_error(503, "La interfaz de la radio no responde")
     if reply.get("t") != "ok":
         return api_error(409, reply.get("err", "Rejected by the radio"))
     return {"status": "OK"}
@@ -1474,7 +1474,7 @@ def cluster_alert_input(data):
         return None, cluster_error(400, "Invalid bands")
     mode = str(data.get("mode", "")).strip().upper()
     if mode not in ("", "CW", "SSB", "DIG"):
-        return None, cluster_error(400, "Invalid mode")
+        return None, cluster_error(400, "Modo inválido")
     return {"pattern": pattern, "bands": ",".join(str(b) for b in bands), "mode": mode,
             "enabled": data.get("enabled", True) is not False}, None
 
@@ -1623,11 +1623,11 @@ def gallery_path(kind, name):
     """Real path of a gallery file, 404 for anything else (no separators, no dot dirs)."""
     sub, exts = GALLERY_DIRS.get(kind, (None, ()))
     if sub is None or not GALLERY_NAME.match(name) or not name.lower().endswith(exts):
-        raise bottle.HTTPError(404, "Not found")
+        raise bottle.HTTPError(404, "No encontrado")
     root = os.path.realpath(os.path.join(settings.FILEBROWSER_PATH, sub))
     path = os.path.realpath(os.path.join(root, name))
     if os.path.dirname(path) != root or not os.path.isfile(path):
-        raise bottle.HTTPError(404, "Not found")
+        raise bottle.HTTPError(404, "No encontrado")
     return root, path
 
 
@@ -1796,7 +1796,7 @@ def zip_gallery_files():
         except bottle.HTTPError:
             pass
     if not files:
-        return api_error(404, "Not found")
+        return api_error(404, "No encontrado")
     one = len({k for k, _, _ in files}) == 1
     os.sync()
     zip_name = f"x6100-{files[0][0] if one else 'all'}-{datetime.now().strftime('%Y%m%d-%H%M%S')}.zip"
@@ -1824,15 +1824,15 @@ def upload_wefax_tx_pic():
 def upload_tx_pic(kind):
     upload = bottle.request.files.get("file")
     if upload is None:
-        return api_error(400, "No file")
+        return api_error(400, "No hay archivo")
     name = upload.raw_filename
     if not GALLERY_NAME.match(name) or not name.endswith(".png"):
-        return api_error(400, "Invalid file name")
+        return api_error(400, "Nombre de archivo inválido")
     data = upload.file.read(SSTV_TX_MAX + 1)
     if len(data) > SSTV_TX_MAX:
-        return api_error(413, "Larger than 4 MB")
+        return api_error(413, "Más grande que 4 MB")
     if not data.startswith(b"\x89PNG"):
-        return api_error(400, "Not a PNG")
+        return api_error(400, "No es un PNG")
     folder = os.path.join(settings.FILEBROWSER_PATH, GALLERY_DIRS[kind][0])
     os.makedirs(folder, exist_ok=True)
     if bottle.request.query.get("unique"):   # the gallery page: keep an existing file, name-1.png, name-2.png...

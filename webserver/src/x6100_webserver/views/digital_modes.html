@@ -1,18 +1,18 @@
-% rebase('base.html', title='Digital modes editor')
-<h2><svg class="i"><use href="#i-pulse"/></svg>Digital modes</h2>
-<p class="sub">Frequencies offered by the FT8/FT4 and JS8 apps.</p>
+% rebase('base.html', title='Editor de modos digitales')
+<h2><svg class="i"><use href="#i-pulse"/></svg>Modos digitales</h2>
+<p class="sub">Frecuencias que ofrecen las apps FT8/FT4 y JS8.</p>
 
 <section class="dp-card">
-<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-list"/></svg></span><div><h3>Frequencies</h3><p>Label, dial frequency, mode and app</p></div><div class="dp-x"><button id="add_mode" class="primary"><svg class="i"><use href="#i-plus"/></svg>Add frequency</button></div></div>
+<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-list"/></svg></span><div><h3>Frecuencias</h3><p>Etiqueta, frecuencia de dial, modo y app</p></div><div class="dp-x"><button id="add_mode" class="primary"><svg class="i"><use href="#i-plus"/></svg>Agregar frecuencia</button></div></div>
 <div class="dp-body tbl">
 <div class="table-wrap">
 <table id="digital_modes">
   <thead>
     <tr>
-      <th class="name">Label</th>
-      <th class="freq">Freq, MHz</th>
-      <th class="">Mode</th>
-      <th class="">Type</th>
+      <th class="name">Etiqueta</th>
+      <th class="freq">Frec, MHz</th>
+      <th class="">Modo</th>
+      <th class="">Tipo</th>
       <th></th>
     </tr>
   </thead>
@@ -202,7 +202,7 @@ var saveRow = function(e) {
 var removeRow = function(e) {
   let row = $(e.currentTarget).parents("tr");
   let data = row.data();
-  if (confirm(`Remove digital mode "${data.label}"?`) == true) {
+  if (confirm(`¿Quitar el modo digital "${data.label}"?`) == true) {
     if (data.id === null) {
       // Simple remove
       row.remove();
