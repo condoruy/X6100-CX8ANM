@@ -11,7 +11,13 @@
 #include "rotary.h"
 #include "encoder.h"
 
-#define VERSION "x6100 IU1WXY firmware - v0.126"
+#define VERSION "x6100 IU1WXY firmware - v0.126"   /* la base; la app X6100 Link lee este número */
+
+/* Versión de esta edición (CMake: VERSION_CX8ANM) */
+#ifndef CX8ANM_VERSION
+#define CX8ANM_VERSION "dev"
+#endif
+#define CX8ANM_NAME "Xiegu X6100-CX8ANM"
 
 
 extern rotary_t     *vol;

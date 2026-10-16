@@ -144,6 +144,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-ccache-
 
+    # Versión CX8ANM: la del archivo + el número de esta ejecución (1.0.7, 1.0.8...)
+    - name: CX8ANM version
+      run: |
+        V="$(tr -d ' \n' < x6100_gui/VERSION_CX8ANM).${{ github.run_number }}"
+        echo "$V" > x6100_gui/VERSION_CX8ANM
+        echo "CX8ANM_VERSION=$V" >> "$GITHUB_ENV"
+        echo "IMG=Xiegu_X6100-CX8ANM_v$V" >> "$GITHUB_ENV"
+        echo "Imagen: Xiegu_X6100-CX8ANM_v$V"
+
     # Configure
     - name: Configure
       run: |
@@ -173,16 +182,16 @@ jobs:
     - name: Compress image
       run: |
         cd AetherX6100Buildroot/build/images
-        mv sdcard.img sdcard.${{ github.ref_name }}.img
-        zip sdcard.${{ github.ref_name }}.img.zip sdcard.${{ github.ref_name }}.img
+        mv sdcard.img ${{ env.IMG }}.img
+        zip ${{ env.IMG }}.img.zip ${{ env.IMG }}.img
 
     # Always keep the image as a workflow artifact: branch runs have no
     # release to attach to, and on a tag it survives a failed Release step.
     - name: Upload image
       uses: actions/upload-artifact@v4
       with:
-        name: sdcard.${{ github.ref_name }}.img.zip
-        path: AetherX6100Buildroot/build/images/sdcard.${{ github.ref_name }}.img.zip
+        name: ${{ env.IMG }}.img.zip
+        path: AetherX6100Buildroot/build/images/${{ env.IMG }}.img.zip
         retention-days: 30
 
     # Create release
@@ -190,4 +199,4 @@ jobs:
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: AetherX6100Buildroot/build/images/sdcard.${{ github.ref_name }}.img.zip
+        files: AetherX6100Buildroot/build/images/${{ env.IMG }}.img.zip

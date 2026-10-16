@@ -5049,7 +5049,8 @@ static void make_info_page() {
     uint8_t row;
 
     row = card_begin("FIRMWARE");
-    row = info_row(row, "Version", strrchr(VERSION, ' ') + 1);
+    row = info_row(row, "Version", CX8ANM_NAME " v" CX8ANM_VERSION);
+    row = info_row(row, "Based on", strrchr(VERSION, ' ') + 1);
     row = info_row(row, "Author", "Giovanni Ricciardi IU1WXY");
     row = info_row(row, "Contact", "giovanni@iu1wxy.com");
     row = info_row(row, "Baseband", x6100_control_get_fw_version_str());

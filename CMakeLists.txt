@@ -6,6 +6,11 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 project(x6100_gui)
 
+# Versión CX8ANM: VERSION_CX8ANM ("1.0"; el workflow de GitHub le suma el número de build)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/VERSION_CX8ANM CX8ANM_VERSION)
+string(STRIP "${CX8ANM_VERSION}" CX8ANM_VERSION)
+add_compile_definitions(CX8ANM_VERSION="${CX8ANM_VERSION}")
+
 include_directories(.)
 
 if(ENABLE_TESTING)

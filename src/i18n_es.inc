@@ -1262,3 +1262,4 @@
 { "type %.8s and Enter on the keyboard", "escriba %.8s e Intro en el teclado" },
 { "type %06u and Enter on the keyboard", "escriba %06u e Intro en el teclado" },
 { "no DNS (WiFi?)", "sin DNS (¿WiFi?)" },
+{ "Based on", "Basado en IU1WXY" },
