@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include "msg.h"
+#include "i18n.h"
 #include "styles.h"
 #include "util.h"
 #include "events.h"
@@ -83,7 +84,7 @@ void msg_tiny_set_text_fmt(const char * fmt, ...) {
     va_list args;
 
     va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    vsnprintf(buf, sizeof(buf), tr(fmt), args);
     va_end(args);
 
     event_send(obj, EVENT_MSG_UPDATE, NULL);

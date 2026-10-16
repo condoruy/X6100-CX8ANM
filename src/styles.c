@@ -9,6 +9,7 @@
 #include "styles.h"
 #include "theme.h"
 #include "fonts/font_select.h"
+#include "i18n.h"
 
 #define PATH "A:/dev/shm/"
 
@@ -402,6 +403,7 @@ void styles_init(void) {
 
 /* The theme by name, its font, the styles: at start and on a theme change (main_screen_set_theme()) */
 void styles_load(const char *name) {
+    i18n_set_lang(params.language.x);   /* el idioma, antes de armar la interfaz */
     theme_init(name);    /* an unknown one falls back to IU1WXY */
     fonts_apply(theme_shape.font >= 0 ? theme_shape.font : params.font.x);
     if (theme_shape.vision)

@@ -2,7 +2,9 @@
  * sony_N are replaced by the alt font before the UI is built. The alt fonts are ASCII only
  * (lv_font_conv --bpp 4 --no-compress --range 32-126 --format lvgl, size two steps below
  * Sony's; Arial: tools/font_gen.py, about 0.8 x Sony's size so two-line button labels fit);
- * icon glyphs come from the untouched Sony copy through the fallback. */
+ * icon glyphs come from the untouched Sony copy through the fallback.
+ * Letras con tilde, ñ, ¡ ¿ (para el español): lat_<familia>_N, solo esos
+ * caracteres, entre la fuente y la copia de Sony: alt -> lat -> Sony. */
 #include <stdbool.h>
 #include "lvgl/lvgl.h"
 #include "font_select.h"
@@ -12,6 +14,8 @@
 
 #define DECL(n) extern lv_font_t sony_##n; extern const lv_font_t roboto_##n, dejavu_##n, arial_##n, rcond_##n;
 SIZES(DECL)
+#define DECL_LAT(n) extern const lv_font_t lat_sony_##n, lat_roboto_##n, lat_dejavu_##n, lat_arial_##n, lat_rcond_##n;
+SIZES(DECL_LAT)
 
 #define SONY(n) &sony_##n,
 #define ROBOTO(n) &roboto_##n,
@@ -23,9 +27,20 @@ static const lv_font_t *const roboto[] = { SIZES(ROBOTO) };
 static const lv_font_t *const dejavu[] = { SIZES(DEJAVU) };
 static const lv_font_t *const arial[] = { SIZES(ARIAL) };
 static const lv_font_t *const rcond[] = { SIZES(RCOND) };
+#define LAT_SONY(n) &lat_sony_##n,
+#define LAT_ROBOTO(n) &lat_roboto_##n,
+#define LAT_DEJAVU(n) &lat_dejavu_##n,
+#define LAT_ARIAL(n) &lat_arial_##n,
+#define LAT_RCOND(n) &lat_rcond_##n,
+static const lv_font_t *const lat_sony[] = { SIZES(LAT_SONY) };
+static const lv_font_t *const lat_roboto[] = { SIZES(LAT_ROBOTO) };
+static const lv_font_t *const lat_dejavu[] = { SIZES(LAT_DEJAVU) };
+static const lv_font_t *const lat_arial[] = { SIZES(LAT_ARIAL) };
+static const lv_font_t *const lat_rcond[] = { SIZES(LAT_RCOND) };
 #define N_FONTS (sizeof(sony) / sizeof(sony[0]))
 
 static lv_font_t orig[N_FONTS];   /* Sony's, as built */
+static lv_font_t lat[N_FONTS];    /* las letras con tilde de la fuente elegida */
 static bool saved;
 
 int buttons_h = 54;  /* = BUTTONS_H_MIN */
@@ -38,14 +53,25 @@ void fonts_apply(uint8_t choice) {
     }
     saved = true;
     buttons_h = 54;
-    if (choice != FONT_ROBOTO && choice != FONT_DEJAVU && choice != FONT_ARIAL && choice != FONT_RCOND) return;
+    if (choice != FONT_ROBOTO && choice != FONT_DEJAVU && choice != FONT_ARIAL && choice != FONT_RCOND) {
+        for (unsigned i = 0; i < N_FONTS; i++) {
+            lat[i]           = *lat_sony[i];
+            lat[i].fallback  = NULL;
+            sony[i]->fallback = &lat[i];
+        }
+        return;
+    }
     if (choice == FONT_DEJAVU) buttons_h = 62;
     const lv_font_t *const *alt = choice == FONT_ROBOTO ? roboto : choice == FONT_DEJAVU ? dejavu :
                                    choice == FONT_ARIAL ? arial : rcond;
+    const lv_font_t *const *alt_lat = choice == FONT_ROBOTO ? lat_roboto : choice == FONT_DEJAVU ? lat_dejavu :
+                                       choice == FONT_ARIAL ? lat_arial : lat_rcond;
 
     for (unsigned i = 0; i < N_FONTS; i++) {
         *sony[i] = *alt[i];
-        sony[i]->fallback = &orig[i];
+        lat[i]          = *alt_lat[i];
+        lat[i].fallback = &orig[i];
+        sony[i]->fallback = &lat[i];
     }
 }
 

@@ -66,7 +66,11 @@ target_sources(${PROJECT_NAME} PUBLIC
     dialog_field.c
     dialog_bands.c
     dialog_snake.c
+    i18n.cpp
 )
+
+# Idiomas: todo texto que llega a LVGL pasa por tr() (i18n_hook.h)
+target_compile_options(${PROJECT_NAME} PRIVATE -include ${CMAKE_CURRENT_SOURCE_DIR}/i18n_hook.h)
 
 add_subdirectory(fonts)
 add_subdirectory(ft8)

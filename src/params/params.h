@@ -201,6 +201,7 @@ typedef struct {
     params_uint8_t       theme;         /* old setting, replaced by theme_name */
     params_str_t         theme_name;    /* built-in theme or /mnt/themes/<name>.json */
     params_uint8_t       font;
+    params_uint8_t       language;      /* LANG_EN, LANG_ES (i18n.h) */
 
     /* durty flags */
 

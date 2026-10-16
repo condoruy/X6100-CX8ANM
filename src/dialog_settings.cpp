@@ -408,6 +408,7 @@ static void uint8_dropdown_update_cb(lv_event_t * e) {
  * built, so the main screen is built again (main_screen_set_theme()) */
 static lv_obj_t *theme_dd;
 static lv_obj_t *font_dd;
+static lv_obj_t *lang_dd;
 
 /* Settings goes with the rest of the screen, then opens again on Display, on the
  * dropdown that was changed (arg) */
@@ -417,7 +418,7 @@ static void theme_apply(void *arg) {
     main_screen_set_theme(params.theme_name.x);
     main_screen_start_app(ACTION_APP_SETTINGS);
     load_display_page(&btn_display);
-    lv_group_focus_obj(font ? font_dd : theme_dd);
+    lv_group_focus_obj(arg == (void *)2 ? lang_dd : font ? font_dd : theme_dd);
 }
 
 static void font_update_cb(lv_event_t * e) {
@@ -428,6 +429,13 @@ static void font_update_cb(lv_event_t * e) {
     }
     params_flush();
     lv_async_call(theme_apply, (void *)1);   /* not from inside the dropdown's own event */
+}
+
+/* Idioma: la interfaz se vuelve a armar, como con el tema */
+static void lang_update_cb(lv_event_t * e) {
+    uint8_dropdown_update_cb(e);
+    params_flush();
+    lv_async_call(theme_apply, (void *)2);   /* not from inside the dropdown's own event */
 }
 
 static void theme_update_cb(lv_event_t * e) {
@@ -2380,6 +2388,24 @@ static uint8_t make_font(uint8_t row) {
 
     obj = dropdown_uint8(grid, &params.font, " Sony Sketch \n Roboto \n DejaVu", font_update_cb);
     font_dd = obj;
+
+    lv_obj_set_size(obj, SMALL_6, ROW_H);
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 1, 6, LV_GRID_ALIGN_CENTER, row, 1);
+    lv_obj_center(obj);
+
+    return row + 1;
+}
+
+static uint8_t make_language(uint8_t row) {
+    lv_obj_t    *obj;
+
+    obj = lv_label_create(grid);
+    lv_label_set_text(obj, "Language");
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_CENTER, row, 1);
+
+    /* Los nombres de los idiomas no se traducen: siempre se reconocen */
+    obj = dropdown_uint8(grid, &params.language, " English \n Español ", lang_update_cb);
+    lang_dd = obj;
 
     lv_obj_set_size(obj, SMALL_6, ROW_H);
     lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 1, 6, LV_GRID_ALIGN_CENTER, row, 1);
@@ -4473,6 +4499,7 @@ static void make_display_page() {
     row = make_knob_info(row);
     row = make_theme(row);
     row = make_font(row);
+    row = make_language(row);
     row = make_digi_text(row);
     row = make_ft8_info(row);
     card_end(row);

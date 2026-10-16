@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="480" viewBox="0 0 800 480">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#0d2140"/>
+      <stop offset="1" stop-color="#050b16"/>
+    </radialGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f7fb"/>
+      <stop offset="1" stop-color="#b9c6d6"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd35a"/>
+      <stop offset="1" stop-color="#e09a12"/>
+    </linearGradient>
+
+    <!-- media ala derecha del cóndor (la izquierda es el espejo) -->
+    <g id="halfCondor">
+      <path fill="url(#wing)" d="
+        M400,118
+        C420,116 438,113 458,108
+        C510,96 572,92 628,98
+        Q650,100 664,104
+        Q690,104 712,112 Q700,118 672,120
+        Q700,124 722,132 Q706,138 676,136
+        Q700,144 718,156 Q700,158 672,150
+        Q690,162 702,176 Q684,172 662,160
+        Q672,172 678,186 Q660,178 642,164
+        C600,166 540,168 488,172
+        C462,174 444,178 430,184
+        L424,204 Q414,214 400,218 Z"/>
+      <!-- banda blanca de las secundarias -->
+      <path fill="#7f93ab" d="M446,150 C520,140 580,138 640,144 C590,150 520,154 452,160 Z"/>
+    </g>
+
+    <!-- flor de lis genérica -->
+    <g id="lis">
+      <path d="M50,4 C63,19 67,38 57,58 L43,58 C33,38 37,19 50,4 Z"/>
+      <path d="M57,58 C60,40 74,30 87,34 C99,38 100,54 90,62 C84,67 76,64 76,58 C80,60 86,58 86,52 C86,44 76,42 70,48 C65,53 63,58 62,62 Z"/>
+      <path transform="translate(100,0) scale(-1,1)" d="M57,58 C60,40 74,30 87,34 C99,38 100,54 90,62 C84,67 76,64 76,58 C80,60 86,58 86,52 C86,44 76,42 70,48 C65,53 63,58 62,62 Z"/>
+      <rect x="31" y="60" width="38" height="8" rx="2"/>
+      <path d="M45,70 C42,82 36,90 28,96 L41,96 C47,90 49,82 50,76 C51,82 53,90 59,96 L72,96 C64,90 58,82 55,70 Z"/>
+    </g>
+  </defs>
+
+  <rect width="800" height="480" fill="url(#bg)"/>
+
+  <!-- ondas de radio sobre la cabeza -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M378,74 A30,30 0 0 1 422,74" stroke="#ffc233" stroke-width="5"/>
+    <path d="M362,62 A50,50 0 0 1 438,62" stroke="#e0a020" stroke-width="5" opacity="0.8"/>
+    <path d="M346,50 A72,72 0 0 1 454,50" stroke="#a87a1c" stroke-width="5" opacity="0.65"/>
+  </g>
+
+  <!-- cóndor -->
+  <use href="#halfCondor"/>
+  <use href="#halfCondor" transform="translate(800,0) scale(-1,1)"/>
+  <!-- collar blanco y cabeza -->
+  <ellipse cx="400" cy="120" rx="23" ry="9" fill="#ffffff" stroke="#c6d2e0" stroke-width="1.5"/>
+  <ellipse cx="400" cy="104" rx="9" ry="10.5" fill="#6b3b38"/>
+  <path d="M395.5,109 Q400,121 404.5,109 Z" fill="#f0d8b0"/>
+
+  <!-- indicativo -->
+  <text x="400" y="318" text-anchor="middle" font-family="Inter, DejaVu Sans" font-weight="800"
+        font-size="112" letter-spacing="10" fill="#f2f6fb">CX8ANM</text>
+
+  <!-- franjas de Uruguay + flor de lis -->
+  <g>
+    <g transform="translate(136,350)">
+      <rect x="0"   y="0" width="22" height="7" fill="#1d4fb8"/>
+      <rect x="26"  y="0" width="22" height="7" fill="#f2f6fb"/>
+      <rect x="52"  y="0" width="22" height="7" fill="#1d4fb8"/>
+      <rect x="78"  y="0" width="22" height="7" fill="#f2f6fb"/>
+      <rect x="104" y="0" width="22" height="7" fill="#1d4fb8"/>
+      <rect x="130" y="0" width="22" height="7" fill="#f2f6fb"/>
+      <rect x="156" y="0" width="22" height="7" fill="#1d4fb8"/>
+      <rect x="182" y="0" width="22" height="7" fill="#f2f6fb"/>
+      <rect x="208" y="0" width="22" height="7" fill="#1d4fb8"/>
+    </g>
+    <g transform="translate(430,350)">
+      <rect x="0"   y="0" width="22" height="7" fill="#1d4fb8"/>
+      <rect x="26"  y="0" width="22" height="7" fill="#f2f6fb"/>
+      <rect x="52"  y="0" width="22" height="7" fill="#1d4fb8"/>
+      <rect x="78"  y="0" width="22" height="7" fill="#f2f6fb"/>
+      <rect x="104" y="0" width="22" height="7" fill="#1d4fb8"/>
+      <rect x="130" y="0" width="22" height="7" fill="#f2f6fb"/>
+      <rect x="156" y="0" width="22" height="7" fill="#1d4fb8"/>
+      <rect x="182" y="0" width="22" height="7" fill="#f2f6fb"/>
+      <rect x="208" y="0" width="22" height="7" fill="#1d4fb8"/>
+    </g>
+    <g transform="translate(375,328) scale(0.5)" fill="url(#gold)">
+      <use href="#lis"/>
+    </g>
+  </g>
+
+  <text x="400" y="418" text-anchor="middle" font-family="Inter, DejaVu Sans" font-weight="700"
+        font-size="26" letter-spacing="7" fill="#ffc233">CÓNDOR TECNOLÓGICO</text>
+  <text x="400" y="452" text-anchor="middle" font-family="Inter, DejaVu Sans" font-weight="500"
+        font-size="16" letter-spacing="6" fill="#8ea3bd">XIEGU X6100 · URUGUAY</text>
+</svg>

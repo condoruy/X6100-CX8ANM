@@ -7,6 +7,7 @@
  */
 
 #include "msg.h"
+#include "i18n.h"
 
 #include "styles.h"
 #include "util.h"
@@ -103,7 +104,7 @@ static void msg_update_cb(lv_event_t * e) {
 
 static void create_msg(const char * fmt, enum msg_type_t type, uint16_t dur, va_list args) {
     delayed_message_t * msg = (delayed_message_t *) malloc(sizeof(delayed_message_t));
-    vsnprintf(msg->text, sizeof(msg->text), fmt, args);
+    vsnprintf(msg->text, sizeof(msg->text), tr(fmt), args);
 
     cJSON *o = cJSON_CreateObject();
     cJSON_AddStringToObject(o, "t", "msg");

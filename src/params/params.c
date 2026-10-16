@@ -110,13 +110,14 @@ params_t params = {
     .rec_gain_db_f          = { .x = 0.0f, .name = "rec_gain_db_f"},
 
     .qth                    = { .x = "",  .max_len = 6, .name = "qth" },
-    .callsign               = { .x = "",  .max_len = 12, .name = "callsign" },
+    .callsign               = { .x = "CX8ANM",  .max_len = 12, .name = "callsign" },
 
     .wifi_enabled           = { .x = false, .name="wifi_enabled" },
 
     .theme                  = { .x = THEME_SIMPLE, .name="theme"},
     .theme_name             = { .x = "IU1WXY", .max_len = 31, .name = "theme_name" },
     .font                  = { .x = 2, .name="font"},     /* FONT_DEJAVU */
+    .language              = { .x = 1, .name="language"}, /* LANG_ES */
 };
 
 
@@ -298,6 +299,7 @@ static bool params_load() {
         if (params_load_bool(&params.wifi_enabled, name, i)) continue;
         if (params_load_uint8(&params.theme, name, i)) continue;
         if (params_load_uint8(&params.font, name, i)) continue;
+        if (params_load_uint8(&params.language, name, i)) continue;
     }
 
     sqlite3_finalize(stmt);
@@ -427,6 +429,7 @@ static void params_save() {
     params_save_bool(&params.wifi_enabled);
     params_save_uint8(&params.theme);
     params_save_uint8(&params.font);
+    params_save_uint8(&params.language);
 
     sql_query_exec("COMMIT");
 }
