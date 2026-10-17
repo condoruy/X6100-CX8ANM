@@ -46,3 +46,11 @@ filtros de modos/actividad del cluster y no repite el mismo indicativo en 15 min
 Todo lo que se recibe en la app NAVTEX queda en /mnt/navtex, un archivo por día (UTC):
 navtex-AAAAMMDD.txt y dsc-AAAAMMDD.txt. Se descargan desde la web: Galería > "NAVTEX / DSC
 recibidos" (o la página Archivos, carpeta navtex). El botón Guardar sigue funcionando igual.
+
+## Operación de campo: lista de sitios (SOTA, POTA, WWBOTA, HOTA)
+- La imagen ya trae las listas de referencias; la primera vez que entra a un programa se copian
+  a /mnt/field y aparecen los 30 sitios más cercanos (MFK elige, apretar = usar ese sitio).
+- La posición sale del GPS, del teléfono (X6100 Link) o del localizador QTH. Si no hay
+  localizador cargado, queda GF15WC (Montevideo); cámbielo en Ajustes > General > QTH.
+- Si no hay lista, se baja sola apenas hay WiFi. Para actualizarla: botón "Actualizar lista"
+  (página 2). "Ref..." permite escribir una referencia a mano.

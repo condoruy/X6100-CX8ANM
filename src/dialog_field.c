@@ -42,6 +42,7 @@
 #include "textarea_window.h"
 #include "theme.h"
 #include "vol.h"
+#include "wifi.h"
 
 #include <ctype.h>
 #include <math.h>
@@ -450,8 +451,17 @@ typedef struct {
     field_ref_t refs[MAX_NEAR];
 } near_result_t;
 
+static void list_update(void);
+
 static void near_result_cb(void *arg) {
     near_result_t *r = arg;
+    static bool    auto_tried;
+
+    /* Sin lista: se baja sola la primera vez que hay WiFi */
+    if (r->n == -1 && !updating && !auto_tried && wifi_get_status() == WIFI_CONNECTED) {
+        auto_tried = true;
+        list_update();
+    }
 
     near_n    = r->n;
     near_prog = r->prog;
@@ -470,9 +480,21 @@ static void near_result_cb(void *arg) {
     }
 }
 
+/* CX8ANM: la imagen trae la lista de referencias (bajada al compilar); la primera vez se copia a /mnt/field */
+#define REFS_BUNDLE "/usr/share/x6100-field/refs.tsv.gz"
+
+static void refs_from_bundle(void) {
+    if (access(REFS_PATH, R_OK) == 0 || access(REFS_BUNDLE, R_OK) != 0)
+        return;
+    mkdir(FIELD_DIR, 0755);
+    if (system("gunzip -c " REFS_BUNDLE " > " REFS_PATH ".tmp && mv " REFS_PATH ".tmp " REFS_PATH) != 0)
+        unlink(REFS_PATH ".tmp");
+}
+
 static void *near_thread(void *arg) {
     near_result_t *r = arg;
 
+    refs_from_bundle();
     r->n = field_refs_near(REFS_PATH, r->prog, r->lat, r->lon, r->refs, MAX_NEAR);
     scheduler_put(near_result_cb, r, sizeof(*r));
     free(r);

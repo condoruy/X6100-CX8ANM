@@ -191,6 +191,8 @@ int main(void) {
     params_init();
     if (strcasecmp(params.theme_name.x, "IU1WXY") == 0)
         params_str_set(&params.theme_name, "CX8ANM");    /* el tema de fábrica cambió de nombre */
+    if (!params.qth.x[0])
+        params_str_set(&params.qth, "GF15WC");   /* Montevideo: sin GPS, Campo busca las referencias cercanas desde acá */
     sstv_resources_init();
     display_settings_check();
     audio_set_play_vol(params.play_gain_db_f.x);

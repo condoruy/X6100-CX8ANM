@@ -122,6 +122,21 @@ jobs:
         grep "^X6100_GUI_DEPENDENCIES" AetherX6100Buildroot/br2_external/package/x6100-gui/x6100_gui.mk
         grep "^BR2_PACKAGE_DNSMASQ" AetherX6100Buildroot/br2_external/configs/X6100_defconfig
 
+    # Operación de campo: la imagen trae las listas POTA/SOTA/WWBOTA/HOTA (la radio las copia a
+    # /mnt/field la primera vez, sin WiFi). Si un sitio no responde, la radio la baja después.
+    - name: Field Ops reference lists
+      run: |
+        D=x6100_gui/rootfs/usr/share/x6100-field
+        mkdir -p $D
+        if X6100_FIELD_DIR=$PWD/fieldrefs timeout 900 python3 x6100_gui/rootfs/usr/sbin/x6100-field update --call CX8ANM; then
+          gzip -9c fieldrefs/refs.tsv > $D/refs.tsv.gz
+          ls -l $D/refs.tsv.gz
+          cut -c1 fieldrefs/refs.tsv | sort | uniq -c
+        else
+          echo "::warning::No se pudieron bajar las listas de referencias; la radio las baja con WiFi"
+          rmdir $D || true
+        fi
+
     - name: Custom boot logo
       run: |
         cp x6100_gui/boot/logo.png AetherX6100Buildroot/br2_external/board/X6100/linux/logo.png
