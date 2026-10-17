@@ -54,3 +54,11 @@ recibidos" (o la página Archivos, carpeta navtex). El botón Guardar sigue func
   localizador cargado, queda GF15WC (Montevideo); cámbielo en Ajustes > General > QTH.
 - Si no hay lista, se baja sola apenas hay WiFi. Para actualizarla: botón "Actualizar lista"
   (página 2). "Ref..." permite escribir una referencia a mano.
+
+## Bandas (Región 2 / Uruguay)
+- Radioaficionado: 2200m, 630m, 160m (1,800-2,000), 80m (3,500-4,000), 60m (5,3515-5,3665),
+  40m (7,000-7,300), 30m, 20m, 17m, 15m, 12m, 10m, 6m (50-54) y CB.
+- AM comercial (onda media 530-1710 kHz) como banda propia, en AM.
+- Onda corta de radiodifusión (120m a 11m): se muestran como referencia al sintonizar.
+- FM comercial (88-108 MHz): el X6100 no recibe por encima de 55 MHz.
+- Las radios ya usadas reciben las bandas nuevas solas al actualizar (migración 8).

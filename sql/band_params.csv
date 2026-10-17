@@ -34,3 +34,11 @@
 301	vfoa_mode	7
 302	vfoa_freq	433500000
 302	vfoa_mode	7
+13	vfoa_freq	136000
+13	vfoa_mode	2
+14	vfoa_freq	475000
+14	vfoa_mode	2
+15	vfoa_freq	5357000
+15	vfoa_mode	2
+114	vfoa_freq	1050000
+114	vfoa_mode	6

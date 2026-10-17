@@ -28,11 +28,13 @@ typedef struct {
     bp_type_t type;
 } bp_seg_t;
 
-/* IARU Region 1, adjacent ranges of the same type merged */
+/* IARU Región 2 (Uruguay), rangos vecinos del mismo tipo juntos */
 static const bp_seg_t plan[] = {
-    {  1810000,  1838000, BP_CW  }, {  1838000,  1843000, BP_DIG }, {  1843000,  2000000, BP_ALL },
-    {  3500000,  3570000, BP_CW  }, {  3570000,  3600000, BP_DIG }, {  3600000,  3800000, BP_ALL },
-    {  7000000,  7040000, BP_CW  }, {  7040000,  7050000, BP_DIG }, {  7050000,  7200000, BP_ALL },
+    {   135700,   137800, BP_CW  }, {   472000,   479000, BP_CW  },
+    {  1800000,  1838000, BP_CW  }, {  1838000,  1843000, BP_DIG }, {  1843000,  2000000, BP_ALL },
+    {  3500000,  3570000, BP_CW  }, {  3570000,  3600000, BP_DIG }, {  3600000,  4000000, BP_ALL },
+    {  5351500,  5354000, BP_CW  }, {  5354000,  5366000, BP_ALL }, {  5366000,  5366500, BP_DIG },
+    {  7000000,  7040000, BP_CW  }, {  7040000,  7050000, BP_DIG }, {  7050000,  7300000, BP_ALL },
     { 10100000, 10130000, BP_CW  }, { 10130000, 10150000, BP_DIG },
     { 14000000, 14070000, BP_CW  }, { 14070000, 14099000, BP_DIG }, { 14099000, 14101000, BP_BCN },
     { 14101000, 14112000, BP_DIG }, { 14112000, 14350000, BP_ALL },
@@ -45,7 +47,7 @@ static const bp_seg_t plan[] = {
     { 28000000, 28070000, BP_CW  }, { 28070000, 28190000, BP_DIG }, { 28190000, 28225000, BP_BCN },
     { 28225000, 29700000, BP_ALL },
     { 50000000, 50100000, BP_CW  }, { 50100000, 50300000, BP_ALL }, { 50300000, 50400000, BP_DIG },
-    { 50400000, 50500000, BP_BCN }, { 50500000, 52000000, BP_ALL },
+    { 50400000, 50500000, BP_BCN }, { 50500000, 54000000, BP_ALL },
 };
 
 static const theme_color_t colors[] = { TC_bp_cw, TC_bp_dig, TC_bp_ssb, TC_bp_bcn };

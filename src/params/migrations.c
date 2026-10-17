@@ -229,6 +229,43 @@ static int _7_add_ft2_presets() {
     return 0;
 }
 
+/* CX8ANM: bandas completas para la Región 2 (Uruguay): 160m desde 1.800, 80m hasta 4.000,
+ * 40m hasta 7.300, 6m hasta 54; nuevas 2200m, 630m, 60m y AM (onda media 530-1710 kHz);
+ * radiodifusión 120m y 90m. Sin tabla de bandas no hace nada: bands_check() carga las de fábrica. */
+static int _8_bands_region2() {
+    sqlite3_stmt *st;
+    int           rc;
+
+    if (sqlite3_prepare_v2(db, "SELECT 1 FROM bands LIMIT 1", -1, &st, 0) != SQLITE_OK)
+        return 0;
+    sqlite3_finalize(st);
+    rc = sqlite3_exec(db,
+        "BEGIN;"
+        "UPDATE bands SET start_freq = 1800000 WHERE id = 1 AND start_freq = 1810000;"
+        "UPDATE bands SET stop_freq = 4000000 WHERE id = 2 AND stop_freq = 3800000;"
+        "UPDATE bands SET stop_freq = 7300000 WHERE id = 4 AND stop_freq = 7200000;"
+        "UPDATE bands SET stop_freq = 54000000 WHERE id = 12 AND stop_freq = 53900000;"
+        "UPDATE bands SET start_freq = 7300000 WHERE id = 103 AND start_freq = 7200000;"
+        "INSERT OR IGNORE INTO bands(id, name, start_freq, stop_freq, type) VALUES "
+            "(13, '2200m', 135700, 137800, 1),"
+            "(14, '630m', 472000, 479000, 1),"
+            "(15, '60m', 5351500, 5366500, 1),"
+            "(114, 'AM 530-1710', 530000, 1710000, 1),"
+            "(112, 'Broadcast 120m', 2300000, 2495000, 0),"
+            "(113, 'Broadcast 90m', 3200000, 3400000, 0);"
+        "INSERT OR IGNORE INTO band_params(bands_id, name, val) VALUES "
+            "(13, 'vfoa_freq', 136000), (13, 'vfoa_mode', 2),"
+            "(14, 'vfoa_freq', 475000), (14, 'vfoa_mode', 2),"
+            "(15, 'vfoa_freq', 5357000), (15, 'vfoa_mode', 2),"
+            "(114, 'vfoa_freq', 1050000), (114, 'vfoa_mode', 6);"
+        "COMMIT;", NULL, NULL, NULL);
+    if (rc != SQLITE_OK) {
+        printf("Cannot update the bands: %s\n", sqlite3_errmsg(db));
+        sqlite3_exec(db, "ROLLBACK;", NULL, NULL, NULL);
+    }
+    return 0;   /* nunca impide arrancar */
+}
+
 static int (*migrations[])() = {
     _0_init_migrations,
     _1_create_ftx_table,
@@ -238,6 +275,7 @@ static int (*migrations[])() = {
     _5_add_ghostnet_presets,
     _6_add_wspr_presets,
     _7_add_ft2_presets,
+    _8_bands_region2,
 };
 
 int migrations_apply(void) {
