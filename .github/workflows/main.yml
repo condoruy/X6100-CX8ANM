@@ -51,11 +51,14 @@ jobs:
       with:
         submodules: true
         repository: gdyuldin/AetherX6100Buildroot
+        # Fijo en la versión probada: los cambios de arriba (p. ej. los enlaces a OpenX6100 del
+        # 16/10/2026) rompían la compilación sin aviso
+        ref: f84ff86391c4cfd253488f6e6a10c3927749d1f8
         path: AetherX6100Buildroot
 
     - name: Patch GUI mk
       run: |
-        sed -i "s,https://github.com/gdyuldin/x6100_gui,${GITHUB_WORKSPACE}/x6100_gui,g" AetherX6100Buildroot/br2_external/package/x6100-gui/x6100_gui.mk
+        sed -i "s,^X6100_GUI_SITE = .*,X6100_GUI_SITE = ${GITHUB_WORKSPACE}/x6100_gui,g" AetherX6100Buildroot/br2_external/package/x6100-gui/x6100_gui.mk
         sed -i "s,^X6100_GUI_SITE_METHOD = git,X6100_GUI_SITE_METHOD = local,g" AetherX6100Buildroot/br2_external/package/x6100-gui/x6100_gui.mk
         sed -i "s,^X6100_GUI_GIT_SUBMODULES,# X6100_GUI_GIT_SUBMODULES,g" AetherX6100Buildroot/br2_external/package/x6100-gui/x6100_gui.mk
 
