@@ -181,7 +181,19 @@ jobs:
         cd AetherX6100Buildroot/build
         make lame mpg123
         make libsndfile-dirclean
-        make
+        set -o pipefail
+        make 2>&1 | tee $GITHUB_WORKSPACE/build.log
+
+    # Si la compilación falla: el error, a la vista en el resumen de la ejecución
+    - name: Show build error
+      if: failure()
+      run: |
+        L=$GITHUB_WORKSPACE/build.log
+        [ -f $L ] || exit 0
+        { grep -nE "error|Error [0-9]|\*\*\*|undefined reference|No such file" $L | grep -vE "Werror|error\.(c|h|o)|-error|strerror|_error" | tail -25; echo ----; tail -40 $L; } > err.txt
+        { echo '### Error de compilación'; echo '```'; cat err.txt; echo '```'; } >> $GITHUB_STEP_SUMMARY
+        msg=$(sed 's/%/%25/g' err.txt | awk '{printf "%s%%0A", $0}')
+        echo "::error title=Build::$msg"
 
     - name: Save ccache
       if: always()
