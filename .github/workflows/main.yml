@@ -23,7 +23,7 @@ jobs:
       with:
         # this might remove tools that are actually needed,
         # if set to "true" but frees about 6 GB
-        tool-cache: true
+        preinstalled-runtimes: true
 
         # all of these default to true, but feel free to set to
         # "false" if necessary for your workflow
@@ -134,9 +134,9 @@ jobs:
         mkdir -p $D
         if X6100_FIELD_DIR=$PWD/fieldrefs timeout 900 python3 x6100_gui/rootfs/usr/sbin/x6100-field update --call CX8ANM; then
           gzip -9c fieldrefs/refs.tsv > $D/refs.tsv.gz
-          rm -rf fieldrefs
           ls -l $D/refs.tsv.gz
           cut -c1 fieldrefs/refs.tsv | sort | uniq -c
+          rm -rf fieldrefs
         else
           echo "::warning::No se pudieron bajar las listas de referencias; la radio las baja con WiFi"
           rmdir $D || true
