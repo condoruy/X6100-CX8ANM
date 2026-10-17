@@ -132,6 +132,7 @@ jobs:
         mkdir -p $D
         if X6100_FIELD_DIR=$PWD/fieldrefs timeout 900 python3 x6100_gui/rootfs/usr/sbin/x6100-field update --call CX8ANM; then
           gzip -9c fieldrefs/refs.tsv > $D/refs.tsv.gz
+          rm -rf fieldrefs
           ls -l $D/refs.tsv.gz
           cut -c1 fieldrefs/refs.tsv | sort | uniq -c
         else
@@ -190,7 +191,9 @@ jobs:
       run: |
         L=$GITHUB_WORKSPACE/build.log
         [ -f $L ] || exit 0
-        { grep -nE "error|Error [0-9]|\*\*\*|undefined reference|No such file" $L | grep -vE "Werror|error\.(c|h|o)|-error|strerror|_error" | tail -25; echo ----; tail -40 $L; } > err.txt
+        { df -h / | tail -1
+          grep -niE "rsync|No space|Permission denied|cannot |\*\*\*|undefined reference" $L | tail -20
+          echo ----; tail -25 $L; } | cut -c1-240 > err.txt
         { echo '### Error de compilación'; echo '```'; cat err.txt; echo '```'; } >> $GITHUB_STEP_SUMMARY
         msg=$(sed 's/%/%25/g' err.txt | awk '{printf "%s%%0A", $0}')
         echo "::error title=Build::$msg"
