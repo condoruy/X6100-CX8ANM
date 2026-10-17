@@ -52,7 +52,26 @@ def one_line(text, n=80):
 def open_url(url, data=None, headers=None, method=None):
     """Binary response stream; caller closes it."""
     req = urllib.request.Request(url, data=data, headers=dict({"User-Agent": user_agent}, **(headers or {})), method=method)
-    return urllib.request.urlopen(req, timeout=TIMEOUT)
+    return urllib.request.urlopen(req, timeout=TIMEOUT, context=ssl_context())
+
+
+_ssl_ctx = None
+
+
+def ssl_context():
+    """Certificados del sistema (paquete ca-certificates), estén donde estén."""
+    global _ssl_ctx
+    if _ssl_ctx is None:
+        try:
+            import ssl
+        except ImportError:
+            raise Fail("Python sin SSL: no puede abrir https (imagen vieja, actualice el firmware)")
+        _ssl_ctx = ssl.create_default_context()
+        for ca in ("/etc/ssl/certs/ca-certificates.crt", "/etc/ssl/cert.pem"):
+            if os.path.exists(ca):
+                _ssl_ctx.load_verify_locations(ca)
+                break
+    return _ssl_ctx
 
 
 def text_lines(stream):

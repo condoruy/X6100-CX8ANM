@@ -74,6 +74,8 @@ jobs:
         echo "BR2_PACKAGE_BOOST=y" >> AetherX6100Buildroot/br2_external/configs/X6100_defconfig
         # Root certificates: x6100-field talks HTTPS to POTA and QRZ
         echo "BR2_PACKAGE_CA_CERTIFICATES=y" >> AetherX6100Buildroot/br2_external/configs/X6100_defconfig
+        # Python sin SSL no abre https ("unknown url type: https"): Actualizar lista, spots POTA, QRZ
+        echo "BR2_PACKAGE_PYTHON3_SSL=y" >> AetherX6100Buildroot/br2_external/configs/X6100_defconfig
         # The display runs on DRM (lv_drivers/display/drm.c); libdrm is already in the defconfig
         sed -i "/^X6100_GUI_DEPENDENCIES/s/$/ libdrm/" AetherX6100Buildroot/br2_external/package/x6100-gui/x6100_gui.mk
         grep "^X6100_GUI_DEPENDENCIES" AetherX6100Buildroot/br2_external/package/x6100-gui/x6100_gui.mk
