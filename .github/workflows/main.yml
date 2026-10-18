@@ -231,9 +231,36 @@ jobs:
         path: AetherX6100Buildroot/build/images/${{ env.IMG }}.img.zip
         retention-days: 30
 
-    # Create release
+    # Paquete para actualizar desde la radio (x6100-update): el sistema del rootfs.ext4 tal cual
+    # (dueños y permisos), sin lo que es de cada radio: redes WiFi, Bluetooth, claves SSH, /mnt
+    - name: Update package
+      run: |
+        cd AetherX6100Buildroot/build/images
+        mkdir -p r
+        sudo mount -o loop,ro rootfs.ext4 r
+        sudo tar -C r -czf update.tar.gz \
+          --exclude=./dev --exclude=./proc --exclude=./sys --exclude=./tmp --exclude=./run \
+          --exclude=./mnt --exclude=./lost+found --exclude=./var/lib \
+          --exclude=./etc/NetworkManager/system-connections --exclude='./etc/ssh/ssh_host_*' \
+          --exclude=./etc/machine-id --exclude=./etc/shadow --exclude=./etc/passwd --exclude=./etc/group .
+        sudo umount r
+        sudo chown $(id -u) update.tar.gz
+        sha256sum update.tar.gz | cut -d' ' -f1 > update.tar.gz.sha256
+        ls -l update.tar.gz; cat update.tar.gz.sha256
+
+    # Cada compilación de main queda publicada (Releases): la imagen para grabar y el paquete
+    # que baja la radio (Ajustes > Info > Actualizar)
     - name: Release
       uses: softprops/action-gh-release@v2
-      if: startsWith(github.ref, 'refs/tags/')
+      if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
       with:
-        files: AetherX6100Buildroot/build/images/${{ env.IMG }}.img.zip
+        tag_name: v${{ env.CX8ANM_VERSION }}
+        name: Xiegu X6100-CX8ANM v${{ env.CX8ANM_VERSION }}
+        make_latest: true
+        body: |
+          Imagen para grabar con balenaEtcher: ${{ env.IMG }}.img.zip
+          Desde la radio: Ajustes > Info > Actualizar (baja update.tar.gz).
+        files: |
+          AetherX6100Buildroot/build/images/${{ env.IMG }}.img.zip
+          AetherX6100Buildroot/build/images/update.tar.gz
+          AetherX6100Buildroot/build/images/update.tar.gz.sha256

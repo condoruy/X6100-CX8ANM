@@ -76,3 +76,11 @@ El receptor es uno solo: escucha una frecuencia por vez, el escaneo las va alter
 Al conectarse a internet, la radio compara su versión (1.0.N) con la última compilación que salió
 bien en github.com/condoruy/X6100-CX8ANM (Actions). Solo avisa cuando hay una compilación propia
 más nueva. Ya no consulta x6100-link.it. Se apaga en Ajustes > Info > Aviso de actualización.
+
+## Actualizar desde la radio
+Cada compilación de GitHub queda publicada en Releases (v1.0.N) con la imagen y el paquete
+update.tar.gz. En la radio, con internet: Ajustes > Info > Actualizar... (busca), y si hay una
+versión nueva, tocar otra vez: baja el paquete a /mnt/update, lo verifica (sha256), lo instala y
+reinicia. Se conservan las redes WiFi, los emparejamientos Bluetooth, las claves SSH y todo /mnt
+(ajustes, logs, grabaciones). No apagar la radio mientras dice "Instalando". Si algo saliera mal,
+se vuelve a grabar la imagen con balenaEtcher como siempre.

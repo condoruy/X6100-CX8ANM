@@ -71,23 +71,18 @@ int main(void) {
 #include "params/params.h"
 #include "station.h"
 
-/* CX8ANM: solo las compilaciones propias (github.com/condoruy/X6100-CX8ANM, Actions > Build image):
- * la última que salió bien tiene el número de ejecución, el último de la versión (1.0.N). El aviso
- * de x6100-link.it era de la edición de IU1WXY y pedía actualizar sin cambios propios. */
-#define FETCH "python3 -c \"import urllib.request as u,json;" \
-              "r=u.Request('https://api.github.com/repos/condoruy/X6100-CX8ANM/actions/workflows/main.yml/runs" \
-              "?status=success&branch=main&per_page=1',headers={'User-Agent':'x6100-cx8anm'});" \
-              "print(json.load(u.urlopen(r,timeout=15))['workflow_runs'][0]['run_number'])\" 2>/dev/null"
+/* CX8ANM: solo las compilaciones propias (github.com/condoruy/X6100-CX8ANM, Releases): x6100-update
+ * dice la última publicada. El aviso de x6100-link.it era de la edición de IU1WXY y pedía
+ * actualizar sin cambios propios. Se instala desde Ajustes > Info > Actualizar. */
+#define FETCH "/usr/sbin/x6100-update latest 2>/dev/null"
 
 static void *check_thread(void *arg) {
     (void)arg;
-    const char *own = strrchr(CX8ANM_VERSION, '.');
-    int         own_n;
 
-    if (!own || (own_n = atoi(own + 1)) <= 0) return NULL;   /* "dev": compilada a mano */
+    if (!strchr(CX8ANM_VERSION, '.')) return NULL;   /* "dev": compilada a mano */
     /* up to ~20 minutes for the WiFi to come up */
     for (int i = 0; i < 20; i++) {
-        char  buf[64] = "";
+        char  buf[32] = "";
         FILE *p;
 
         sleep(i ? 60 : 30);
@@ -95,14 +90,11 @@ static void *check_thread(void *arg) {
             if (!fgets(buf, sizeof(buf), p)) buf[0] = 0;
             pclose(p);
         }
+        buf[strcspn(buf, " \r\n")] = 0;
         if (!buf[0]) continue;      /* no network yet */
 
-        int latest = atoi(buf);
-        if (latest > own_n && params.update_alert.x) {
-            char ver[32];
-            snprintf(ver, sizeof(ver), "%.*s%d", (int)(own - CX8ANM_VERSION + 1), CX8ANM_VERSION, latest);
-            msg_schedule_long_text_fmt("New CX8ANM version %s: download it from GitHub (Actions)", ver);
-        }
+        if (params.update_alert.x && update_newer(buf, CX8ANM_VERSION))
+            msg_schedule_long_text_fmt("New CX8ANM version %s: Settings > Info > Update", buf);
         break;
     }
     return NULL;

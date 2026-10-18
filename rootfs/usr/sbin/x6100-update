@@ -1,0 +1,178 @@
+#!/usr/bin/env python3
+# CX8ANM: actualización desde la radio, con las compilaciones de github.com/condoruy/X6100-CX8ANM.
+# Cada compilación de GitHub publica un "release" v1.0.N con update.tar.gz: el sistema completo
+# (sin las redes WiFi, los emparejamientos Bluetooth ni nada de /mnt, que se conservan).
+#
+#   x6100-update latest              "1.0.N" de la última publicada, o nada (sin red)
+#   x6100-update check <versión>     "new 1.0.N <MB>" | "same 1.0.N" | "error <motivo>"
+#   x6100-update install             baja, verifica, instala y reinicia; el avance en STATUS
+#
+# STATUS (/tmp/x6100-update.status), una línea: "download <0-100>", "verify", "install",
+# "done <versión>" o "error <motivo>". La GUI lo lee cada segundo.
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tarfile
+import time
+import urllib.request
+
+REPO = "condoruy/X6100-CX8ANM"
+API = f"https://api.github.com/repos/{REPO}/releases/latest"
+ASSET = "update.tar.gz"
+WORK = "/mnt/update"
+STATUS = "/tmp/x6100-update.status"
+UA = {"User-Agent": "x6100-cx8anm-update"}
+
+
+def status(text):
+    tmp = STATUS + ".tmp"
+    with open(tmp, "w") as f:
+        f.write(text + "\n")
+    os.replace(tmp, STATUS)
+
+
+def newer(a, b):
+    """'1.0.13' > '1.0.12', número por número"""
+    def nums(v):
+        return [int(x) for x in v.lstrip("v").split(".") if x.isdigit()]
+    return nums(a) > nums(b)
+
+
+def latest():
+    req = urllib.request.Request(API, headers=UA)
+    rel = json.load(urllib.request.urlopen(req, timeout=20))
+    ver = rel["tag_name"].lstrip("v")
+    assets = {a["name"]: a for a in rel.get("assets", [])}
+    return ver, assets
+
+
+def cmd_latest(args):
+    try:
+        print(latest()[0])
+    except Exception:
+        pass
+    return 0
+
+
+def cmd_check(args):
+    own = args[0] if args else ""
+    try:
+        ver, assets = latest()
+    except Exception as e:
+        print("error", str(getattr(e, "reason", e))[:60])
+        return 1
+    if ASSET not in assets:
+        print("error la versión", ver, "no trae el paquete de actualización")
+        return 1
+    if newer(ver, own):
+        print("new", ver, max(1, assets[ASSET]["size"] // 1048576))
+    else:
+        print("same", ver)
+    return 0
+
+
+def download(url, path, size):
+    req = urllib.request.Request(url, headers=UA)
+    got, last = 0, -1
+    h = hashlib.sha256()
+    with urllib.request.urlopen(req, timeout=60) as r, open(path, "wb") as f:
+        while True:
+            chunk = r.read(256 * 1024)
+            if not chunk:
+                break
+            f.write(chunk)
+            h.update(chunk)
+            got += len(chunk)
+            pct = got * 100 // size if size else 0
+            if pct != last:
+                status(f"download {pct}")
+                last = pct
+    if size and got != size:
+        raise RuntimeError("descarga incompleta")
+    return h.hexdigest()
+
+
+def extract(pkg, root):
+    """Cada archivo se escribe aparte y se cambia por el viejo de una vez (rename): un programa o
+    una biblioteca en uso sigue con la copia vieja hasta reiniciar, nunca con una a medias."""
+    with tarfile.open(pkg, "r:gz") as tar:
+        for m in tar:
+            name = os.path.normpath(m.name).lstrip("./")
+            if not name or name.startswith("..") or "/../" in "/" + name + "/":
+                continue
+            dst = os.path.join(root, name)
+            tmp = dst + ".x6100new"
+            try:
+                if m.isdir():
+                    os.makedirs(dst, exist_ok=True)
+                    os.chmod(dst, m.mode)
+                    continue
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+                if os.path.lexists(tmp):
+                    os.remove(tmp)
+                if m.issym():
+                    os.symlink(m.linkname, tmp)
+                elif m.islnk():
+                    os.link(os.path.join(root, os.path.normpath(m.linkname).lstrip("./")), tmp)
+                elif m.isfile():
+                    with tar.extractfile(m) as src, open(tmp, "wb") as out:
+                        shutil.copyfileobj(src, out, 256 * 1024)
+                    os.chmod(tmp, m.mode)
+                else:
+                    continue        # dispositivos: los hace el sistema al arrancar
+                if not m.islnk():
+                    os.lchown(tmp, m.uid, m.gid)
+                if os.path.isdir(dst) and not os.path.islink(dst):
+                    shutil.rmtree(dst)  # era una carpeta y ahora es un archivo
+                os.replace(tmp, dst)
+            except OSError as e:
+                if os.path.lexists(tmp):
+                    os.remove(tmp)
+                raise RuntimeError(f"/{name}: {e.strerror}")
+
+
+def cmd_install(args):
+    try:
+        status("download 0")
+        ver, assets = latest()
+        if ASSET not in assets or ASSET + ".sha256" not in assets:
+            raise RuntimeError(f"la versión {ver} no trae el paquete de actualización")
+        os.makedirs(WORK, exist_ok=True)
+        free = shutil.disk_usage(WORK).free
+        size = assets[ASSET]["size"]
+        if free < size + 20 * 1048576:
+            raise RuntimeError(f"falta lugar en la tarjeta ({free // 1048576} MB libres)")
+        req = urllib.request.Request(assets[ASSET + ".sha256"]["browser_download_url"], headers=UA)
+        want = urllib.request.urlopen(req, timeout=30).read().decode().split()[0].lower()
+        pkg = os.path.join(WORK, ASSET)
+        got = download(assets[ASSET]["browser_download_url"], pkg, size)
+        status("verify")
+        if got != want:
+            raise RuntimeError("el archivo bajado no coincide (sha256)")
+        status("install")
+        extract(pkg, "/")
+        os.remove(pkg)
+        subprocess.run(["sync"])
+        status(f"done {ver}")
+    except Exception as e:
+        status("error " + " ".join(str(getattr(e, "reason", e)).split())[:80])
+        return 1
+    time.sleep(6)       # la GUI muestra "listo" antes de reiniciar
+    subprocess.run(["sync"])
+    subprocess.run(["reboot"])
+    return 0
+
+
+def main(argv):
+    cmds = {"latest": cmd_latest, "check": cmd_check, "install": cmd_install}
+    if len(argv) < 2 or argv[1] not in cmds:
+        print("uso: x6100-update latest | check <versión> | install")
+        return 2
+    return cmds[argv[1]](argv[2:])
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

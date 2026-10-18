@@ -5079,6 +5079,104 @@ static uint8_t make_diag(uint8_t row) {
     return row + 1;
 }
 
+/* CX8ANM: Actualizar desde la radio (x6100-update). Primer toque: busca la última versión publicada
+ * en GitHub; si hay una nueva, el segundo toque la baja, la instala y reinicia. El avance sale
+ * de UPD_STATUS, que el script escribe; los avisos importantes van también a la barra de mensajes. */
+#define UPD_CTL    "/usr/sbin/x6100-update"
+#define UPD_STATUS "/tmp/x6100-update.status"
+
+static lv_obj_t   *upd_note;    /* NULL fuera de la página */
+static lv_obj_t   *upd_btn;
+static enum { UPD_IDLE, UPD_CHECKING, UPD_READY, UPD_INSTALLING } upd_state;
+static char        upd_ver[24];
+static lv_timer_t *upd_timer;
+
+static void upd_say(const char *s) {
+    if (upd_note) lv_label_set_text(upd_note, s);
+}
+
+static void upd_checked(const char *out, int status, void *user) {
+    char ver[24] = "";
+    int  mb = 0;
+
+    upd_state = UPD_IDLE;
+    if (sscanf(out, "new %23s %d", ver, &mb) == 2) {
+        char buf[96];
+        snprintf(upd_ver, sizeof(upd_ver), "%s", ver);
+        snprintf(buf, sizeof(buf), tr("%s available (%d MB): press again to install"), ver, mb);
+        upd_say(buf);
+        upd_state = UPD_READY;
+    } else if (sscanf(out, "same %23s", ver) == 1) {
+        char buf[64];
+        snprintf(buf, sizeof(buf), tr("Up to date (%s)"), ver);
+        upd_say(buf);
+    } else {
+        upd_say(!strncmp(out, "error ", 6) ? out + 6 : tr("No answer: is there internet?"));
+    }
+}
+
+static void upd_poll(lv_timer_t *t) {
+    char  line[128] = "", buf[128];
+    FILE *f = fopen(UPD_STATUS, "r");
+    int   pct;
+
+    if (!f) return;
+    if (!fgets(line, sizeof(line), f)) line[0] = 0;
+    fclose(f);
+    line[strcspn(line, "\r\n")] = 0;
+    if (sscanf(line, "download %d", &pct) == 1) {
+        snprintf(buf, sizeof(buf), tr("Downloading %s: %d%%"), upd_ver, pct);
+        upd_say(buf);
+    } else if (!strcmp(line, "verify")) {
+        upd_say("Checking the download...");
+    } else if (!strcmp(line, "install")) {
+        upd_say("Installing: do not turn the radio off");
+        msg_update_text_fmt("Installing the update: do not turn the radio off");
+    } else if (!strncmp(line, "done ", 5)) {
+        upd_say("Updated: restarting...");
+        msg_schedule_long_text_fmt("Updated to %s: the radio restarts", line + 5);
+        lv_timer_del(upd_timer);
+        upd_timer = NULL;
+    } else if (!strncmp(line, "error ", 6)) {
+        upd_say(line + 6);
+        msg_update_text_fmt("Update failed: %s", line + 6);
+        upd_state = UPD_IDLE;
+        lv_timer_del(upd_timer);
+        upd_timer = NULL;
+    }
+}
+
+static void upd_btn_cb(lv_event_t *e) {
+    if (upd_state == UPD_CHECKING || upd_state == UPD_INSTALLING) return;
+    if (upd_state == UPD_READY) {
+        upd_state = UPD_INSTALLING;
+        unlink(UPD_STATUS);
+        upd_say("Starting...");
+        sh_run(UPD_CTL " install", NULL, NULL);
+        if (!upd_timer) upd_timer = lv_timer_create(upd_poll, 1000, NULL);
+        return;
+    }
+    upd_state = UPD_CHECKING;
+    upd_say("Looking for a new version...");
+    sh_run(UPD_CTL " check " CX8ANM_VERSION, upd_checked, NULL);
+}
+
+static uint8_t make_update(uint8_t row) {
+    wl_row_label(row, "Update");
+    upd_btn = wl_button(row, "Update...", upd_btn_cb);
+    lv_obj_add_event_cb(upd_btn, diag_ptr_clear_cb, LV_EVENT_DELETE, &upd_btn);
+    upd_note = wl_note(row);
+    lv_obj_add_event_cb(upd_note, diag_ptr_clear_cb, LV_EVENT_DELETE, &upd_note);
+    if (upd_state == UPD_READY) {
+        char buf[96];
+        snprintf(buf, sizeof(buf), tr("%s available: press again to install"), upd_ver);
+        upd_say(buf);
+    } else if (upd_state == UPD_INSTALLING) {
+        upd_say("Installing...");
+    }
+    return row + 1;
+}
+
 /* Info: cards and rows as the other tabs, in the same font */
 static void make_info_page() {
     grid_delete();
@@ -5092,6 +5190,7 @@ static void make_info_page() {
     row = info_row(row, "Contact", "giovanni@iu1wxy.com");
     row = info_row(row, "Baseband", x6100_control_get_fw_version_str());
     row = make_update_alert(row);
+    row = make_update(row);
     row = make_diag(row);
     card_end(row);
 }
