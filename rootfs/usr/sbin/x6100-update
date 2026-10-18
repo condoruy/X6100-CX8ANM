@@ -120,11 +120,12 @@ def extract(pkg, root):
                 elif m.isfile():
                     with tar.extractfile(m) as src, open(tmp, "wb") as out:
                         shutil.copyfileobj(src, out, 256 * 1024)
-                    os.chmod(tmp, m.mode)
                 else:
                     continue        # dispositivos: los hace el sistema al arrancar
                 if not m.islnk():
                     os.lchown(tmp, m.uid, m.gid)
+                if m.isfile():
+                    os.chmod(tmp, m.mode)   # después del dueño: chown borra el setuid
                 if os.path.isdir(dst) and not os.path.islink(dst):
                     shutil.rmtree(dst)  # era una carpeta y ahora es un archivo
                 os.replace(tmp, dst)
