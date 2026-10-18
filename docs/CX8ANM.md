@@ -62,3 +62,12 @@ recibidos" (o la página Archivos, carpeta navtex). El botón Guardar sigue func
 - Onda corta de radiodifusión (120m a 11m): se muestran como referencia al sintonizar.
 - FM comercial (88-108 MHz): el X6100 no recibe por encima de 55 MHz.
 - Las radios ya usadas reciben las bandas nuevas solas al actualizar (migración 8).
+
+## NAVTEX / DSC: escaneo de frecuencias marcadas
+1. Frec. → elegir una estación o canal (NAVTEX o DSC) → página 2 → "Marcar frec.". Repetir con otras.
+   Las marcadas aparecen con [ESCANEO] en la lista (se guardan en /mnt/navtex/scan.conf).
+2. "Escanear" recorre las marcadas: NAVTEX 6 s cada una, DSC 2 s (cambia solo entre NAVTEX y DSC).
+3. Si detecta NAVTEX (texto que decodifica) o DSC (patrón de puntos o llamada), se queda escuchando y
+   decodificando; vuelve a escanear 30 s (NAVTEX) o 15 s (DSC) después de que termina.
+4. Todo lo recibido se guarda solo (archivos del día). Tocar Frec. o Modo detiene el escaneo.
+El receptor es uno solo: escucha una frecuencia por vez, el escaneo las va alternando.

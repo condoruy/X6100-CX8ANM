@@ -23,8 +23,10 @@
 #include "dsp.h"
 #include "remote_server.h"
 #include "msg.h"
+#include "main_screen.h"
 
 #include <pthread.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -67,6 +69,12 @@ static void page_cb(button_data_t *data);
 static const char *mode_label(void);
 static const char *page1_label(void);
 static const char *page2_label(void);
+static void mark_cb(button_data_t *data);
+static void scan_cb(button_data_t *data);
+static const char *mark_label(void);
+static const char *scan_label(void);
+static void scan_stop(const char *why);
+static void scan_tick(void);
 
 static navtex_decoder_t *decoder = NULL;
 
@@ -148,8 +156,20 @@ static buttons_page_t btn_page_1 = {
     .items = { &btn_page, &btn_freq, &btn_mode, &btn_clear, &btn_close }
 };
 
+static button_data_t btn_mark = {
+    .type = BTN_TEXT_FN,
+    .label_fn = mark_label,
+    .press = mark_cb
+};
+
+static button_data_t btn_scan = {
+    .type = BTN_TEXT_FN,
+    .label_fn = scan_label,
+    .press = scan_cb
+};
+
 static buttons_page_t btn_page_2_items = {
-    .items = { &btn_page_2, &btn_save, NULL, NULL, NULL }
+    .items = { &btn_page_2, &btn_save, &btn_mark, &btn_scan, NULL }
 };
 
 static dialog_t dialog = {
@@ -191,12 +211,74 @@ static const freq_list_item_t navtex_freqs[NAVTEX_N + DSC_N] = {
 };
 
 #define DSC_DEFAULT (NAVTEX_N + 4)   /* 8414.5 kHz */
+#define ALL_N       (NAVTEX_N + DSC_N)
 
-/* The mode's part of navtex_freqs */
+/* CX8ANM: frecuencias marcadas para el escaneo (NAVTEX y DSC juntas), en /mnt/navtex/scan.conf */
+#define SCAN_CONF       NAVTEX_SAVE_DIR "/scan.conf"
+#define SCAN_SETTLE_MS  700     /* después de sintonizar: AGC y filtros */
+#define SCAN_DWELL_NAV  6000    /* NAVTEX: SITOR-B necesita unos segundos para sincronizar */
+#define SCAN_DWELL_DSC  2000    /* DSC: el patrón de puntos dura 2 s en HF */
+#define SCAN_HOLD_NAV   30000   /* se queda mientras llegan caracteres, y 30 s más */
+#define SCAN_HOLD_DSC   15000
+#define SCAN_NAV_CHARS  6       /* caracteres en el período para decir "hay NAVTEX" */
+
+static bool                scan_mark[ALL_N];
+static freq_list_item_t    disp_freqs[ALL_N];
+static char                disp_note[ALL_N][48];
+static volatile unsigned   act_nav, act_dsc;    /* hilo de audio: caracteres NAVTEX, señales DSC */
+static int                 dot_run, dot_last = -1;
+static enum { SCAN_OFF, SCAN_DWELL, SCAN_HOLD } scan_state;
+static int                 scan_idx = -1;
+static uint32_t            scan_t0, scan_last_act;
+static unsigned            scan_nav0, scan_dsc0;
+
+static void disp_build(void)
+{
+    for (int i = 0; i < ALL_N; i++) {
+        disp_freqs[i] = navtex_freqs[i];
+        if (navtex_freqs[i].group || !scan_mark[i])
+            continue;
+        snprintf(disp_note[i], sizeof(disp_note[i]), "%s%s[ESCANEO]", navtex_freqs[i].note ? navtex_freqs[i].note : "",
+                 navtex_freqs[i].note ? "  " : "");
+        disp_freqs[i].note = disp_note[i];
+    }
+}
+
+static void scan_load(void)
+{
+    FILE *f = fopen(SCAN_CONF, "r");
+    long  hz;
+
+    memset(scan_mark, 0, sizeof(scan_mark));
+    if (f) {
+        while (fscanf(f, "%ld", &hz) == 1)
+            for (int i = 0; i < ALL_N; i++)
+                if (!navtex_freqs[i].group && navtex_freqs[i].freq_hz == hz)
+                    scan_mark[i] = true;
+        fclose(f);
+    }
+    disp_build();
+}
+
+static void scan_save(void)
+{
+    FILE *f;
+
+    mkdir(NAVTEX_SAVE_DIR, 0755);
+    f = fopen(SCAN_CONF, "w");
+    if (!f)
+        return;
+    for (int i = 0; i < ALL_N; i++)
+        if (scan_mark[i])
+            fprintf(f, "%ld\n", (long)navtex_freqs[i].freq_hz);
+    fclose(f);
+}
+
+/* The mode's part of navtex_freqs (with the scan marks in the notes) */
 static const freq_list_item_t *mode_freqs(int *n)
 {
     *n = dsc_mode ? DSC_N : NAVTEX_N;
-    return dsc_mode ? navtex_freqs + NAVTEX_N : navtex_freqs;
+    return dsc_mode ? disp_freqs + NAVTEX_N : disp_freqs;
 }
 
 /* The info bar keeps the station's short name ("DSC", "HF MSI"): with the note it ran
@@ -264,6 +346,8 @@ static void char_cb(int c, void *userdata)
 
     if (c == '\r' || dsc_mode)
         return;
+    if (c > ' ' && c < 127)
+        act_nav++;
 
     pthread_mutex_lock(&text_mutex);
 
@@ -278,6 +362,7 @@ static void dsc_call_cb(const dsc_call_t *call, void *userdata)
 {
     (void)userdata;
 
+    act_dsc++;
     pthread_mutex_lock(&text_mutex);
     if (dsc_npending < DSC_PENDING_MAX)
         dsc_pending[dsc_npending++] = *call;
@@ -291,6 +376,18 @@ static void bit_cb(int mark, void *userdata)
 
     if (!dsc_mode)
         return;
+    /* El patrón de puntos de DSC (bits alternados) o una llamada en curso: actividad */
+    if (mark != dot_last) {
+        if (++dot_run >= 40) {
+            act_dsc++;
+            dot_run = 0;
+        }
+    } else {
+        dot_run = 0;
+    }
+    dot_last = mark;
+    if (dsc_rx.locked)
+        act_dsc++;
     if (dsc_reset) {
         dsc_rx_init(&dsc_rx, dsc_call_cb, NULL);
         dsc_reset = false;
@@ -752,6 +849,7 @@ static void ui_timer_cb(lv_timer_t *timer)
 
     if (scroll)
         header_update();
+    scan_tick();
 
     /* The worker never touches LVGL or destroys the decoder.  When a test
      * reaches EOF, finish the thread here in the UI context and return to
@@ -842,6 +940,8 @@ static void construct_cb(lv_obj_t *parent)
     test_finished = false;
 
     reset_decoder();
+    scan_state = SCAN_OFF;
+    scan_load();
 
     /* Full screen in the common app look; the main waterfall is hidden */
     dialog.obj = dialog_init(parent);
@@ -895,6 +995,7 @@ static void construct_cb(lv_obj_t *parent)
 static void destruct_cb(void)
 {
     freq_list_close();
+    scan_state = SCAN_OFF;
 
     /* Stop the WAV worker before destroying decoder/UI objects. */
     if (test_mode || test_thread_valid)
@@ -1069,6 +1170,8 @@ static void freq_cb(button_data_t *data)
     int n;
     const freq_list_item_t *list = mode_freqs(&n);
 
+    if (scan_state != SCAN_OFF)
+        scan_stop("Scan stopped: manual tuning");
     if (freq_list_is_open())
         freq_list_close();
     else if (scroll)
@@ -1100,6 +1203,8 @@ static void mode_set(bool dsc)
 static void mode_cb(button_data_t *data)
 {
     (void)data;
+    if (scan_state != SCAN_OFF)
+        scan_stop("Scan stopped");
     mode_set(!dsc_mode);
 }
 
@@ -1146,4 +1251,198 @@ int dialog_navtex_remote_state(char *buf, size_t size)
 
     freq_list_base(list, n, 1000, cparam_i_get(cfg_fg_freq), &dial);
     return snprintf(buf, size, "{\"base\":%i,\"mode\":%i}", (int)dial, dsc_mode ? 1 : 0);
+}
+
+/* ---- CX8ANM: escaneo de las frecuencias marcadas ---- */
+
+/* The list entry the VFO is on (any mode), -1 none */
+static int current_entry(void)
+{
+    int32_t f = cparam_i_get(cfg_fg_freq) + 1000;
+
+    for (int i = 0; i < ALL_N; i++)
+        if (!navtex_freqs[i].group && navtex_freqs[i].freq_hz == f && (i >= NAVTEX_N) == dsc_mode)
+            return i;
+    for (int i = 0; i < ALL_N; i++)
+        if (!navtex_freqs[i].group && navtex_freqs[i].freq_hz == f)
+            return i;
+    return -1;
+}
+
+static int marked_count(void)
+{
+    int n = 0;
+
+    for (int i = 0; i < ALL_N; i++)
+        n += scan_mark[i];
+    return n;
+}
+
+static const char *mark_label(void)
+{
+    int i = current_entry();
+
+    return i >= 0 && scan_mark[i] ? "Unmark\nfreq." : "Mark\nfreq.";
+}
+
+static const char *scan_label(void)
+{
+    return scan_state == SCAN_OFF ? "Scan:\nOFF" : "Scan:\nON";
+}
+
+static void scan_buttons(void)
+{
+    if (btn_mark.disp_btn) buttons_refresh(&btn_mark);
+    if (btn_scan.disp_btn) buttons_refresh(&btn_scan);
+}
+
+static void mark_cb(button_data_t *data)
+{
+    (void)data;
+    int i = current_entry();
+
+    if (i < 0) {
+        msg_update_text_fmt("Tune a station from the list first (Freq.)");
+        return;
+    }
+    scan_mark[i] = !scan_mark[i];
+    scan_save();
+    disp_build();
+    msg_update_text_fmt(scan_mark[i] ? "%.1f kHz marked for scanning (%d)" : "%.1f kHz unmarked (%d)",
+                        navtex_freqs[i].freq_hz / 1000.0, marked_count());
+    scan_buttons();
+}
+
+/* Tunes to entry i without the list's message, and the mode follows (NAVTEX / DSC) */
+static void scan_tune(int i)
+{
+    const freq_list_item_t *it = &navtex_freqs[i];
+    int32_t                 dial = it->freq_hz - 1000;
+    bool                    dsc = i >= NAVTEX_N;
+
+    if (dsc != dsc_mode) {
+        dsc_mode  = dsc;
+        dsc_reset = true;
+        mode_show();
+    }
+    main_screen_set_freq(dial);
+    cparam_i_set(cfg_cur_mode, x6100_mode_usb);
+    freq_strip_set_label(it->name, dial);
+    dot_run      = 0;
+    scan_idx     = i;
+    scan_state   = SCAN_DWELL;
+    scan_t0      = lv_tick_get();
+    scan_nav0    = act_nav;
+    scan_dsc0    = act_dsc;
+}
+
+static void scan_next(void)
+{
+    for (int k = 1; k <= ALL_N; k++) {
+        int i = (scan_idx + k + ALL_N) % ALL_N;
+        if (scan_mark[i]) {
+            scan_tune(i);
+            return;
+        }
+    }
+    scan_stop("Scan stopped: no marked frequencies");
+}
+
+static void scan_status(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
+static void scan_status(const char *fmt, ...)
+{
+    char    buf[120];
+    va_list ap;
+
+    if (!scroll)
+        return;
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof(buf), tr(fmt), ap);
+    va_end(ap);
+    if (strcmp(buf, lv_label_get_text(frame.status)))
+        lv_label_set_text(frame.status, buf);
+}
+
+static void scan_stop(const char *why)
+{
+    scan_state = SCAN_OFF;
+    if (why)
+        msg_update_text_fmt("%s", tr(why));
+    mode_show();
+    scan_buttons();
+}
+
+static void scan_cb(button_data_t *data)
+{
+    (void)data;
+
+    if (scan_state != SCAN_OFF) {
+        scan_stop("Scan stopped");
+        return;
+    }
+    if (test_mode) {
+        msg_update_text_fmt("Stop the test first");
+        return;
+    }
+    if (marked_count() == 0) {
+        msg_update_text_fmt("Mark frequencies first: Freq., choose one, Mark freq.");
+        return;
+    }
+    freq_list_close();
+    scan_idx = current_entry() >= 0 ? current_entry() - 1 : -1;
+    scan_next();
+    msg_update_text_fmt("Scanning %d frequencies", marked_count());
+    scan_buttons();
+}
+
+/* UI timer: dwell on each marked frequency; with NAVTEX or DSC activity it stays and decodes */
+static void scan_tick(void)
+{
+    if (scan_state == SCAN_OFF || scan_idx < 0)
+        return;
+
+    bool     dsc   = scan_idx >= NAVTEX_N;
+    uint32_t el    = lv_tick_elaps(scan_t0);
+    double   khz   = navtex_freqs[scan_idx].freq_hz / 1000.0;
+    unsigned nav   = act_nav - scan_nav0, dscn = act_dsc - scan_dsc0;
+    bool     activity;
+
+    if (el < SCAN_SETTLE_MS) {      /* lo de antes de asentarse no cuenta */
+        scan_nav0 = act_nav;
+        scan_dsc0 = act_dsc;
+        return;
+    }
+    activity = dsc ? dscn > 0 : nav >= SCAN_NAV_CHARS;
+
+    if (scan_state == SCAN_DWELL) {
+        if (activity) {
+            scan_state    = SCAN_HOLD;
+            scan_last_act = lv_tick_get();
+            scan_nav0     = act_nav;
+            scan_dsc0     = act_dsc;
+            msg_update_text_fmt(dsc ? "DSC activity on %.1f kHz: listening" : "NAVTEX activity on %.1f kHz: listening",
+                                khz);
+            return;
+        }
+        if (el >= (uint32_t)(SCAN_SETTLE_MS + (dsc ? SCAN_DWELL_DSC : SCAN_DWELL_NAV))) {
+            scan_next();
+            return;
+        }
+        scan_status("SCAN  %.1f kHz  %s   (Scan: stop)", khz, dsc ? "DSC" : "NAVTEX");
+        return;
+    }
+
+    /* HOLD: cualquier actividad nueva renueva la espera */
+    if (act_nav != scan_nav0 || act_dsc != scan_dsc0) {
+        scan_last_act = lv_tick_get();
+        scan_nav0     = act_nav;
+        scan_dsc0     = act_dsc;
+    }
+    uint32_t quiet = lv_tick_elaps(scan_last_act), hold = dsc ? SCAN_HOLD_DSC : SCAN_HOLD_NAV;
+    if (quiet >= hold) {
+        scan_next();
+        return;
+    }
+    scan_status("RECEIVING  %.1f kHz  %s   - back to scan in %u s", khz, dsc ? "DSC" : "NAVTEX",
+                (unsigned)((hold - quiet) / 1000));
 }
