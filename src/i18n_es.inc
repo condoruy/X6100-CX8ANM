@@ -1287,3 +1287,4 @@
 { "NAVTEX activity on %.1f kHz: listening", "Actividad NAVTEX en %.1f kHz: escuchando" },
 { "SCAN  %.1f kHz  %s   (Scan: stop)", "ESCANEO  %.1f kHz  %s   (Escanear: detener)" },
 { "RECEIVING  %.1f kHz  %s   - back to scan in %u s", "RECIBIENDO  %.1f kHz  %s   - vuelve a escanear en %u s" },
+{ "New CX8ANM version %s: download it from GitHub (Actions)", "Hay una versión CX8ANM %s nueva: bájela de GitHub (Actions)" },

@@ -1761,7 +1761,7 @@ static uint8_t make_waterfall_smooth_scroll(uint8_t row) {
     return row + 1;
 }
 
-/* A message at start when x6100-link.it has a newer release (update_check.c) */
+/* Aviso al arrancar cuando hay una compilación CX8ANM más nueva en GitHub (update_check.c) */
 static uint8_t make_update_alert(uint8_t row) {
     lv_obj_t *obj = lv_label_create(grid);
 

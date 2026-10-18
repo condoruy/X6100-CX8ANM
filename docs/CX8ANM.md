@@ -71,3 +71,8 @@ recibidos" (o la página Archivos, carpeta navtex). El botón Guardar sigue func
    decodificando; vuelve a escanear 30 s (NAVTEX) o 15 s (DSC) después de que termina.
 4. Todo lo recibido se guarda solo (archivos del día). Tocar Frec. o Modo detiene el escaneo.
 El receptor es uno solo: escucha una frecuencia por vez, el escaneo las va alternando.
+
+## Aviso de versión nueva
+Al conectarse a internet, la radio compara su versión (1.0.N) con la última compilación que salió
+bien en github.com/condoruy/X6100-CX8ANM (Actions). Solo avisa cuando hay una compilación propia
+más nueva. Ya no consulta x6100-link.it. Se apaga en Ajustes > Info > Aviso de actualización.
