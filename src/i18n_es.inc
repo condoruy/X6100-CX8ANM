@@ -1305,3 +1305,6 @@
 { "Installing...", "Instalando..." },
 { "Volume: %i%%", "Volumen: %i%%" },
 { "Show UTC too", "Mostrar también UTC" },
+{ "Power save", "Modo ahorro" },
+{ "Power save on: CPU slows down when idle, screen dims sooner", "Modo ahorro: el procesador baja la velocidad en reposo y la pantalla se atenúa antes" },
+{ "Power save off", "Modo ahorro apagado" },

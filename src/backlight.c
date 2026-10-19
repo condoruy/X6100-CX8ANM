@@ -16,6 +16,7 @@
 #include "lvgl/lvgl.h"
 #include "backlight.h"
 #include "util.h"
+#include "power_save.h"
 
 static int          power;
 static int          brightness;
@@ -58,10 +59,10 @@ void backlight_init() {
 
 void backlight_tick() {
     if (timer) {
-        lv_timer_set_period(timer, params.brightness_timeout * 1000);
+        lv_timer_set_period(timer, power_save_dim_timeout(params.brightness_timeout) * 1000);
         lv_timer_reset(timer);
     } else {
-        timer = lv_timer_create(backlight_timer, params.brightness_timeout * 1000, NULL);
+        timer = lv_timer_create(backlight_timer, power_save_dim_timeout(params.brightness_timeout) * 1000, NULL);
         lv_timer_set_repeat_count(timer, 1);
 
         backlight_set_brightness(params.brightness_normal);

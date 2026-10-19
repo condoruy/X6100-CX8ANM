@@ -94,3 +94,11 @@ se vuelve a grabar la imagen con balenaEtcher como siempre.
   Fluida" elige cuántas imágenes por segundo manda la radio: menos imágenes, menos tráfico
   WiFi y menos ruido en el receptor (por defecto Liviana, 2 por segundo).
 - Cada actualización deja su historial en /mnt/update/update.log (web > Archivos > update).
+
+## Modo ahorro y banda base
+- Ajustes > Info > Modo ahorro: el procesador baja la velocidad en reposo (schedutil en vez de
+  performance) y la pantalla se atenúa a los 15 s como mucho. Apagado por defecto. Para medir:
+  /mnt/battery_log.csv (vbat, batcap, cpu_mhz cada 30 s).
+- Ajustes > Info > Banda base: muestra "(OK)" si es la última oficial conocida de Xiegu (V1.1.8,
+  15/09/2024) o "- Xiegu 1.1.8" si hay una más nueva. Se actualiza con el procedimiento oficial
+  de Xiegu (fuente de 13,8 V). La versión conocida está en src/power_save.c (BASEBAND_LATEST).

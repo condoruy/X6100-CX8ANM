@@ -7,6 +7,7 @@
  */
 
 #include "update_check.h"
+#include "power_save.h"
 #include "lvgl/lvgl.h"
 #include "lv_drivers/display/fbdev.h"
 #include "lv_drivers/display/drm.h"
@@ -218,6 +219,7 @@ int main(void) {
     wifi_power_setup();
     btaudio_init();
     bt_dev_init();
+    power_save_apply();
     backlight_init();
     cat_init();
     wfview_server_init();

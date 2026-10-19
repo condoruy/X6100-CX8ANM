@@ -37,6 +37,7 @@ extern "C" {
     #include "audio.h"
     #include "meter.h"
     #include "main.h"
+    #include "power_save.h"
     #include "msg.h"
     #include "textarea_window.h"
     #include "station.h"
@@ -5096,6 +5097,32 @@ static uint8_t make_diag(uint8_t row) {
     return row + 1;
 }
 
+/* Modo ahorro (power_save.c): procesador que baja la velocidad en reposo y pantalla que se
+ * atenúa antes. Se aplica al tocar el interruptor. */
+static void power_save_changed_cb(lv_event_t *e) {
+    power_save_apply();
+    msg_update_text_fmt(params.power_save.x ? "Power save on: CPU slows down when idle, screen dims sooner"
+                                            : "Power save off");
+}
+
+static uint8_t make_power_save(uint8_t row) {
+    lv_obj_t *obj = lv_label_create(grid);
+
+    lv_label_set_text(obj, "Power save");
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_CENTER, row, 1);
+
+    obj = lv_obj_create(grid);
+    lv_obj_set_size(obj, SMALL_3, ROW_H);
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 4, 3, LV_GRID_ALIGN_CENTER, row, 1);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_TRANSP, LV_PART_MAIN);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_center(obj);
+    obj = switch_bool(obj, &params.power_save);
+    lv_obj_set_width(obj, SMALL_3 - 30);
+    lv_obj_add_event_cb(obj, power_save_changed_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    return row + 1;
+}
+
 /* CX8ANM: Actualizar desde la radio (x6100-update). Primer toque: busca la última versión publicada
  * en GitHub; si hay una nueva, el segundo toque la baja, la instala y reinicia. El avance sale
  * de UPD_STATUS, que el script escribe; los avisos importantes van también a la barra de mensajes. */
@@ -5205,8 +5232,9 @@ static void make_info_page() {
     row = info_row(row, "Based on", strrchr(VERSION, ' ') + 1);
     row = info_row(row, "Author", "Giovanni Ricciardi IU1WXY");
     row = info_row(row, "Contact", "giovanni@iu1wxy.com");
-    row = info_row(row, "Baseband", x6100_control_get_fw_version_str());
+    row = info_row(row, "Baseband", power_save_baseband_text(x6100_control_get_fw_version_str()));
     row = make_update_alert(row);
+    row = make_power_save(row);
     row = make_update(row);
     row = make_diag(row);
     card_end(row);
