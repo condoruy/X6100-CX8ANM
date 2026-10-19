@@ -5,7 +5,7 @@
 #
 #   x6100-update latest              "1.0.N" de la última publicada, o nada (sin red)
 #   x6100-update check <versión>     "new 1.0.N <MB>" | "same 1.0.N" | "error <motivo>"
-#   x6100-update install             baja, verifica, instala y reinicia; el avance en STATUS
+#   x6100-update install             baja, verifica, instala y apaga (se prende con el botón); el avance en STATUS
 #
 # STATUS (/tmp/x6100-update.status), una línea: "download <0-100>", "verify", "install",
 # "done <versión>" o "error <motivo>". La GUI lo lee cada segundo.
@@ -188,9 +188,11 @@ def cmd_install(args):
     except Exception as e:
         status("error " + " ".join(str(getattr(e, "reason", e)).split())[:80])
         return 1
-    time.sleep(6)       # la GUI muestra "listo" antes de reiniciar
+    # El X6100 no rearranca bien con "reboot" (queda la pantalla negra hasta tocar el botón):
+    # se apaga del todo y se prende con el botón de encendido
+    time.sleep(8)       # la GUI muestra "listo" antes de apagar
     subprocess.run(["sync"])
-    subprocess.run(["reboot"])
+    subprocess.run(["poweroff"])
     return 0
 
 

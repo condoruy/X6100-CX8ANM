@@ -5150,8 +5150,8 @@ static void upd_poll(lv_timer_t *t) {
         upd_say("Installing: do not turn the radio off");
         msg_update_text_fmt("Installing the update: do not turn the radio off");
     } else if (!strncmp(line, "done ", 5)) {
-        upd_say("Updated: restarting...");
-        msg_schedule_long_text_fmt("Updated to %s: the radio restarts", line + 5);
+        upd_say("Updated: the radio turns off");
+        msg_schedule_long_text_fmt("Updated to %s: the radio turns off, press power to start it", line + 5);
         lv_timer_del(upd_timer);
         upd_timer = NULL;
     } else if (!strncmp(line, "error ", 6)) {
