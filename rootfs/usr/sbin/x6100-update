@@ -27,11 +27,25 @@ STATUS = "/tmp/x6100-update.status"
 UA = {"User-Agent": "x6100-cx8anm-update"}
 
 
+LOG = "/mnt/update/update.log"   # historial de actualizaciones (página web > Archivos > update)
+
+
 def status(text):
     tmp = STATUS + ".tmp"
     with open(tmp, "w") as f:
         f.write(text + "\n")
     os.replace(tmp, STATUS)
+    if not text.startswith("download ") or text.endswith(" 0") or text.endswith(" 100"):
+        log(text)
+
+
+def log(text):
+    try:
+        os.makedirs(os.path.dirname(LOG), exist_ok=True)
+        with open(LOG, "a") as f:
+            f.write(time.strftime("%Y-%m-%d %H:%M:%S ") + text + "\n")
+    except OSError:
+        pass
 
 
 def newer(a, b):

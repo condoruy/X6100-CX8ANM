@@ -93,3 +93,4 @@ se vuelve a grabar la imagen con balenaEtcher como siempre.
   un clic en los botones de abajo de la imagen los aprieta. "Imagen: Mínima/Liviana/Normal/
   Fluida" elige cuántas imágenes por segundo manda la radio: menos imágenes, menos tráfico
   WiFi y menos ruido en el receptor (por defecto Liviana, 2 por segundo).
+- Cada actualización deja su historial en /mnt/update/update.log (web > Archivos > update).
