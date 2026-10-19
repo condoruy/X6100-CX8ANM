@@ -98,7 +98,20 @@ def download(url, path, size):
 def extract(pkg, root):
     """Cada archivo se escribe aparte y se cambia por el viejo de una vez (rename): un programa o
     una biblioteca en uso sigue con la copia vieja hasta reiniciar, nunca con una a medias."""
-    with tarfile.open(pkg, "r:gz") as tar:
+    # El Python de la radio puede no tener zlib ("gzip module is not available"): se descomprime
+    # con el gunzip del sistema y tarfile lee el tar de corrido
+    unzip = subprocess.Popen(["gunzip", "-c", pkg], stdout=subprocess.PIPE)
+    try:
+        with tarfile.open(fileobj=unzip.stdout, mode="r|") as tar:
+            _extract_all(tar, root)
+    finally:
+        unzip.stdout.close()
+        if unzip.wait() != 0:
+            raise RuntimeError("gunzip: el paquete está dañado")
+
+
+def _extract_all(tar, root):
+    if True:
         for m in tar:
             name = os.path.normpath(m.name).lstrip("./")
             if not name or name.startswith("..") or "/../" in "/" + name + "/":
