@@ -25,6 +25,7 @@
 extern "C" {
     #include "styles.h"
     #include "theme.h"
+    #include "radio.h"
 
     #include <stdio.h>
     #include <stdlib.h>
@@ -83,6 +84,12 @@ struct ControlSubjBase : public Control {
 struct ControlSubjInt : public ControlSubjBase<int32_t> {
     using ControlSubjBase<int32_t>::ControlSubjBase;
     std::string to_str() { return std::to_string(subj->get()); }
+};
+
+/* Volumen en % (la placa va de 0 a 55) */
+struct ControlVolPct : public ControlSubjBase<int32_t> {
+    using ControlSubjBase<int32_t>::ControlSubjBase;
+    std::string to_str() { return std::to_string(radio_vol_pct(subj->get())) + "%"; }
 };
 
 struct ControlCluster : public Control {
@@ -196,8 +203,7 @@ static void on_knob_info_enabled_change(Subject *subj, void *user_data);
 
 
 static std::map<int, Control*> controls = {
-    {CTRL_VOL, new ControlSubjInt("Volume", &cfg_sm.p_volume)},
-    {CTRL_VOL, new ControlSubjInt("Volume", &cfg_sm.p_volume)},
+    {CTRL_VOL, new ControlVolPct("Volume", &cfg_sm.p_volume)},
     {CTRL_SQL, new ControlSubjInt("Voice SQL", &cfg_sm.p_squelch)},
     {CTRL_RFG, new ControlSubjInt("RF gain", &cfg_sm.p_rfgain)},
     {CTRL_FILTER_LOW, new ControlSubjInt("Filter low", &cfg_sm.cp_cur_filter_low)},

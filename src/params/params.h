@@ -202,6 +202,7 @@ typedef struct {
     params_str_t         theme_name;    /* built-in theme or /mnt/themes/<name>.json */
     params_uint8_t       font;
     params_bool_t        cluster_band_notify;   /* aviso de spots nuevos en la banda del VFO (dialog_cluster.c) */
+    params_bool_t        clock_utc;     /* el reloj alterna hora local y UTC (clock.c) */
     params_bool_t        auto_log;      /* QSO guardados solos al mandar 73/SK (auto_log.c) */
     params_uint8_t       language;      /* LANG_EN, LANG_ES (i18n.h) */
 

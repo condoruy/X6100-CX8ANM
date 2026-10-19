@@ -4209,6 +4209,22 @@ static uint8_t make_zone(uint8_t row) {
     return row + 1;
 }
 
+/* El reloj de la pantalla alterna hora local y UTC (clock.c) */
+static uint8_t make_clock_utc(uint8_t row) {
+    lv_obj_t *obj = lv_label_create(grid);
+
+    lv_label_set_text(obj, "Show UTC too");
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_CENTER, row, 1);
+
+    obj = lv_obj_create(grid);
+    lv_obj_set_size(obj, 256, ROW_H);
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 1, 3, LV_GRID_ALIGN_CENTER, row, 1);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_TRANSP, LV_PART_MAIN);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    switch_bool(obj, &params.clock_utc);
+    return row + 1;
+}
+
 /* QSO guardados solos (auto_log.c): CW, PSK, Olivia, JTTY y JS8 al mandar 73 / SK */
 static uint8_t make_auto_log(uint8_t row) {
     lv_obj_t *obj = lv_label_create(grid);
@@ -4246,6 +4262,7 @@ static void make_general_page() {
     row = make_date(row);
     row = make_time(row);
     row = make_zone(row);
+    row = make_clock_utc(row);
     card_end(row);
 
     row = card_begin("CONTROLS");

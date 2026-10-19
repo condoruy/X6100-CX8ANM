@@ -470,7 +470,7 @@ static void update_cb(lv_timer_t *t) {
     lv_obj_invalidate(scope);
 
     lv_bar_set_value(vol_bar, param_i_get(cfg_volume), LV_ANIM_OFF);
-    snprintf(buf, sizeof(buf), "%i", (int)param_i_get(cfg_volume));
+    snprintf(buf, sizeof(buf), "%i%%", radio_vol_pct((int)param_i_get(cfg_volume)));
     set_text(vol_val, buf);
     lv_bar_set_value(sql_bar, param_i_get(cfg_squelch), LV_ANIM_OFF);
     snprintf(buf, sizeof(buf), "%i", (int)param_i_get(cfg_squelch));

@@ -84,3 +84,12 @@ versión nueva, tocar otra vez: baja el paquete a /mnt/update, lo verifica (sha2
 reinicia. Se conservan las redes WiFi, los emparejamientos Bluetooth, las claves SSH y todo /mnt
 (ajustes, logs, grabaciones). No apagar la radio mientras dice "Instalando". Si algo saliera mal,
 se vuelve a grabar la imagen con balenaEtcher como siempre.
+
+## Volumen, reloj y página Equipo
+- El volumen se muestra de 0 a 100 % (la placa va de 0 a 55: 100 % es el máximo real).
+- Reloj: cada 15 s muestra 10 s la hora local y 5 s la UTC (dice "UTC" en lugar de los
+  segundos). Ajustes > General > FECHA / HORA > "Mostrar también UTC".
+- Equipo (web): cruz "NAVEGAR MENÚS Y LISTAS" (▲▼◀▶, OK, Atrás) y flechas ← → del teclado;
+  un clic en los botones de abajo de la imagen los aprieta. "Imagen: Mínima/Liviana/Normal/
+  Fluida" elige cuántas imágenes por segundo manda la radio: menos imágenes, menos tráfico
+  WiFi y menos ruido en el receptor (por defecto Liviana, 2 por segundo).

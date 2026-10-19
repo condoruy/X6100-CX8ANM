@@ -81,6 +81,10 @@ void radio_set_ptt(bool tx);
 void radio_set_mic_override(int mic);
 /* The mic in use: the override, else cfg_mic */
 int radio_get_mic(void);
+
+/* El volumen del parlante va de 0 a 55 en la placa de radio: en pantalla, 0 a 100 % */
+#define RADIO_VOL_MAX 55
+static inline int radio_vol_pct(int vol) { return (vol * 100 + RADIO_VOL_MAX / 2) / RADIO_VOL_MAX; }
 void radio_set_modem(bool tx);
 bool radio_get_modem(void);   /* the TX audio from the GUI (apps, recordings), not the mic */
 /* The base plays this app's audio on the speaker (as voice prompts and the

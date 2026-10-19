@@ -132,11 +132,30 @@ static void * encoder_thread(void *arg) {
     return NULL;
 }
 
-/* ¿Alguien mira la página? (el servidor toca el archivo en cada pedido) */
+static int want_fps = 2;    /* lo que pide la página: menos cuadros, menos WiFi y menos ruido en la radio */
+
+/* ¿Alguien mira la página? (el servidor toca el archivo en cada pedido y escribe ahí los
+ * cuadros por segundo que eligió la página: 1 a MIRROR_FPS) */
 static bool watched(void) {
     struct stat st;
+    static time_t read_at;
 
-    return stat(MIRROR_FLAG, &st) == 0 && time(NULL) - st.st_mtime <= MIRROR_IDLE_S;
+    if (stat(MIRROR_FLAG, &st) != 0 || time(NULL) - st.st_mtime > MIRROR_IDLE_S) {
+        return false;
+    }
+    if (st.st_mtime != read_at) {
+        FILE *f = fopen(MIRROR_FLAG, "r");
+        int   n = 0;
+
+        read_at = st.st_mtime;
+        if (f) {
+            if (fscanf(f, "%d", &n) == 1 && n >= 1) {
+                want_fps = n > MIRROR_FPS ? MIRROR_FPS : n;
+            }
+            fclose(f);
+        }
+    }
+    return true;
 }
 
 static void timer_cb(lv_timer_t *t) {
@@ -160,6 +179,9 @@ static void timer_cb(lv_timer_t *t) {
     ms  = now_ms();
     if (last_ms && seq == last_seq && ms - last_ms < MIRROR_KEEP_MS) {
         return;
+    }
+    if (last_ms && ms - last_ms < 1000 / want_fps - 20) {
+        return;                             /* más cuadros que los pedidos */
     }
 
     pthread_mutex_lock(&mut);

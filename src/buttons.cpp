@@ -919,7 +919,7 @@ buttons_page_t *buttons_get_cur_page() {
 
 static const char * vol_label_getter() {
     static char buf[16];
-    sprintf(buf, "Volume:\n%i", cfg_sm.p_volume.get());
+    sprintf(buf, "Volume:\n%i%%", radio_vol_pct(cfg_sm.p_volume.get()));
     return buf;
 }
 

@@ -12,6 +12,7 @@
 #include "theme.h"
 #include "backlight.h"
 #include "msg.h"
+#include "params/params.h"
 
 #include <time.h>
 #include <stdio.h>
@@ -48,8 +49,20 @@ static void show_time() {
     now = time(NULL);
     t = localtime(&now);
 
+    /* CX8ANM: con "Mostrar también UTC", cada 15 s: 10 s la hora local y 5 s la UTC (con "UTC"
+     * en lugar de los segundos). Si la zona es UTC no hay nada que alternar. */
+    bool utc = params.clock_utc.x && t->tm_gmtoff != 0 && now % 15 >= 10;
+    if (utc)
+        t = gmtime(&now);
     lv_label_set_text_fmt(time_label, "%02i:%02i", t->tm_hour, t->tm_min);
-    lv_label_set_text_fmt(sec_label, ":%02i", t->tm_sec);
+    if (utc)
+        lv_label_set_text(sec_label, " UTC");
+    else
+        lv_label_set_text_fmt(sec_label, ":%02i", t->tm_sec);
+    if (theme_shape.vision) {   /* VISION no muestra los segundos: "UTC" sí */
+        if (utc) lv_obj_clear_flag(sec_label, LV_OBJ_FLAG_HIDDEN);
+        else lv_obj_add_flag(sec_label, LV_OBJ_FLAG_HIDDEN);
+    }
 
     pthread_mutex_lock(&power_mux);
     const char * bat_sym;

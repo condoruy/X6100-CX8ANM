@@ -9,6 +9,7 @@
 
 extern "C" {
 #include "msg.h"
+#include "radio.h"
 #include "cluster_column.h"
 #include "rtty.h"
 }
@@ -124,7 +125,7 @@ void controls_encoder_update(cfg_ctrl_t ctrl, int32_t diff, std::string &msg) {
     switch (ctrl) {
         case CTRL_VOL:
             i = radio_change_vol(diff);
-            snprintf(msg.data(), msg.capacity(), tr("Volume: %i"), i);
+            snprintf(msg.data(), msg.capacity(), tr("Volume: %i%%"), radio_vol_pct(i));
             break;
 
         case CTRL_RFG:

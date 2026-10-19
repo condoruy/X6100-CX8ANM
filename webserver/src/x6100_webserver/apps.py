@@ -887,10 +887,15 @@ mirror_key_dev = {}      # código -> /dev/input/eventN que lo tiene
 mirror_ptt_timer = None
 
 
-def mirror_touch():
+def mirror_touch(fps=None):
+    """Alguien mira; fps: cuadros por segundo que pide la página (1-6, la GUI lo lee)"""
     try:
-        with open(MIRROR_FLAG, "a"):
-            pass
+        if fps:
+            with open(MIRROR_FLAG, "w") as f:
+                f.write("%d\n" % fps)
+        else:
+            with open(MIRROR_FLAG, "a"):
+                pass
         os.utime(MIRROR_FLAG)
     except OSError:
         pass
@@ -989,6 +994,10 @@ def equipo_stream():
     """La pantalla en vivo (MJPEG): una imagen nueva cada vez que la GUI escribe una"""
     bottle.response.content_type = "multipart/x-mixed-replace; boundary=x6100frame"
     bottle.response.set_header("Cache-Control", "no-store")
+    try:
+        fps = min(6, max(1, int(bottle.request.query.get("fps", "2"))))
+    except ValueError:
+        fps = 2
 
     def frames():
         last, sent, touched = None, 0, 0
@@ -996,7 +1005,7 @@ def equipo_stream():
         while time.time() < deadline:
             now = time.time()
             if now - touched > 1:
-                mirror_touch()
+                mirror_touch(fps)
                 touched = now
             try:
                 st = os.stat(MIRROR_JPEG)
@@ -1013,7 +1022,7 @@ def equipo_stream():
                     last, sent = stamp, now
                     yield (b"--x6100frame\r\nContent-Type: image/jpeg\r\nContent-Length: " +
                            str(len(data)).encode() + b"\r\n\r\n" + data + b"\r\n")
-            time.sleep(0.04)
+            time.sleep(0.1)
 
     return frames()
 

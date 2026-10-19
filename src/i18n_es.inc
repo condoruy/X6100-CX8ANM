@@ -1303,3 +1303,5 @@
 { "Update failed: %s", "No se pudo actualizar: %s" },
 { "Looking for a new version...", "Buscando una versión nueva..." },
 { "Installing...", "Instalando..." },
+{ "Volume: %i%%", "Volumen: %i%%" },
+{ "Show UTC too", "Mostrar también UTC" },
