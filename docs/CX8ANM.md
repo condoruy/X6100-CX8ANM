@@ -102,3 +102,23 @@ se vuelve a grabar la imagen con balenaEtcher como siempre.
 - Ajustes > Info > Banda base: muestra "(OK)" si es la última oficial conocida de Xiegu (V1.1.8,
   15/09/2024) o "- Xiegu 1.1.8" si hay una más nueva. Se actualiza con el procedimiento oficial
   de Xiegu (fuente de 13,8 V). La versión conocida está en src/power_save.c (BASEBAND_LATEST).
+
+## Temas estilo equipo de alta gama
+
+Seis temas nuevos en **Ajustes → Display → INTERFACE → Theme**, con la estética de las pantallas de los
+equipos de base (colores, teclas, recuadro del modo, S-meter y paleta de la cascada):
+
+| Tema | Estilo |
+|---|---|
+| **Pro Azul** | negro con teclas grises en degradé, azul para lo activo, modo en recuadro, cascada azul → amarillo → rojo |
+| **Pro Ambar** | visor ámbar sobre negro, todo en tonos cálidos, cascada "fuego" |
+| **Pro Verde** | verde fósforo de los visores clásicos, plano, sin degradés |
+| **Pro Grafito** | gris grafito de los equipos SDR modernos, amarillo para lo activo, línea de acento |
+| **Pro Marino** | pantalla azul profundo con números blancos y modo en amarillo |
+| **Noche Roja** | todo en rojo sobre negro para operar de noche sin perder la visión nocturna (con el brillo bajo) |
+
+Vistas previas aproximadas: `docs/screenshots/themes_alta_gama/`. Se cambian al instante, sin reiniciar.
+Para retocarlos: `themes/alta_gama.py` (paleta corta → los 128 colores) y volver a compilar, o editar
+el `.json` en `/mnt/themes/` desde la página web (Archivos). Un tema puede además pedir la disposición
+`"deck": true` (frecuencia grande con S/SWR/ALC al lado), `"meter_gradient"` y `"mono_cluster"`
+(ver `docs/THEMES.md`).

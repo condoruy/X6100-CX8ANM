@@ -1,0 +1,220 @@
+#!/usr/bin/env python3
+"""Temas "alta gama" para el X6100 (CX8ANM).
+
+Cada tema se describe con una paleta corta (fondo, superficies, texto, acento, botón activo, cascada...)
+y de ahí salen los ~140 colores que usa la interfaz (src/theme.h). Escribe themes/alta-gama/<nombre>.json,
+que la imagen copia a /mnt/themes al arrancar.
+
+    python3 themes/alta_gama.py            # escribe los JSON
+    python3 themes/alta_gama.py --preview  # además, vistas previas en docs/screenshots/themes_alta_gama/
+"""
+import json
+import os
+import re
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUT = os.path.join(ROOT, 'themes', 'alta-gama')
+
+
+def base_classic():
+    """Los colores del tema Classic (4ª columna de THEME_COLORS): lo que el tema no cambia"""
+    src = open(os.path.join(ROOT, 'src', 'theme.h')).read()
+    out = {}
+    for m in re.finditer(r'X\((\w+),\s*0x(\w+),\s*0x(\w+),\s*0x(\w+),\s*0x(\w+)\)', src):
+        out[m.group(1)] = int(m.group(5), 16)
+    return out
+
+
+def h(c):
+    return int(c.lstrip('#'), 16) if isinstance(c, str) else c
+
+
+def mix(a, b, t):
+    """t = 0: a; t = 1: b"""
+    a, b = h(a), h(b)
+    r = [round(((a >> s) & 255) * (1 - t) + ((b >> s) & 255) * t) for s in (16, 8, 0)]
+    return r[0] << 16 | r[1] << 8 | r[2]
+
+
+def lum(c):
+    c = h(c)
+    return 0.299 * (c >> 16 & 255) + 0.587 * (c >> 8 & 255) + 0.114 * (c & 255)
+
+
+def tint(c, hue):
+    """La luminosidad de c con el tono de hue (noche roja: todo en rojo)"""
+    l = lum(c) / 255
+    hue = h(hue)
+    hl = max(lum(hue) / 255, 1e-3)
+    r = [min(255, round(((hue >> s) & 255) * l / hl)) for s in (16, 8, 0)]
+    return r[0] << 16 | r[1] << 8 | r[2]
+
+
+def roles(p):
+    """Paleta corta -> todos los roles"""
+    bg, text = h(p['bg']), h(p['text'])
+    c = dict(base_classic())
+    surf, surf2, border = h(p['surface']), h(p['surface2']), h(p['border'])
+    acc, act, act_text = h(p['accent']), h(p['active']), h(p['active_text'])
+    c.update({
+        'bg': bg,
+        'bar': h(p.get('bar', surf)), 'bar_grad': h(p.get('bar_grad', surf2)), 'bar_border': border,
+        'strip': h(p.get('strip', surf)), 'strip_grad': h(p.get('strip_grad', surf2)), 'strip_border': border,
+        'dialog': surf, 'dialog_grad': surf2, 'dialog_border': border,
+        'btn': h(p['btn']), 'btn_grad': h(p.get('btn_grad', p['btn'])), 'btn_border': h(p.get('btn_border', border)),
+        'btn_text': h(p.get('btn_text', text)),
+        'btn_active': act, 'btn_active_grad': h(p.get('active_grad', act)), 'btn_active_border': h(p.get('active_border', act)),
+        'btn_active_text': act_text,
+        'btn_page': h(p.get('page', p['btn'])), 'btn_page_text': h(p.get('page_text', p.get('head', acc))),
+        'btn_off_text': mix(text, bg, .65), 'btn_off_border': mix(border, bg, .5),
+        'btn_mark': h(p.get('mark', acc)), 'btn_mark_assigned': mix(p.get('mark', acc), bg, .35),
+        'btn_mark_active': h(p.get('mark_active', p.get('tx', 0xff3030))),
+        'card': border, 'focus': act, 'focus_text': act_text, 'edited': acc,
+        'panel': bg, 'panel_border': border, 'list': mix(surf2, bg, .5), 'row': mix(surf, text, .08),
+        'popup': surf2, 'popup_border': border, 'side': mix(surf2, bg, .3), 'chip': mix(surf, text, .1),
+        'sel_bg': h(p.get('sel_bg', mix(act, bg, .55))), 'sel_text': h(p.get('sel_text', text)),
+        'sel_border': h(p.get('sel_border', act)), 'focus_bg': h(p.get('sel_bg', mix(act, bg, .4))),
+        'near_bg': mix(acc, bg, .8), 'vfo': h(p.get('vfo', acc)), 'vfo_bg': mix(p.get('vfo', acc), bg, .82),
+        'text': text, 'text_value': h(p.get('value', text)), 'text_dim': h(p['dim']),
+        'text_soft': mix(text, bg, .25), 'text_mute': mix(text, bg, .48), 'text_faint': mix(text, bg, .62),
+        'text_head': h(p.get('head', acc)), 'line': h(p.get('line', p['dim'])), 'action': acc,
+        'accent': acc, 'accent_soft': mix(acc, text, .4),
+        'veil': mix(bg, surf, .5), 'track': mix(surf, text, .15), 'frame': mix(surf2, bg, .4),
+        'off': mix(text, bg, .7), 'icon_off': mix(surf, bg, .3), 'switch_off': mix(text, bg, .15),
+        'lock': acc, 'control_border': mix(text, bg, .45), 'toggle_on': act, 'toggle_focus': mix(act, text, .4),
+        'vfo_line': h(p.get('vfo_line', 0xff2020)), 'spot': h(p.get('spot', p.get('head', acc))),
+        'mode_text': h(p.get('mode', acc)), 'mode_dig': h(p.get('mode_dig', acc)),
+        'mode_bg': h(p.get('mode_bg', act)), 'mode_border': h(p.get('mode_border', p.get('mode_bg', act))),
+        'pill_off_text': h(p.get('pill_off', mix(text, bg, .35))), 'pill_border': border,
+        'meter_weak': h(p.get('meter_weak', p['meter_bar'])), 'meter_bar': h(p['meter_bar']),
+        'meter_over': h(p.get('meter_over', p['meter_high'])),
+        'meter_low': h(p['meter_low']), 'meter_high': h(p['meter_high']),
+        'title_text': h(p.get('head', acc)),
+    })
+    if 'bp' in p:   # plan de banda: CW, digitales, SSB, balizas, texto
+        for k, v in zip(('bp_cw', 'bp_dig', 'bp_ssb', 'bp_bcn', 'bp_text'), p['bp']):
+            c[k] = h(v)
+    for k in ('ok', 'warn', 'err', 'info', 'tx', 'digi'):
+        if k in p:
+            c[k] = h(p[k])
+    c['ok_bg'] = mix(c['ok'], bg, .78)
+    c['ok_bar'] = mix(c['ok'], bg, .15)
+    c['warn_bg'] = mix(c['warn'], bg, .78)
+    c['err_bg'] = mix(c['err'], bg, .75)
+    c['err_strong'] = c['err']
+    c['tx_bg'] = mix(c['tx'], bg, .25)
+    c['tx_box'] = mix(c['tx'], bg, .6)
+    if 'hue' in p:   # todo en un solo tono (Noche Roja)
+        for k in c:
+            c[k] = tint(c[k], p['hue'])
+    return c
+
+
+# ---------- los temas ----------
+# "inspirado en": la estética de la pantalla de cada familia de equipos, no su logo ni su marca
+THEMES = {
+    # Negro con teclas grises en degradé, azul para lo activo, recuadro del modo, cascada azul-amarillo-rojo
+    'Pro Azul': dict(
+        base='Classic', font='arial', radius=3, radius_btn=4, radius_popup=4, border=1,
+        btn_gradient=True, box_gradient=True, focus_solid=True, mode_box=True, pill_border=1,
+        palette=dict(bg='#000000', surface='#16263e', surface2='#060b14', border='#3a5a88',
+                     strip='#0b1626', strip_grad='#000000', btn='#5a6170', btn_grad='#1e2129', btn_border='#7d8696',
+                     text='#ffffff', value='#ffffff', dim='#9aa6b4', head='#6cc6ff', accent='#ffa628',
+                     active='#2f72d6', active_grad='#123e86', active_border='#9fd2ff', active_text='#ffffff',
+                     mode='#ffffff', mode_bg='#1f5fbf', mode_border='#9fd2ff',
+                     meter_bar='#e6e6e6', meter_low='#40e040', meter_high='#ff3030', meter_over='#ff4040',
+                     mark='#ffa628', vfo='#40c8ff', spot='#40e8ff'),
+        waterfall=['#000000', '#00003c', '#00008c', '#0040ff', '#00c0ff', '#00ff80', '#ffff00', '#ff8000', '#ff0000']),
+    # Ámbar sobre negro, como los visores de cristal líquido ámbar: todo cálido, cascada en fuego
+    'Pro Ambar': dict(
+        base='Classic', font='dejavu', radius=2, radius_btn=3, radius_popup=3, border=1,
+        btn_gradient=True, box_gradient=True, focus_solid=True, mode_box=True, pill_border=1, meter_gradient=True,
+        palette=dict(bg='#050302', surface='#24180a', surface2='#0b0703', border='#7a5418',
+                     strip='#1a1106', strip_grad='#050302', btn='#3a2810', btn_grad='#140d05', btn_border='#8a6020',
+                     text='#ffb84a', value='#ffd27a', dim='#b07e30', head='#ffcf70', accent='#ffd000',
+                     active='#ffb000', active_grad='#d88a00', active_border='#ffe0a0', active_text='#1a0f00',
+                     mode='#1a0f00', mode_bg='#ffb000', mode_border='#ffe0a0',
+                     meter_bar='#ffb000', meter_weak='#6a4a10', meter_low='#ffb000', meter_high='#ff3000',
+                     sel_text='#ffe0a0', vfo='#ffd000', spot='#ffe9a0', ok='#d8e040', info='#ffd27a',
+                     digi='#ff9a50', warn='#ff8a00', mode_dig='#ffd000',
+                     bp=('#3a2404', '#7a5008', '#5a3a08', '#6a1800', '#ffd27a')),
+        waterfall=['#050302', '#1e0c00', '#4a1e00', '#8a3c00', '#d06a00', '#ffa000', '#ffd060', '#fff0c0']),
+    # Verde fósforo (visores fluorescentes de los equipos clásicos): verde sobre negro, sin degradés
+    'Pro Verde': dict(
+        base='Classic', font='roboto', radius=0, radius_btn=0, radius_popup=0, border=1,
+        btn_gradient=False, box_gradient=False, focus_solid=True, mode_box=False, pill_border=0, meter_gradient=True,
+        palette=dict(bg='#000000', surface='#06150c', surface2='#020a05', border='#1f6b40',
+                     btn='#071a0e', btn_border='#2a8a52', text='#5dff9a', value='#a8ffcc', dim='#2fa864',
+                     head='#9dffc4', accent='#c8ff60', active='#2bd46a', active_text='#001a0a',
+                     mode='#c8ff60', meter_bar='#2bd46a', meter_weak='#0f4a26', meter_low='#2bd46a',
+                     meter_high='#e8ff70', meter_over='#e8ff70', vfo='#c8ff60', spot='#c8ff60',
+                     ok='#5dff9a', info='#7dffe0', warn='#e8ff70', digi='#7dffe0',
+                     bp=('#0a3a20', '#2a6a10', '#0f5a2c', '#5a5a00', '#c8ffd8')),
+        waterfall=['#000000', '#001a0c', '#003c1c', '#006b34', '#00a850', '#3ce070', '#a0ff90', '#f0ffd0']),
+    # Grafito de los equipos SDR modernos: gris oscuro plano, amarillo para lo activo, línea de acento
+    'Pro Grafito': dict(
+        base='Classic', font='roboto', radius=6, radius_btn=6, radius_popup=6, border=1, btn_gap=2,
+        btn_gradient=False, box_gradient=False, focus_solid=True, mode_box=False, pill_border=0, rule=True,
+        palette=dict(bg='#15171b', surface='#24272d', surface2='#1a1c20', border='#3a3f47',
+                     strip='#101215', strip_grad='#101215', btn='#2b2f36', btn_border='#3a3f47',
+                     text='#f2f4f7', value='#ffffff', dim='#9aa1ab', head='#4fd1ff', accent='#ffd400',
+                     active='#ffd400', active_border='#ffd400', active_text='#141414', page_text='#ffd400',
+                     mode='#ffd400', meter_bar='#4fd1ff', meter_low='#4fd1ff', meter_high='#ff4060',
+                     vfo='#4fd1ff', spot='#4fd1ff', mark='#4fd1ff', sel_bg='#3a3416', sel_text='#ffd400'),
+        waterfall=['#000010', '#000a50', '#0050c8', '#00c8ff', '#00ff90', '#ffe000', '#ff4000', '#ff0060']),
+    # Azul profundo con números blancos, como las pantallas azules de los equipos de base
+    'Pro Marino': dict(
+        base='Classic', font='arial', radius=4, radius_btn=5, radius_popup=5, border=1,
+        btn_gradient=True, box_gradient=True, focus_solid=True, mode_box=True, pill_border=1,
+        palette=dict(bg='#00122b', surface='#0a2b5c', surface2='#04183a', border='#4b7cc4',
+                     strip='#001f47', strip_grad='#000f26', btn='#23466f', btn_grad='#0c2240', btn_border='#5c8ad0',
+                     text='#ffffff', value='#e8f2ff', dim='#8fb0d8', head='#8fd0ff', accent='#ffd040',
+                     active='#d8ecff', active_grad='#9cc8f4', active_border='#ffffff', active_text='#002050',
+                     mode='#002050', mode_bg='#ffd040', mode_border='#ffe890',
+                     meter_bar='#ffffff', meter_low='#ffd040', meter_high='#ff5040',
+                     vfo='#ffd040', spot='#a8e0ff', mark='#ffd040', sel_bg='#1f5fbf', mode_dig='#ffd040'),
+        waterfall=['#000a1e', '#00285a', '#0050a8', '#0090e8', '#40c8ff', '#c8f0ff', '#ffffff']),
+    # Noche: todo en rojo sobre negro para no perder la visión nocturna (con el brillo bajo)
+    'Noche Roja': dict(
+        base='Classic', font='roboto', radius=3, radius_btn=4, radius_popup=4, border=1,
+        btn_gradient=False, box_gradient=False, focus_solid=True, mode_box=False, pill_border=0,
+        meter_gradient=True, mono_cluster=True,
+        palette=dict(bg='#000000', surface='#1a0403', surface2='#0a0101', border='#5a120c',
+                     btn='#160302', btn_border='#6a1810', text='#ff4a3a', value='#ff6a58', dim='#a02418',
+                     head='#ff6a58', accent='#ff8a70', active='#d01a0c', active_text='#000000',
+                     mode='#ff8a70', meter_bar='#c02010', meter_low='#c02010', meter_high='#ff6050',
+                     bp=('#2a0200', '#4a0800', '#3a0400', '#600a00', '#ff6a58'), hue='#ff2a14'),
+        waterfall=['#000000', '#140000', '#380000', '#6a0000', '#a00800', '#d81800', '#ff5030']),
+}
+
+
+def build(name, t):
+    c = roles(t['palette'])
+    j = {'base': t['base'], 'colors': {k: '#%06x' % v for k, v in c.items()}}
+    for k in ('radius', 'radius_btn', 'radius_popup', 'border', 'btn_gradient', 'box_gradient', 'focus_solid',
+              'pill_border', 'mode_box', 'btn_gap', 'rule', 'meter_gradient', 'mono_cluster', 'deck', 'font'):
+        if k in t:
+            j[k] = t[k]
+    j['waterfall'] = t['waterfall']
+    j['waterfall_steps'] = 0
+    return j, c
+
+
+def main():
+    os.makedirs(OUT, exist_ok=True)
+    built = {}
+    for name, t in THEMES.items():
+        j, c = build(name, t)
+        with open(os.path.join(OUT, name + '.json'), 'w') as f:
+            json.dump(j, f, indent=1)
+            f.write('\n')
+        built[name] = (j, c)
+        print('ok', name, len(j['colors']), 'colores')
+    if '--preview' in sys.argv:
+        import alta_gama_preview
+        alta_gama_preview.render_all(built, os.path.join(ROOT, 'docs', 'screenshots', 'themes_alta_gama'))
+
+
+if __name__ == '__main__':
+    main()

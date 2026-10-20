@@ -295,6 +295,11 @@ static bool load_file(const char *name) {
     get_int(root, "btn_gap", &theme_shape.btn_gap);
     theme_shape.btn_gap = theme_shape.btn_gap < 0 ? 0 : theme_shape.btn_gap > 4 ? 4 : theme_shape.btn_gap;
     get_bool(root, "rule", &theme_shape.rule);
+    /* CX8ANM: también desde el archivo: la disposición "deck" (frecuencia grande con S/SWR/ALC al lado),
+     * el S-meter en un degradé parejo y el cluster en un solo color */
+    get_bool(root, "deck", &theme_shape.deck);
+    get_bool(root, "meter_gradient", &theme_shape.meter_gradient);
+    get_bool(root, "mono_cluster", &theme_shape.mono_cluster);
     v = theme_shape.waterfall_steps;
     get_int(root, "waterfall_steps", &v);
     theme_shape.waterfall_steps = v;
@@ -304,7 +309,8 @@ static bool load_file(const char *name) {
         theme_shape.font = !strcasecmp(font, "roboto") ? FONT_ROBOTO :
                            !strcasecmp(font, "dejavu") ? FONT_DEJAVU :
                            !strcasecmp(font, "arial") ? FONT_ARIAL :
-                           !strcasecmp(font, "sony") ? FONT_SONY : -1;
+                           !strcasecmp(font, "sony") ? FONT_SONY :
+                           !strcasecmp(font, "rcond") ? FONT_RCOND : -1;
     }
     const cJSON *wf = cJSON_GetObjectItemCaseSensitive(root, "waterfall");
     if (cJSON_IsArray(wf) && cJSON_GetArraySize(wf) >= 2) {

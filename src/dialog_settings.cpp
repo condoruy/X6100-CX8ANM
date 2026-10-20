@@ -2349,8 +2349,8 @@ static uint8_t make_freq_accel(uint8_t row) {
 /* The built-in themes and the files in /mnt/themes */
 static uint8_t make_theme(uint8_t row) {
     lv_obj_t    *obj;
-    char        names[16][32];
-    int         n = theme_list(names, 16);
+    char        names[32][32];
+    int         n = theme_list(names, 32);
     std::string options;
 
     obj = lv_label_create(grid);
