@@ -974,8 +974,8 @@ static const char *disp_set(cJSON *req, disp_set_t *d) {
             return "Radio is transmitting";     /* the open app closes */
         if (walkie_on())
             return "Not in walkie mode";        /* its screen holds the buttons */
-        char   names[32][32];
-        int    count = theme_list(names, 32);
+        char   names[64][32];
+        int    count = theme_list(names, 64);
 
         for (int i = 0; cJSON_IsString(n) && i < count; i++)
             if (!strcmp(n->valuestring, names[i])) {
@@ -1009,10 +1009,10 @@ static const char *disp_set(cJSON *req, disp_set_t *d) {
 }
 
 static void disp_get(client_t *c) {
-    char   buf[2048];
+    char   buf[4096];
     int    l = snprintf(buf, sizeof(buf), "{\"t\":\"disp\"");
-    char   names[32][32];
-    int    count = theme_list(names, 32);
+    char   names[64][32];
+    int    count = theme_list(names, 64);
 
     for (auto &o : disp_ints)
         l += snprintf(buf + l, sizeof(buf) - l, ",\"%s\":%d", o.name, (int)o.p->get());

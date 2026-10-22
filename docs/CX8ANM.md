@@ -103,22 +103,26 @@ se vuelve a grabar la imagen con balenaEtcher como siempre.
   15/09/2024) o "- Xiegu 1.1.8" si hay una más nueva. Se actualiza con el procedimiento oficial
   de Xiegu (fuente de 13,8 V). La versión conocida está en src/power_save.c (BASEBAND_LATEST).
 
-## Temas estilo equipo de alta gama
+## Temas estilo equipo de alta gama y transceptores reconocidos
 
-Seis temas nuevos en **Ajustes → Display → INTERFACE → Theme**, con la estética de las pantallas de los
-equipos de base (colores, teclas, recuadro del modo, S-meter y paleta de la cascada):
+Temas disponibles en **Ajustes → Display → INTERFACE → Theme**, con la estética de las pantallas de los
+equipos de base (colores, teclas, recuadro del modo, S-meter y paleta de la cascada), cada uno con su
+variante estándar y su variante **Deck** (disposición de alta densidad con frecuencia gigante, escalas S/SWR/ALC al costado y teclas planas):
 
 | Tema | Estilo |
 |---|---|
-| **Pro Azul** | negro con teclas grises en degradé, azul para lo activo, modo en recuadro, cascada azul → amarillo → rojo |
-| **Pro Ambar** | visor ámbar sobre negro, todo en tonos cálidos, cascada "fuego" |
-| **Pro Verde** | verde fósforo de los visores clásicos, plano, sin degradés |
-| **Pro Grafito** | gris grafito de los equipos SDR modernos, amarillo para lo activo, línea de acento |
-| **Pro Marino** | pantalla azul profundo con números blancos y modo en amarillo |
-| **Noche Roja** | todo en rojo sobre negro para operar de noche sin perder la visión nocturna (con el brillo bajo) |
+| **Pro Azul** / **Pro Azul Deck** | negro con teclas grises en degradé, azul para lo activo, modo en recuadro, cascada azul → amarillo → rojo |
+| **Pro Ambar** / **Pro Ambar Deck** | visor ámbar sobre negro, todo en tonos cálidos, cascada "fuego" |
+| **Pro Verde** / **Pro Verde Deck** | verde fósforo de los visores clásicos, plano, sin degradés |
+| **Pro Grafito** / **Pro Grafito Deck** | gris grafito de los equipos SDR modernos, amarillo para lo activo, línea de acento |
+| **Pro Marino** / **Pro Marino Deck** | pantalla azul profundo con números blancos y modo en amarillo |
+| **Noche Roja** / **Noche Roja Deck** | todo en rojo sobre negro para operar de noche sin perder la visión nocturna (con el brillo bajo) |
+| **Icom IC-7300** / **Icom IC-7300 Deck** | pantalla táctil negro azabache, teclas biseladas en gris oscuro, modo en azul Icom característico y cascada multinivel |
+| **Yaesu FTDX** / **Yaesu FTDX Deck** | gris metálico satinado, teclas ámbar incandescente y cascada de alto contraste estilo 3DSS |
+| **Kenwood TS-890** / **Kenwood TS-890 Deck** | grafito profundo, verde esmeralda y acentos en oro suave de la gama alta de Kenwood |
+| **Elecraft K4** / **Elecraft K4 Deck** | estética táctica modular SDR, negro anodizado mate, acentos amarillo oro y máxima legibilidad |
 
-Vistas previas aproximadas: `docs/screenshots/themes_alta_gama/`. Se cambian al instante, sin reiniciar.
-Para retocarlos: `themes/alta_gama.py` (paleta corta → los 128 colores) y volver a compilar, o editar
-el `.json` en `/mnt/themes/` desde la página web (Archivos). Un tema puede además pedir la disposición
-`"deck": true` (frecuencia grande con S/SWR/ALC al lado), `"meter_gradient"` y `"mono_cluster"`
-(ver `docs/THEMES.md`).
+La lista de temas en Ajustes y en la web ahora admite hasta 64 temas. Se cambian al instante, sin reiniciar.
+Para retocarlos o agregar nuevos: `themes/alta_gama.py` (paleta corta → los 128 colores) y volver a compilar, o editar
+el `.json` en `/mnt/themes/` desde la página web (Archivos). Las variantes Deck activan `"deck": true`
+(frecuencia grande con S/SWR/ALC al lado) y tipografía compacta `rcond`.

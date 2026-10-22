@@ -113,7 +113,7 @@ def roles(p):
 
 # ---------- los temas ----------
 # "inspirado en": la estética de la pantalla de cada familia de equipos, no su logo ni su marca
-THEMES = {
+BASE_THEMES = {
     # Negro con teclas grises en degradé, azul para lo activo, recuadro del modo, cascada azul-amarillo-rojo
     'Pro Azul': dict(
         base='Classic', font='arial', radius=3, radius_btn=4, radius_popup=4, border=1,
@@ -186,7 +186,71 @@ THEMES = {
                      mode='#ff8a70', meter_bar='#c02010', meter_low='#c02010', meter_high='#ff6050',
                      bp=('#2a0200', '#4a0800', '#3a0400', '#600a00', '#ff6a58'), hue='#ff2a14'),
         waterfall=['#000000', '#140000', '#380000', '#6a0000', '#a00800', '#d81800', '#ff5030']),
+    # Icom IC-7300: pantalla táctil en negro azabache, teclas biseladas, azul Icom en modos y cascada multinivel
+    'Icom IC-7300': dict(
+        base='Classic', font='arial', radius=3, radius_btn=4, radius_popup=4, border=1,
+        btn_gradient=True, box_gradient=True, focus_solid=True, mode_box=True, pill_border=1,
+        palette=dict(bg='#040608', surface='#121824', surface2='#070b10', border='#2b394d',
+                     strip='#0c121c', strip_grad='#020406', btn='#2b3545', btn_grad='#141a24', btn_border='#44546d',
+                     text='#f2f5f9', value='#ffffff', dim='#8a98ab', head='#40b0ff', accent='#ffaa1e',
+                     active='#1858be', active_grad='#0e387c', active_border='#70b5ff', active_text='#ffffff',
+                     mode='#ffffff', mode_bg='#124ba0', mode_border='#60a8ff',
+                     meter_bar='#e8ecf2', meter_low='#00d050', meter_high='#ff2626', meter_over='#ff3838',
+                     vfo='#38b4ff', spot='#50c4ff', mark='#ffaa1e', sel_bg='#15427d', sel_text='#80ccff'),
+        waterfall=['#000000', '#000030', '#001880', '#0040e0', '#00b0f0', '#00d860', '#ffe000', '#ff6800', '#ee0000']),
+    # Yaesu FTDX: gris metálico satinado, teclas ámbar incandescente y cascada estilo 3DSS
+    'Yaesu FTDX': dict(
+        base='Classic', font='roboto', radius=2, radius_btn=3, radius_popup=3, border=1,
+        btn_gradient=True, box_gradient=True, focus_solid=True, mode_box=True, pill_border=1,
+        palette=dict(bg='#08090b', surface='#191c22', surface2='#0b0d10', border='#3e4450',
+                     strip='#121418', strip_grad='#060708', btn='#282c35', btn_grad='#14161b', btn_border='#485060',
+                     text='#f0f3f6', value='#ffffff', dim='#949ca8', head='#00c0f0', accent='#ff9600',
+                     active='#ff8800', active_grad='#b85800', active_border='#ffbe60', active_text='#000000',
+                     mode='#000000', mode_bg='#ff9600', mode_border='#ffbe60',
+                     meter_bar='#00c8f0', meter_weak='#004860', meter_low='#00c8f0', meter_high='#ff3010', meter_over='#ff3010',
+                     vfo='#00c8f0', spot='#4de0ff', mark='#ff9600', sel_bg='#402400', sel_text='#ffb440'),
+        waterfall=['#000004', '#08082c', '#14208c', '#0088d8', '#00d8f0', '#c80088', '#ff3000', '#ffb000']),
+    # Kenwood TS-890: grafito profundo, verde esmeralda y acentos en oro suave
+    'Kenwood TS-890': dict(
+        base='Classic', font='dejavu', radius=3, radius_btn=4, radius_popup=4, border=1,
+        btn_gradient=True, box_gradient=True, focus_solid=True, mode_box=True, pill_border=1,
+        palette=dict(bg='#060709', surface='#16191f', surface2='#0a0c0f', border='#343b47',
+                     strip='#0e1014', strip_grad='#040507', btn='#252a33', btn_grad='#12151a', btn_border='#404856',
+                     text='#eaf0f6', value='#f8fbff', dim='#8a94a2', head='#44d472', accent='#f2a828',
+                     active='#2ea854', active_grad='#165c2c', active_border='#76f09e', active_text='#ffffff',
+                     mode='#ffffff', mode_bg='#184e2a', mode_border='#5ce088',
+                     meter_bar='#44d472', meter_weak='#124824', meter_low='#44d472', meter_high='#f03828', meter_over='#f03828',
+                     vfo='#f2a828', spot='#72e89a', mark='#f2a828', sel_bg='#10361c', sel_text='#64e68e'),
+        waterfall=['#000000', '#000c2e', '#002888', '#0078d0', '#00c8e0', '#24c060', '#f4b820', '#d82020']),
+    # Elecraft K4: estética táctica modular, negro anodizado, acentos amarillo oro y máxima legibilidad
+    'Elecraft K4': dict(
+        base='Classic', font='roboto', radius=1, radius_btn=2, radius_popup=2, border=1,
+        btn_gradient=False, box_gradient=False, focus_solid=True, mode_box=True, pill_border=1,
+        palette=dict(bg='#0d0f12', surface='#1b1f26', surface2='#111418', border='#323a48',
+                     strip='#14171d', strip_grad='#14171d', btn='#222832', btn_border='#384252',
+                     text='#f4f6fa', value='#ffffff', dim='#949eae', head='#ffc820', accent='#ffc820',
+                     active='#ffc820', active_border='#ffe070', active_text='#12151a',
+                     mode='#12151a', mode_bg='#ffc820', mode_border='#ffe070',
+                     meter_bar='#48c8ff', meter_low='#48c8ff', meter_high='#ff3848', meter_over='#ff3848',
+                     vfo='#ffc820', spot='#ffdb58', mark='#ffc820', sel_bg='#3a2f0a', sel_text='#ffc820'),
+        waterfall=['#000000', '#060c24', '#0a2468', '#0070c8', '#00c0d8', '#20c040', '#ffe020', '#ff3010', '#ffffff']),
 }
+
+
+def make_deck_variant(src):
+    """Crea una variante con disposición deck (frecuencia gigante, medidores al costado, teclas planas)."""
+    t = dict(src)
+    t['deck'] = True
+    t['font'] = 'rcond'
+    t['radius_btn'] = 0
+    return t
+
+
+# Construimos el diccionario final THEMES con cada tema y su variante Deck correspondiente
+THEMES = {}
+for name, spec in BASE_THEMES.items():
+    THEMES[name] = spec
+    THEMES[name + ' Deck'] = make_deck_variant(spec)
 
 
 def build(name, t):
