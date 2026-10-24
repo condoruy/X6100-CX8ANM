@@ -27,6 +27,9 @@ typedef enum {
 void audio_init();
 void audio_mixer_setup(x6100_base_ver_t base_ver);
 int audio_play(int16_t *buf, size_t samples);
+/* audio_play() que se rinde: -1 si *run pasa a false, -2 si el sonido no avanza en timeout_ms
+ * (nunca se queda esperando para siempre, como audio_play()) */
+int audio_play_until(int16_t *buf, size_t samples, volatile bool *run, int timeout_ms);
 void audio_play_wait();
 void audio_play_flush();
 /* Without the radio lock: call radio_set_play_mode() */

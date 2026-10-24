@@ -61,8 +61,6 @@ static char        list_err[96];
 static station_t   playing;             /* la que suena */
 static volatile bool play_on;
 static volatile pid_t play_pid;
-static pthread_t   play_thread;
-static bool        play_thread_on;
 
 /* la lista se baja en otro hilo; gen descarta las respuestas viejas */
 static station_t   fetch_buf[MAX_ST];
@@ -332,19 +330,38 @@ static void load_list(void) {
 
 /* ---------- reproducción ---------- */
 
+/* Nada de esto espera en el hilo de la pantalla: parar solo avisa y corta el ayudante; el hilo de
+ * reproducción termina por su cuenta y, si mientras tanto se eligió otra emisora, la arranca al final
+ * (play_ended). Antes se esperaba al hilo y, con una emisora trabada, se colgaba la radio. */
+static volatile bool play_alive;        /* el hilo de reproducción todavía no terminó */
+static station_t     pending;           /* la próxima, cuando termine el hilo anterior */
+static bool          pending_on;
+
 static void stop_play(void) {
     play_on = false;
     pid_t pid = play_pid;
     if (pid > 0) kill(-pid, SIGTERM);      /* todo el grupo: el ayudante y su decodificador */
-    if (play_thread_on) {
-        pthread_join(play_thread, NULL);
-        play_thread_on = false;
-    }
 }
+
+static void launch(void);
 
 static void play_ended(void *arg) {
     (void)arg;
+    if (pending_on && !play_alive && dialog.run) {
+        pending_on = false;
+        launch();
+    }
     if (dialog.run) show_list();
+}
+
+static void end_child(pid_t pid) {
+    kill(-pid, SIGTERM);
+    for (int i = 0; i < 40; i++) {          /* hasta 2 s, después a la fuerza */
+        if (waitpid(pid, NULL, WNOHANG) == pid) return;
+        usleep(50000);
+    }
+    kill(-pid, SIGKILL);
+    waitpid(pid, NULL, 0);
 }
 
 static void *play_fn(void *arg) {
@@ -352,7 +369,8 @@ static void *play_fn(void *arg) {
     int fds[2];
 
     if (pipe(fds) != 0) {
-        play_on = false;
+        play_on = play_alive = false;
+        scheduler_put_noargs(play_ended);
         return NULL;
     }
     unlink(STATUS_FILE);
@@ -370,9 +388,11 @@ static void *play_fn(void *arg) {
     close(fds[1]);
     if (pid < 0) {
         close(fds[0]);
-        play_on = false;
+        play_on = play_alive = false;
+        scheduler_put_noargs(play_ended);
         return NULL;
     }
+    setpgid(pid, pid);
     play_pid = pid;
 
     /* En los auriculares Bluetooth si están; si no, el parlante como el grabador */
@@ -387,32 +407,53 @@ static void *play_fn(void *arg) {
         if (r <= 0) break;
         have += r;
         size_t samples = have / 2;
-        if (samples && play_on) audio_play(buf, samples);
+        /* si el sonido no avanza en 3 s, se corta en vez de quedarse esperando */
+        if (samples && audio_play_until(buf, samples, &play_on, 3000) == -2) {
+            FILE *f = fopen(STATUS_FILE, "w");
+            if (f) {
+                fputs("error el audio no avanza\n\n\n", f);
+                fclose(f);
+            }
+            break;
+        }
         if (have & 1) ((char *)buf)[0] = ((char *)buf)[have - 1];
         have &= 1;
     }
-    close(fds[0]);
-    kill(-pid, SIGTERM);
-    waitpid(pid, NULL, 0);
     play_pid = 0;
+    end_child(pid);
+    close(fds[0]);
 
     audio_play_flush();
     if (bt) audio_play_bt_end();
     else radio_set_play_mode(AUDIO_PLAY_OFF);
-    play_on = false;
+    play_on    = false;
+    play_alive = false;
     scheduler_put_noargs(play_ended);
     return NULL;
 }
 
+static void launch(void) {
+    pthread_t t;
+
+    if (radio_get_state() != RADIO_RX) return;
+    play_on    = true;
+    play_alive = true;
+    if (pthread_create(&t, NULL, play_fn, NULL) == 0) {
+        pthread_detach(t);
+    } else {
+        play_on = play_alive = false;
+    }
+}
+
 static void start_play(const station_t *s) {
     if (radio_get_state() != RADIO_RX) return;
-    stop_play();
     playing = *s;
-    play_on = true;
-    if (pthread_create(&play_thread, NULL, play_fn, NULL) == 0) {
-        play_thread_on = true;
+    if (play_alive) {           /* la anterior todavía se está cerrando: esta arranca después */
+        stop_play();
+        pending    = *s;
+        pending_on = true;
     } else {
-        play_on = false;
+        launch();
     }
     show_list();
 }
@@ -463,6 +504,7 @@ static void play_cb(button_data_t *b) {
 
 static void stop_cb(button_data_t *b) {
     (void)b;
+    pending_on = false;
     stop_play();
     show_list();
 }
@@ -563,7 +605,8 @@ static void key_cb(lv_event_t *e) {
 
 static void tx_cb(lv_event_t *e) {
     (void)e;
-    if (play_on) {      /* nunca al aire: se corta antes de transmitir */
+    if (play_on || pending_on) {      /* nunca al aire: se corta antes de transmitir */
+        pending_on = false;
         stop_play();
         show_list();
     }
@@ -631,6 +674,7 @@ static void construct_cb(lv_obj_t *parent) {
 }
 
 static void destruct_cb(void) {
+    pending_on = false;
     stop_play();
     playing.name[0] = 0;
     textarea_window_close();

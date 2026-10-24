@@ -183,10 +183,10 @@ def resolve(url, depth=0):
     raise Fail("la lista no trae ninguna dirección")
 
 
-def decoder(ctype, url):
+def decoder(ctype, url, force_ffmpeg=False):
     ctype = (ctype or "").lower()
     mp3 = "mpeg" in ctype or "mp3" in ctype or (not ctype and url.lower().split("?")[0].endswith(".mp3"))
-    if mp3 and shutil.which("mpg123"):
+    if mp3 and shutil.which("mpg123") and not (force_ffmpeg and shutil.which("ffmpeg")):
         return ["mpg123", "-q", "-s", "-m", "-r", "44100", "-"], "MP3"
     if shutil.which("ffmpeg"):
         name = "AAC" if "aac" in ctype or "mp4" in ctype else "OGG" if "ogg" in ctype or "opus" in ctype else \
@@ -221,7 +221,7 @@ def play_hls(url):
         raise Fail("no se pudo abrir la emisora (HLS)")
 
 
-def play_once(url):
+def play_once(url, force_ffmpeg=False):
     url, hls = resolve(url)
     if hls:
         return play_hls(url)
@@ -238,7 +238,7 @@ def play_once(url):
         ctype = (r.headers.get("Content-Type") or "").split(";")[0].strip()
     metaint = int(r.headers.get("icy-metaint") or 0)
     kbps = r.headers.get("icy-br") or ""
-    cmd, codec = decoder(ctype, url)
+    cmd, codec = decoder(ctype, url, force_ffmpeg)
     detail = codec + (" " + kbps.split(",")[0] + " kbps" if kbps else "")
     name = clean(r.headers.get("icy-name") or "")
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
@@ -278,14 +278,17 @@ def cmd_play(args):
         raise Fail("falta la dirección")
     url = args[0]
     tries = 0
+    force_ffmpeg = False
     while True:
         status("connecting")
         started = time.time()
         try:
-            play_once(url)
+            play_once(url, force_ffmpeg)
             return 0
         except Fail as e:
             err = str(e)
+            if "decodificador" in err:
+                force_ffmpeg = True     # una emisora que dice MP3 y manda otra cosa: ffmpeg se arregla
         except Exception as e:
             err = reason(e)
         # si sonó un rato y se cortó, se reconecta (hasta 3 veces seguidas)

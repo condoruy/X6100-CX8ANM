@@ -181,6 +181,28 @@ int audio_play(int16_t *samples_buf, size_t samples) {
     return res;
 }
 
+int audio_play_until(int16_t *samples_buf, size_t samples, volatile bool *run, int timeout_ms) {
+    pa_stream *stm = cur_stm();
+    int        waited = 0;
+
+    while (true) {
+        size_t size;
+
+        if (!*run) return -1;
+        pa_threaded_mainloop_lock(mloop);
+        size = pa_stream_writable_size(stm);
+        pa_threaded_mainloop_unlock(mloop);
+        if (size != (size_t)-1 && size >= samples * 2) break;
+        if (waited >= timeout_ms) return -2;
+        usleep(2000);
+        waited += 2;
+    }
+    pa_threaded_mainloop_lock(mloop);
+    int res = pa_stream_write(stm, samples_buf, samples * 2, NULL, 0, PA_SEEK_RELATIVE);
+    pa_threaded_mainloop_unlock(mloop);
+    return res;
+}
+
 /* Drops the queued audio, so a stop is immediate. */
 void audio_play_flush() {
     pa_operation *op;
