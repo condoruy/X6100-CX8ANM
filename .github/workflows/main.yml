@@ -83,6 +83,9 @@ jobs:
         echo "BR2_PACKAGE_PYTHON3_SSL=y" >> AetherX6100Buildroot/br2_external/configs/X6100_defconfig
         # y zlib (gzip, zipfile): el actualizador y otros scripts lo usan
         echo "BR2_PACKAGE_PYTHON3_ZLIB=y" >> AetherX6100Buildroot/br2_external/configs/X6100_defconfig
+        # Radio por Internet (x6100-iradio): MP3 con mpg123 (ya está), AAC/OGG/HLS con ffmpeg
+        echo "BR2_PACKAGE_FFMPEG=y" >> AetherX6100Buildroot/br2_external/configs/X6100_defconfig
+        echo "BR2_PACKAGE_FFMPEG_FFMPEG=y" >> AetherX6100Buildroot/br2_external/configs/X6100_defconfig
         # The display runs on DRM (lv_drivers/display/drm.c); libdrm is already in the defconfig
         sed -i "/^X6100_GUI_DEPENDENCIES/s/$/ libdrm/" AetherX6100Buildroot/br2_external/package/x6100-gui/x6100_gui.mk
         grep "^X6100_GUI_DEPENDENCIES" AetherX6100Buildroot/br2_external/package/x6100-gui/x6100_gui.mk

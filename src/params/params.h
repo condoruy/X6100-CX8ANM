@@ -71,6 +71,7 @@ typedef enum {
     ACTION_APP_PSK,     /* 121, appended after SNAKE: PSK31/PSK63 (upstream's 114/115 are MODES/CWTRAINER here) */
     ACTION_APP_OLIVIA,  /* 122 */
     ACTION_APP_JTTY,    /* 123, appended after OLIVIA */
+    ACTION_APP_IRADIO,  /* 124, CX8ANM: radio por Internet */
 } press_action_t;
 
 typedef enum {

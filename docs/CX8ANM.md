@@ -121,8 +121,31 @@ variante estándar y su variante **Deck** (disposición de alta densidad con fre
 | **Yaesu FTDX** / **Yaesu FTDX Deck** | gris metálico satinado, teclas ámbar incandescente y cascada de alto contraste estilo 3DSS |
 | **Kenwood TS-890** / **Kenwood TS-890 Deck** | grafito profundo, verde esmeralda y acentos en oro suave de la gama alta de Kenwood |
 | **Elecraft K4** / **Elecraft K4 Deck** | estética táctica modular SDR, negro anodizado mate, acentos amarillo oro y máxima legibilidad |
+| **Icom IC-7300 B** / **Deck** | la pantalla "tipo B" de Icom: fondo azul en degradé, teclas grises y naranja para lo activo |
+| **Icom IC-7610** / **Deck** | negro con teclas grises en degradé, azul para lo activo y el modo en recuadro |
+| **Yaesu FT-991A** / **Deck** | paneles gris azulado, teclas azules y amarillo para lo activo |
+| **Kenwood TS-990** / **Deck** | frecuencia ámbar sobre negro con acentos azules |
+| **Elecraft KX3** / **Deck** | visor de cristal líquido claro con números negros: se lee muy bien al sol |
+| **Flex SmartSDR** / **Deck** | pizarra oscura de los SDR de PC, amarillo para lo activo, cascada azul a rojo |
+| **ANAN Thetis** / **Deck** | negro, frecuencia amarilla y rótulos verdes |
+| **Expert SunSDR** / **Deck** | negro y naranja |
 
 La lista de temas en Ajustes y en la web ahora admite hasta 64 temas. Se cambian al instante, sin reiniciar.
-Para retocarlos o agregar nuevos: `themes/alta_gama.py` (paleta corta → los 128 colores) y volver a compilar, o editar
-el `.json` en `/mnt/themes/` desde la página web (Archivos). Las variantes Deck activan `"deck": true`
+Para retocarlos o agregar nuevos: `themes/alta_gama.py` (paleta corta → los 128 colores) y volver a compilar, o copiar
+un `.json` a `/mnt/themes/` en la tarjeta. Las variantes Deck activan `"deck": true`
 (frecuencia grande con S/SWR/ALC al lado) y tipografía compacta `rcond`.
+Vistas previas aproximadas: `docs/screenshots/themes_alta_gama/pro.png` y `estilos.png`.
+
+## Radio por Internet
+
+**APP → (página 2) → Radio Internet.** Emisoras del directorio abierto radio-browser.info:
+
+- **Lista** pasa por: *Favoritas* → *País* (Uruguay al empezar) → *Las más escuchadas del mundo* → la última búsqueda.
+- **Buscar**: nombre de la emisora o género (rock, tango, noticias...). `pais AR` cambia el país de la lista.
+- **Reproducir** (o apretar la perilla MFK sobre la emisora), **Parar**, **Favorita** (agrega o quita).
+- Arriba: la emisora, el formato (MP3 128 kbps...) y el tema que está sonando, si la emisora lo manda.
+- El volumen es el de siempre. Suena por el parlante o por los auriculares Bluetooth si están conectados.
+- Al transmitir (PTT) la emisora se corta: nunca sale al aire. Al cerrar la aplicación se detiene.
+- Necesita WiFi (o el celular como punto de acceso). Unos 60 MB por hora a 128 kbps.
+- Las favoritas quedan en `/mnt/iradio/favorites.tsv` (nombre, dirección, formato, kbps, país; una por
+  línea, separadas por tabulador), y se pueden bajar desde la página web (Archivos > iradio).

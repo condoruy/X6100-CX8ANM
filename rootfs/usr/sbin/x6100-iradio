@@ -1,0 +1,322 @@
+#!/usr/bin/env python3
+# CX8ANM: radio por Internet en el X6100.
+#
+#   x6100-iradio country <CC> | top | search <texto>
+#        lista de emisoras (directorio abierto radio-browser.info), una por línea:
+#        nombre<TAB>url<TAB>códec<TAB>kbps<TAB>país   ("error <motivo>" si no hay red)
+#   x6100-iradio play <url>
+#        audio PCM s16 mono 44100 Hz por la salida estándar (la GUI lo manda al parlante);
+#        el estado en STATUS: tres líneas, estado ("connecting", "playing", "error ..."),
+#        detalle ("MP3 128 kbps") y el título que manda la emisora
+#
+# MP3 lo decodifica mpg123; AAC, OGG/Opus y lo demás, ffmpeg. Listas .pls/.m3u: la primera dirección.
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import threading
+import time
+import urllib.parse
+import urllib.request
+
+STATUS = "/tmp/x6100-iradio.status"
+UA = "X6100-CX8ANM/1.0"
+API = ["https://de1.api.radio-browser.info", "https://de2.api.radio-browser.info",
+       "https://fi1.api.radio-browser.info", "https://nl1.api.radio-browser.info"]
+_ssl_ctx = None
+
+
+class Fail(Exception):
+    pass
+
+
+# Los servidores SHOUTcast viejos contestan "ICY 200 OK" en vez de "HTTP/1.0 200 OK"
+import http.client
+
+
+def _read_status(self):
+    line = str(self.fp.readline(65537), "iso-8859-1")
+    if not line:
+        raise http.client.RemoteDisconnected("la emisora no contestó")
+    if line.startswith("ICY"):
+        line = "HTTP/1.0" + line[3:]
+    try:
+        version, code, why = line.split(None, 2)
+    except ValueError:
+        try:
+            version, code = line.split(None, 1)
+            why = ""
+        except ValueError:
+            version, code, why = "", "", ""
+    if not version.startswith("HTTP/"):
+        self._close_conn()
+        raise http.client.BadStatusLine(line)
+    return version, int(code), why
+
+
+http.client.HTTPResponse._read_status = _read_status
+
+
+def ssl_context():
+    """Certificados del sistema (paquete ca-certificates), estén donde estén."""
+    global _ssl_ctx
+    if _ssl_ctx is None:
+        try:
+            import ssl
+        except ImportError:
+            raise Fail("Python sin SSL (actualice el firmware)")
+        _ssl_ctx = ssl.create_default_context()
+        for ca in ("/etc/ssl/certs/ca-certificates.crt", "/etc/ssl/cert.pem"):
+            if os.path.exists(ca):
+                _ssl_ctx.load_verify_locations(ca)
+                break
+    return _ssl_ctx
+
+
+def opener(url, headers=None, timeout=15):
+    h = {"User-Agent": UA}
+    h.update(headers or {})
+    req = urllib.request.Request(url, headers=h)
+    kw = {"timeout": timeout}
+    if url.startswith("https:"):
+        kw["context"] = ssl_context()
+    return urllib.request.urlopen(req, **kw)
+
+
+def reason(e):
+    r = getattr(e, "reason", None) or getattr(e, "code", None) or e
+    return " ".join(str(r).split())[:70]
+
+
+# ---------- directorio de emisoras ----------
+def api(path, params):
+    q = urllib.parse.urlencode(params)
+    last = None
+    for base in API:
+        try:
+            with opener(base + path + "?" + q, timeout=12) as r:
+                return json.load(r)
+        except Exception as e:      # el siguiente servidor
+            last = e
+    raise Fail("sin conexión con el directorio (" + reason(last) + ")")
+
+
+def clean(s):
+    return " ".join(str(s or "").replace("\t", " ").split())
+
+
+def print_list(rows):
+    seen = set()
+    n = 0
+    for s in rows:
+        url = s.get("url_resolved") or s.get("url") or ""
+        name = clean(s.get("name"))
+        if not url or not name or url in seen:
+            continue
+        if (s.get("hls") or 0) and not shutil.which("ffmpeg"):
+            continue
+        seen.add(url)
+        print("\t".join([name[:60], url, clean(s.get("codec")).upper()[:8], str(s.get("bitrate") or ""),
+                         clean(s.get("countrycode"))[:2]]))
+        n += 1
+    if not n:
+        print("error no se encontraron emisoras")
+
+
+COMMON = {"hidebroken": "true", "order": "clickcount", "reverse": "true", "limit": "100"}
+
+
+def cmd_country(args):
+    cc = (args[0] if args else "UY").upper()[:2]
+    print_list(api("/json/stations/search", dict(COMMON, countrycode=cc)))
+
+
+def cmd_top(args):
+    print_list(api("/json/stations/search", dict(COMMON, limit="100")))
+
+
+def cmd_search(args):
+    text = " ".join(args).strip()
+    if not text:
+        raise Fail("escriba un nombre")
+    m = re.match(r"^(?:pa[ií]s|country)\s+([A-Za-z]{2})$", text, re.I)
+    if m:
+        return cmd_country([m.group(1)])
+    rows = api("/json/stations/search", dict(COMMON, name=text, limit="80"))
+    if len(rows) < 15:      # también por género (rock, tango, noticias...)
+        rows += api("/json/stations/search", dict(COMMON, tag=text.lower(), limit="60"))
+    print_list(rows)
+
+
+# ---------- reproducción ----------
+def status(state, detail="", title=""):
+    try:
+        tmp = STATUS + ".tmp"
+        with open(tmp, "w") as f:
+            f.write(f"{state}\n{detail}\n{title}\n")
+        os.replace(tmp, STATUS)
+    except OSError:
+        pass
+
+
+def resolve(url, depth=0):
+    """Una lista (.pls, .m3u) a la primera dirección de audio; HLS queda tal cual (ffmpeg)."""
+    low = url.lower().split("?")[0]
+    if depth > 3 or not low.endswith((".pls", ".m3u", ".m3u8", ".asx")):
+        return url, False
+    with opener(url) as r:
+        text = r.read(65536).decode("utf-8", "replace")
+    if "#EXT-X-" in text:
+        return url, True       # HLS
+    for line in text.splitlines():
+        line = line.strip()
+        m = re.match(r"^File\d+=(.+)$", line, re.I)
+        if m:
+            line = m.group(1).strip()
+        m = re.search(r'href="(https?://[^"]+)"', line, re.I)
+        if m:
+            line = m.group(1)
+        if line.startswith(("http://", "https://")):
+            return resolve(line, depth + 1)
+    raise Fail("la lista no trae ninguna dirección")
+
+
+def decoder(ctype, url):
+    ctype = (ctype or "").lower()
+    mp3 = "mpeg" in ctype or "mp3" in ctype or (not ctype and url.lower().split("?")[0].endswith(".mp3"))
+    if mp3 and shutil.which("mpg123"):
+        return ["mpg123", "-q", "-s", "-m", "-r", "44100", "-"], "MP3"
+    if shutil.which("ffmpeg"):
+        name = "AAC" if "aac" in ctype or "mp4" in ctype else "OGG" if "ogg" in ctype or "opus" in ctype else \
+               "MP3" if mp3 else (ctype.split("/")[-1][:6].upper() or "AUDIO")
+        return ["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "quiet", "-i", "pipe:0",
+                "-f", "s16le", "-ac", "1", "-ar", "44100", "pipe:1"], name
+    if shutil.which("mpg123"):
+        return ["mpg123", "-q", "-s", "-m", "-r", "44100", "-"], "MP3"
+    raise Fail("formato " + (ctype or "?") + " no soportado")
+
+
+def title_of(meta):
+    try:
+        text = meta.rstrip(b"\0").decode("utf-8")
+    except UnicodeDecodeError:
+        text = meta.rstrip(b"\0").decode("latin-1", "replace")
+    m = re.search(r"StreamTitle='(.*?)';", text, re.S)
+    return clean(m.group(1))[:90] if m else None
+
+
+def play_hls(url):
+    if not shutil.which("ffmpeg"):
+        raise Fail("esta emisora usa HLS: falta ffmpeg")
+    status("connecting", "HLS")
+    p = subprocess.Popen(["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "quiet", "-i", url,
+                          "-f", "s16le", "-ac", "1", "-ar", "44100", "pipe:1"], stdin=subprocess.DEVNULL)
+    time.sleep(2)
+    if p.poll() is None:
+        status("playing", "HLS")
+    rc = p.wait()
+    if rc:
+        raise Fail("no se pudo abrir la emisora (HLS)")
+
+
+def play_once(url):
+    url, hls = resolve(url)
+    if hls:
+        return play_hls(url)
+    r = opener(url, {"Icy-MetaData": "1"}, timeout=15)
+    ctype = (r.headers.get("Content-Type") or "").split(";")[0].strip()
+    if ctype.startswith(("text/html", "application/json")):
+        raise Fail("la dirección no es una emisora (" + ctype + ")")
+    if ctype in ("audio/x-scpls", "audio/x-mpegurl", "application/vnd.apple.mpegurl", "audio/mpegurl"):
+        r.close()
+        url, hls = resolve(url + ("" if url.lower().endswith((".pls", ".m3u", ".m3u8")) else "#.m3u"))
+        if hls:
+            return play_hls(url)
+        r = opener(url, {"Icy-MetaData": "1"}, timeout=15)
+        ctype = (r.headers.get("Content-Type") or "").split(";")[0].strip()
+    metaint = int(r.headers.get("icy-metaint") or 0)
+    kbps = r.headers.get("icy-br") or ""
+    cmd, codec = decoder(ctype, url)
+    detail = codec + (" " + kbps.split(",")[0] + " kbps" if kbps else "")
+    name = clean(r.headers.get("icy-name") or "")
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    status("playing", detail, name)
+    try:
+        while True:
+            chunk = r.read(metaint if metaint else 8192)
+            if not chunk:
+                raise Fail("la emisora cortó")
+            p.stdin.write(chunk)
+            if metaint:
+                n = r.read(1)
+                if not n:
+                    raise Fail("la emisora cortó")
+                if n[0]:
+                    t = title_of(r.read(n[0] * 16))
+                    if t is not None:
+                        status("playing", detail, t or name)
+            if p.poll() is not None:
+                raise Fail("el decodificador se detuvo")
+    except BrokenPipeError:
+        raise Fail("el decodificador se detuvo")
+    finally:
+        try:
+            p.stdin.close()
+        except Exception:
+            pass
+        try:
+            p.wait(timeout=5)       # que termine de sacar lo que tiene
+        except subprocess.TimeoutExpired:
+            p.kill()
+        r.close()
+
+
+def cmd_play(args):
+    if not args:
+        raise Fail("falta la dirección")
+    url = args[0]
+    tries = 0
+    while True:
+        status("connecting")
+        started = time.time()
+        try:
+            play_once(url)
+            return 0
+        except Fail as e:
+            err = str(e)
+        except Exception as e:
+            err = reason(e)
+        # si sonó un rato y se cortó, se reconecta (hasta 3 veces seguidas)
+        tries = 0 if time.time() - started > 60 else tries + 1
+        if tries >= 3:
+            status("error " + err)
+            return 1
+        status("connecting", "reconectando: " + err)
+        time.sleep(2)
+
+
+def main(argv):
+    cmds = {"country": cmd_country, "top": cmd_top, "search": cmd_search, "play": cmd_play}
+    if len(argv) < 2 or argv[1] not in cmds:
+        print("uso: x6100-iradio country CC | top | search TEXTO | play URL", file=sys.stderr)
+        return 2
+    try:
+        return cmds[argv[1]](argv[2:]) or 0
+    except Fail as e:
+        if argv[1] == "play":
+            status("error " + str(e))
+        else:
+            print("error", e)
+        return 1
+    except Exception as e:
+        if argv[1] == "play":
+            status("error " + reason(e))
+        else:
+            print("error", reason(e))
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

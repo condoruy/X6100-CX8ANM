@@ -981,6 +981,7 @@ static action_items_t long_action_items[] = {
     { .label = " APP CW Trainer ", .action = ACTION_APP_CWTRAINER },
     { .label = " APP Field Ops ", .action = ACTION_APP_FIELD },
     { .label = " APP Bands ", .action = ACTION_APP_BANDS },
+    { .label = " APP Internet radio ", .action = ACTION_APP_IRADIO },
     { .label = " APP RX recorder ", .action = ACTION_APP_RECORDER },
     { .label = " APP SWR Scan ", .action = ACTION_APP_SWRSCAN },
     { .label = " APP GPS ", .action = ACTION_APP_GPS },

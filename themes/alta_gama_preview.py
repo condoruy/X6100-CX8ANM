@@ -213,7 +213,7 @@ def render(name, j, c):
     return im
 
 
-def render_all(built, outdir):
+def render_all(built, outdir, sheet_name='todos'):
     os.makedirs(outdir, exist_ok=True)
     thumbs = []
     for name, (j, c) in built.items():
@@ -233,6 +233,6 @@ def render_all(built, outdir):
         y = pad + (i // cols) * (th + 44 + pad)
         d.text((x, y + 6), name, font=f, fill=(240, 240, 240))
         sheet.paste(im.resize((tw, th), Image.LANCZOS), (x, y + 40))
-    fn = os.path.join(outdir, 'todos.png')
+    fn = os.path.join(outdir, sheet_name + '.png')
     sheet.save(fn)
     print('hoja', fn)

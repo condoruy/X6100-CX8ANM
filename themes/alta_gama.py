@@ -17,12 +17,14 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'themes', 'alta-gama')
 
 
-def base_classic():
-    """Los colores del tema Classic (4ª columna de THEME_COLORS): lo que el tema no cambia"""
+def base_colors(base='Classic'):
+    """Los colores del tema base (columna de THEME_COLORS): lo que el tema no cambia.
+    Classic para los temas oscuros, Outdoor para los claros"""
+    col = {'CX8ANM': 2, 'Legacy': 3, 'Outdoor': 4, 'Classic': 5}[base]
     src = open(os.path.join(ROOT, 'src', 'theme.h')).read()
     out = {}
     for m in re.finditer(r'X\((\w+),\s*0x(\w+),\s*0x(\w+),\s*0x(\w+),\s*0x(\w+)\)', src):
-        out[m.group(1)] = int(m.group(5), 16)
+        out[m.group(1)] = int(m.group(col), 16)
     return out
 
 
@@ -51,10 +53,10 @@ def tint(c, hue):
     return r[0] << 16 | r[1] << 8 | r[2]
 
 
-def roles(p):
+def roles(p, base='Classic'):
     """Paleta corta -> todos los roles"""
     bg, text = h(p['bg']), h(p['text'])
-    c = dict(base_classic())
+    c = dict(base_colors(base))
     surf, surf2, border = h(p['surface']), h(p['surface2']), h(p['border'])
     acc, act, act_text = h(p['accent']), h(p['active']), h(p['active_text'])
     c.update({
@@ -237,6 +239,99 @@ BASE_THEMES = {
 }
 
 
+MORE_RIGS = {
+    # Icom, pantalla "tipo B": fondo azul en degradé, teclas grises, letra blanca
+    'Icom IC-7300 B': dict(
+        base='Classic', font='arial', radius=3, radius_btn=4, radius_popup=4, border=1,
+        btn_gradient=True, box_gradient=True, focus_solid=True, mode_box=False, pill_border=0,
+        palette=dict(bg='#0b2f7a', surface='#1d4fae', surface2='#0a2462', border='#6f95d8',
+                     strip='#123d92', strip_grad='#08205a', btn='#9aa0aa', btn_grad='#3c4049', btn_border='#c8ccd4',
+                     text='#ffffff', value='#ffffff', dim='#b8c8e8', head='#ffffff', accent='#ffa000',
+                     active='#ffa000', active_grad='#c06a00', active_border='#ffe0a0', active_text='#000000',
+                     mode='#ffffff', meter_bar='#ffffff', meter_low='#40e040', meter_high='#ff3030',
+                     vfo='#ffd040', spot='#ffd040', sel_bg='#ffa000', sel_text='#000000', mode_dig='#ffd040'),
+        waterfall=['#00062a', '#000a60', '#0030c0', '#00a0ff', '#40ffff', '#ffff00', '#ff8000', '#ff0000']),
+    # Icom de base: negro, teclas grises en degradé, azul para lo activo, modo en recuadro
+    'Icom IC-7610': dict(
+        base='Classic', font='arial', radius=3, radius_btn=4, radius_popup=4, border=1,
+        btn_gradient=True, box_gradient=True, focus_solid=True, mode_box=True, pill_border=1,
+        palette=dict(bg='#000000', surface='#262626', surface2='#050505', border='#5a5a5a',
+                     strip='#141414', strip_grad='#000000', btn='#6c6c6c', btn_grad='#262626', btn_border='#9a9a9a',
+                     text='#ffffff', value='#ffffff', dim='#a8a8a8', head='#40c8ff', accent='#ffa000',
+                     active='#2f72d6', active_grad='#123e86', active_border='#9fd2ff', active_text='#ffffff',
+                     mode='#ffffff', mode_bg='#1f5fbf', mode_border='#9fd2ff',
+                     meter_bar='#e6e6e6', meter_low='#40e040', meter_high='#ff3030', vfo='#40c8ff', spot='#40e8ff'),
+        waterfall=['#000000', '#000048', '#0020c0', '#0090ff', '#00ffff', '#ffff00', '#ff8000', '#ff0000', '#ffffff']),
+    # Yaesu de uso general: paneles gris azulado, teclas azules, letra blanca
+    'Yaesu FT-991A': dict(
+        base='Classic', font='arial', radius=4, radius_btn=5, radius_popup=5, border=1,
+        btn_gradient=True, box_gradient=True, focus_solid=True, mode_box=False, pill_border=0,
+        palette=dict(bg='#0e1620', surface='#22303e', surface2='#0e1620', border='#4c6a88',
+                     btn='#2f63b8', btn_grad='#163a78', btn_border='#7aa4e0', text='#ffffff', value='#ffffff',
+                     dim='#9ab0c8', head='#ffe040', accent='#ffe040', active='#ffe040', active_grad='#c8a800',
+                     active_border='#fff4a0', active_text='#101010', mode='#ffe040',
+                     meter_bar='#ffffff', meter_low='#40e060', meter_high='#ff3030', vfo='#ffe040', spot='#ffe040'),
+        waterfall=['#000010', '#00185a', '#0050c0', '#00c060', '#e0e000', '#ff6000', '#ffffff']),
+    # Kenwood de tope de gama: frecuencia ámbar sobre negro con acentos azules
+    'Kenwood TS-990': dict(
+        base='Classic', font='dejavu', radius=3, radius_btn=3, radius_popup=3, border=1,
+        btn_gradient=True, box_gradient=True, focus_solid=True, mode_box=True, pill_border=1,
+        palette=dict(bg='#000000', surface='#1a1208', surface2='#000000', border='#5a4220',
+                     btn='#2c2418', btn_grad='#0e0a06', btn_border='#6a5030', text='#ffc860', value='#ffb030',
+                     dim='#a88a50', head='#60b8ff', accent='#60b8ff', active='#2a6ad0', active_grad='#103a80',
+                     active_border='#9ad0ff', active_text='#ffffff', mode='#ffffff', mode_bg='#2a6ad0',
+                     mode_border='#9ad0ff', meter_bar='#ffb030', meter_low='#ffb030', meter_high='#ff3020',
+                     vfo='#60b8ff', spot='#60b8ff', mode_dig='#60b8ff'),
+        waterfall=['#000000', '#00103a', '#00308a', '#0080d0', '#40c0ff', '#ffd060', '#ffffff']),
+    # Elecraft portátil: visor de cristal líquido claro, números negros (bueno al sol)
+    'Elecraft KX3': dict(
+        base='Outdoor', font='roboto', radius=3, radius_btn=3, radius_popup=3, border=2,
+        btn_gradient=False, box_gradient=False, focus_solid=True, mode_box=False, pill_border=0, meter_gradient=True,
+        palette=dict(bg='#c9d3a4', surface='#d8e0b4', surface2='#d8e0b4', border='#3a4228',
+                     btn='#b8c290', btn_border='#3a4228', text='#101408', value='#000000', dim='#4a5232',
+                     head='#000000', accent='#2a3010', active='#1c2208', active_text='#d8e0b4', mode='#000000',
+                     meter_bar='#1c2208', meter_weak='#7a845a', meter_low='#1c2208', meter_high='#000000',
+                     meter_over='#000000', vfo='#000000', spot='#000000', vfo_line='#000000', sel_bg='#1c2208',
+                     sel_text='#d8e0b4', ok='#1c4a10', warn='#5a3a00', err='#7a0000', info='#102a50', tx='#7a0000',
+                     digi='#3a1060', mode_dig='#000000', page_text='#000000',
+                     bp=('#8a946a', '#a0a070', '#98a878', '#a08868', '#101408')),
+        waterfall=['#c9d3a4', '#aab48a', '#8a946c', '#6a7450', '#4a5236', '#2c321e', '#101408']),
+    # SDR de PC (SmartSDR): pizarra oscura, amarillo para lo activo, panorama azul y cascada a rojo
+    'Flex SmartSDR': dict(
+        base='Classic', font='roboto', radius=2, radius_btn=2, radius_popup=2, border=1, rule=True,
+        btn_gradient=False, box_gradient=True, focus_solid=True, mode_box=False, pill_border=0,
+        palette=dict(bg='#0a0e14', surface='#1c2430', surface2='#10161e', border='#34404e',
+                     btn='#1c2430', btn_border='#34404e', text='#e8eef6', value='#ffffff', dim='#8a98a8',
+                     head='#40b0ff', accent='#ffc400', active='#ffc400', active_text='#101010', mode='#ffc400',
+                     meter_bar='#40b0ff', meter_low='#40e070', meter_high='#ff3a3a', vfo='#ffc400', spot='#40b0ff',
+                     sel_bg='#3a3000', sel_text='#ffc400', page_text='#ffc400'),
+        waterfall=['#000000', '#000a3c', '#002a8c', '#0070d0', '#00c0a0', '#a0e000', '#ffc000', '#ff2000']),
+    # SDR de PC (Thetis): negro, frecuencia amarilla, rótulos verdes
+    'ANAN Thetis': dict(
+        base='Classic', font='arial', radius=0, radius_btn=2, radius_popup=2, border=1,
+        btn_gradient=True, box_gradient=False, focus_solid=True, mode_box=False, pill_border=0,
+        palette=dict(bg='#000000', surface='#0a0a0a', surface2='#000000', border='#404040',
+                     btn='#4a4a4a', btn_grad='#1e1e1e', btn_border='#707070', text='#e0e0e0', value='#ffff40',
+                     dim='#909090', head='#40ff60', accent='#ffff40', active='#3a8a3a', active_grad='#1a4a1a',
+                     active_border='#80ff80', active_text='#ffffff', mode='#40ff60',
+                     meter_bar='#40ff60', meter_low='#ffff40', meter_high='#ff3030', vfo='#ffff40', spot='#40ff60',
+                     mode_dig='#40ff60'),
+        waterfall=['#000000', '#00002a', '#000080', '#0000ff', '#00ffff', '#00ff00', '#ffff00', '#ff0000']),
+    # SDR de PC (ExpertSDR): negro y naranja
+    'Expert SunSDR': dict(
+        base='Classic', font='roboto', radius=4, radius_btn=4, radius_popup=4, border=1,
+        btn_gradient=False, box_gradient=True, focus_solid=True, mode_box=True, pill_border=0,
+        palette=dict(bg='#0c0c0e', surface='#1e1e22', surface2='#121214', border='#3a3a40',
+                     btn='#1e1e22', btn_border='#3a3a40', text='#f0f0f0', value='#ffffff', dim='#9a9aa0',
+                     head='#ff8a20', accent='#ff8a20', active='#ff8a20', active_text='#140800', mode='#140800',
+                     mode_bg='#ff8a20', mode_border='#ffb870', meter_bar='#ff8a20', meter_low='#ff8a20',
+                     meter_high='#ff2a2a', vfo='#ff8a20', spot='#ffb870', sel_bg='#4a2808', sel_text='#ffb870',
+                     mode_dig='#ff8a20'),
+        waterfall=['#000000', '#100020', '#300060', '#8000a0', '#e02060', '#ff8020', '#ffe080', '#ffffff']),
+}
+BASE_THEMES.update(MORE_RIGS)
+
+
 def make_deck_variant(src):
     """Crea una variante con disposición deck (frecuencia gigante, medidores al costado, teclas planas)."""
     t = dict(src)
@@ -254,7 +349,7 @@ for name, spec in BASE_THEMES.items():
 
 
 def build(name, t):
-    c = roles(t['palette'])
+    c = roles(t['palette'], t['base'])
     j = {'base': t['base'], 'colors': {k: '#%06x' % v for k, v in c.items()}}
     for k in ('radius', 'radius_btn', 'radius_popup', 'border', 'btn_gradient', 'box_gradient', 'focus_solid',
               'pill_border', 'mode_box', 'btn_gap', 'rule', 'meter_gradient', 'mono_cluster', 'deck', 'font'):
@@ -268,16 +363,24 @@ def build(name, t):
 def main():
     os.makedirs(OUT, exist_ok=True)
     built = {}
+    for f in os.listdir(OUT):          # los que ya no existen
+        if f.endswith('.json'):
+            os.remove(os.path.join(OUT, f))
     for name, t in THEMES.items():
+        assert len(name) < 32, name
         j, c = build(name, t)
         with open(os.path.join(OUT, name + '.json'), 'w') as f:
             json.dump(j, f, indent=1)
             f.write('\n')
-        built[name] = (j, c)
+        if not t.get('deck'):
+            built[name] = (j, c)
         print('ok', name, len(j['colors']), 'colores')
     if '--preview' in sys.argv:
         import alta_gama_preview
-        alta_gama_preview.render_all(built, os.path.join(ROOT, 'docs', 'screenshots', 'themes_alta_gama'))
+        out = os.path.join(ROOT, 'docs', 'screenshots', 'themes_alta_gama')
+        pro = {k: v for k, v in built.items() if k.startswith(('Pro ', 'Noche'))}
+        alta_gama_preview.render_all(pro, out, 'pro')
+        alta_gama_preview.render_all({k: v for k, v in built.items() if k not in pro}, out, 'estilos')
 
 
 if __name__ == '__main__':
