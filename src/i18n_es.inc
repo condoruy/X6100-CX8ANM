@@ -1326,4 +1326,4 @@
 { "Choose a station first", "Primero elegí una emisora" },
 { "Removed from favorites", "Quitada de favoritas" },
 { "Added to favorites", "Agregada a favoritas" },
-{ "Station or genre (\"pais AR\": another country)", "Emisora o género (\"pais AR\": otro país)" },
+{ "Station, genre, \"pais AR\" or a stream address (http://...)", "Emisora, género, \"pais AR\" o una dirección (http://...)" },

@@ -1311,6 +1311,111 @@ def delete_cw_message(dbcon, id):
     return read_cw_messages(dbcon)
 
 
+# ---------- Radio por Internet: las favoritas de la app (src/dialog_iradio.c) ----------
+# /mnt/iradio/favorites.tsv: nombre <TAB> dirección <TAB> formato <TAB> kbps <TAB> país, una por línea
+
+IRADIO_FAV_MAX = 150
+
+
+def iradio_file():
+    return os.path.join(settings.FILEBROWSER_PATH or "/mnt", "iradio", "favorites.tsv")
+
+
+def read_iradio():
+    out = []
+    try:
+        with open(iradio_file(), encoding="utf-8", errors="replace") as f:
+            for line in f:
+                p = line.rstrip("\r\n").split("\t")
+                if len(p) >= 2 and p[0] and p[1].startswith(("http://", "https://")):
+                    p += [""] * (5 - len(p))
+                    out.append({"name": p[0], "url": p[1], "codec": p[2], "kbps": p[3], "cc": p[4]})
+    except OSError:
+        pass
+    return out
+
+
+def write_iradio(items):
+    path = iradio_file()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        for s in items:
+            f.write("\t".join([s["name"], s["url"], s["codec"], s["kbps"], s["cc"]]) + "\n")
+    os.replace(tmp, path)
+    os.sync()
+
+
+def iradio_entry():
+    data = bottle.request.json if isinstance(bottle.request.json, dict) else {}
+    clean = lambda v, n: " ".join(str(v or "").replace("\t", " ").split())[:n]
+    s = {"name": clean(data.get("name"), 60), "url": clean(data.get("url"), 250).replace(" ", "%20"),
+         "codec": clean(data.get("codec"), 8).upper(), "kbps": clean(data.get("kbps"), 6), "cc": clean(data.get("cc"), 2).upper()}
+    if not s["url"].lower().startswith(("http://", "https://")):
+        raise ValueError("La dirección tiene que empezar con http:// o https://")
+    if not s["name"]:
+        raise ValueError("Falta el nombre de la emisora")
+    if s["kbps"] and not s["kbps"].isdigit():
+        raise ValueError("Los kbps son un número (por ejemplo 128)")
+    return s
+
+
+@app.route('/iradio')
+def iradio_page():
+    return bottle.template('iradio')
+
+
+@app.get('/api/iradio')
+def get_iradio():
+    return {"stations": read_iradio(), "max": IRADIO_FAV_MAX}
+
+
+@app.post('/api/iradio')
+def add_iradio():
+    try:
+        s = iradio_entry()
+        items = read_iradio()
+        if any(x["url"] == s["url"] for x in items):
+            raise ValueError("Esa dirección ya está en las favoritas")
+        if len(items) >= IRADIO_FAV_MAX:
+            raise ValueError("Ya hay %d favoritas: quite alguna" % IRADIO_FAV_MAX)
+        items.append(s)
+        write_iradio(items)
+    except ValueError as ex:
+        return api_error(400, str(ex))
+    except OSError as ex:
+        return api_error(500, f"No se pudo guardar: {ex}")
+    return get_iradio()
+
+
+@app.put('/api/iradio/<i:int>')
+def set_iradio(i):
+    try:
+        s = iradio_entry()
+        items = read_iradio()
+        if not 0 <= i < len(items):
+            raise ValueError("Esa emisora ya no está (recargue la página)")
+        items[i] = s
+        write_iradio(items)
+    except ValueError as ex:
+        return api_error(400, str(ex))
+    except OSError as ex:
+        return api_error(500, f"No se pudo guardar: {ex}")
+    return get_iradio()
+
+
+@app.delete('/api/iradio/<i:int>')
+def delete_iradio(i):
+    try:
+        items = read_iradio()
+        if 0 <= i < len(items):
+            del items[i]
+            write_iradio(items)
+    except OSError as ex:
+        return api_error(500, f"No se pudo guardar: {ex}")
+    return get_iradio()
+
+
 def read_channels():
     """Valid channels from channels.json; invalid ones are skipped like the GUI does."""
     try:

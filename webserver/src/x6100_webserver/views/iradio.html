@@ -1,0 +1,86 @@
+% rebase('base.html', title='Radio por Internet')
+<h2><svg class="i"><use href="#i-speaker"/></svg>Radio por Internet</h2>
+<p class="sub">Las emisoras favoritas de APP &rarr; Radio Internet. Agregá una con su nombre y la dirección del audio
+(la que termina en .mp3, .aac, .pls o .m3u, o la que da la página de la emisora para "escuchar en otro reproductor").
+La radio las muestra la próxima vez que pasás por Favoritas con la tecla Lista.</p>
+
+<section class="dp-card">
+<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-speaker"/></svg></span><div><h3>Favoritas</h3><p id="count"></p></div><div class="dp-x"><button id="add" class="primary"><svg class="i"><use href="#i-plus"/></svg>Agregar</button></div></div>
+<div class="dp-body tbl">
+<div class="table-wrap">
+<table id="stations">
+  <thead>
+    <tr><th>Nombre</th><th>Dirección</th><th>Formato</th><th>kbps</th><th>País</th><th></th></tr>
+  </thead>
+  <tbody></tbody>
+</table>
+</div>
+<div class="actions"><span class="status" id="status"></span></div>
+</div>
+</section>
+
+<script>
+var showStatus = function(text, error=false) {
+  const el = $("#status");
+  el.toggleClass("error", error);
+  el.html('<span class="dot"></span>').append(document.createTextNode(text));
+}
+
+var button = function(cls, icon, title) {
+  return $("<button class='action'>").addClass(cls).attr("title", title).append($("<i>").addClass(icon));
+}
+
+var call = function(type, url, payload) {
+  $.ajax({
+    url: url,
+    type: type,
+    data: payload ? JSON.stringify(payload) : undefined,
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    success: function(r) { render(r); showStatus("Guardado"); },
+    error: function(xhr) { showStatus(xhr.responseJSON ? xhr.responseJSON.msg : "No se pudo guardar", true); }
+  });
+}
+
+var input = function(cls, value, max, ph, width) {
+  return $("<input autocomplete='off'>").addClass(cls).attr("maxlength", max).attr("placeholder", ph)
+    .val(value || "").css("width", width);
+}
+
+// i es null para una nueva, todavía sin guardar
+var stationRow = function(s, i) {
+  const row = $("<tr>");
+  const name = input("name", s.name, 60, "Radio Ejemplo", "100%");
+  const url = input("url", s.url, 250, "https://...", "100%");
+  const codec = input("codec", s.codec, 8, "MP3", "5em");
+  const kbps = input("kbps", s.kbps, 6, "128", "4em");
+  const cc = input("cc", s.cc, 2, "UY", "3em");
+  row.append($("<td>").css("min-width", "12em").append(name), $("<td>").css("width", "60%").append(url),
+             $("<td>").append(codec), $("<td>").append(kbps), $("<td>").append(cc));
+  const actions = $("<td class='action-cell'>").appendTo(row);
+  actions.append(button("save", "si-disk", "Guardar").on("click", function() {
+    const d = {name: name.val(), url: url.val().trim(), codec: codec.val(), kbps: kbps.val(), cc: cc.val()};
+    if (i === null) call("POST", "/api/iradio", d);
+    else call("PUT", "/api/iradio/" + i, d);
+  }));
+  actions.append(" ", button("remove", "si-trash", "Quitar").on("click", function() {
+    if (i === null) row.remove();
+    else call("DELETE", "/api/iradio/" + i);
+  }));
+  return row;
+}
+
+var render = function(data) {
+  const body = $("#stations>tbody").empty();
+  data.stations.forEach(function(s, i) { body.append(stationRow(s, i)); });
+  $("#count").text(data.stations.length + " de " + data.max);
+}
+
+$("#add").on("click", function() {
+  const row = stationRow({}, null);
+  $("#stations>tbody").append(row);
+  row.find("input.name").focus();
+});
+
+$.get('/api/iradio', {}, render);
+</script>

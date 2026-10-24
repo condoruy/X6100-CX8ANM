@@ -541,6 +541,26 @@ static bool search_ok_cb(void) {
     const char *t = textarea_window_get();
     char        clean[48];
 
+    /* Una dirección (http://...): va directo a las favoritas, con el nombre del servidor */
+    if (t && (!strncasecmp(t, "http://", 7) || !strncasecmp(t, "https://", 8)) && !strpbrk(t, " \t\n'\"")) {
+        static station_t favs[MAX_ST];
+        station_t        st = {0};
+        const char      *host = strstr(t, "//") + 2;
+        int              n    = load_favs(favs, MAX_ST);
+
+        snprintf(st.url, sizeof(st.url), "%s", t);
+        snprintf(st.name, sizeof(st.name), "%.*s", (int)strcspn(host, "/:?"), host);
+        if (n < MAX_ST && !is_fav(st.url)) {
+            favs[n++] = st;
+            save_favs(favs, n);
+        }
+        msg_update_text_fmt("%s: %s", tr("Added to favorites"), st.name);
+        kind = L_FAV;
+        lv_group_add_obj(keyboard_group, table);
+        lv_group_set_editing(keyboard_group, true);
+        load_list();
+        return true;
+    }
     safe_text(t ? t : "", clean, sizeof(clean));
     /* "pais AR": las emisoras de otro país (código de dos letras) */
     if ((!strncasecmp(clean, "pais ", 5) || !strncasecmp(clean, "país ", 6) || !strncasecmp(clean, "country ", 8))) {
@@ -578,7 +598,7 @@ static bool search_cancel_cb(void) {
 static void search_cb(button_data_t *b) {
     (void)b;
     lv_group_remove_obj(table);
-    textarea_window_open_w_label(search_ok_cb, search_cancel_cb, tr("Station or genre (\"pais AR\": another country)"));
+    textarea_window_open_w_label(search_ok_cb, search_cancel_cb, tr("Station, genre, \"pais AR\" or a stream address (http://...)"));
     textarea_window_set(query);
 }
 

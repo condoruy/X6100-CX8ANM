@@ -147,5 +147,8 @@ Vistas previas aproximadas: `docs/screenshots/themes_alta_gama/pro.png` y `estil
 - El volumen es el de siempre. Suena por el parlante o por los auriculares Bluetooth si están conectados.
 - Al transmitir (PTT) la emisora se corta: nunca sale al aire. Al cerrar la aplicación se detiene.
 - Necesita WiFi (o el celular como punto de acceso). Unos 60 MB por hora a 128 kbps.
+- **Agregar una emisora a mano:** en la página web, **Operación → Radio Internet** (o la ficha
+  *Radio por Internet* de la página principal): **Agregar**, nombre y dirección del audio, y guardar.
+  También desde la radio: en **Buscar** se escribe la dirección completa (`http://...`) y queda en Favoritas.
 - Las favoritas quedan en `/mnt/iradio/favorites.tsv` (nombre, dirección, formato, kbps, país; una por
-  línea, separadas por tabulador), y se pueden bajar desde la página web (Archivos > iradio).
+  línea, separadas por tabulador).
