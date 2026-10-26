@@ -50,3 +50,7 @@ void mem_save(uint16_t id);
 
 /* Proprietary temporary status/channel overlay. */
 void channel_overlay_show(const char *name);
+
+/* CX8ANM: la frecuencia actual a la lista de canales (V/M), y esa lista desde los botones */
+void main_screen_save_channel(void);
+void main_screen_open_channels(void);

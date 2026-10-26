@@ -73,6 +73,7 @@ typedef enum {
     ACTION_APP_JTTY,    /* 123, appended after OLIVIA */
     ACTION_APP_IRADIO,  /* 124, CX8ANM: radio por Internet */
     ACTION_APP_METEO,   /* 125, CX8ANM: estación meteorológica e INUMET */
+    ACTION_APP_CB,      /* 126, CX8ANM: canales de la Banda Ciudadana */
 } press_action_t;
 
 typedef enum {
@@ -206,6 +207,9 @@ typedef struct {
     params_bool_t        cluster_band_notify;   /* aviso de spots nuevos en la banda del VFO (dialog_cluster.c) */
     params_bool_t        power_save;    /* Modo ahorro (power_save.c) */
     params_bool_t        meteo_alerts;  /* alertas de INUMET en pantalla (meteo_alerts.c) */
+    params_bool_t        cb_knob;       /* en la CB la perilla salta de canal en canal (cb.c) */
+    params_uint8_t       cb_mode;       /* modo al ir a un canal CB: 0 AM, 1 FM, 2 USB, 3 LSB */
+    params_uint8_t       cb_band;       /* banda CB del app: 0 A ... 4 E (2: la oficial) */
     params_bool_t        clock_utc;     /* el reloj alterna hora local y UTC (clock.c) */
     params_bool_t        auto_log;      /* QSO guardados solos al mandar 73/SK (auto_log.c) */
     params_uint8_t       language;      /* LANG_EN, LANG_ES (i18n.h) */

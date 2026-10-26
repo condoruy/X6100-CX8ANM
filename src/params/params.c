@@ -122,6 +122,9 @@ params_t params = {
     .clock_utc             = { .x = true, .name="clock_utc"},
     .power_save            = { .x = false, .name="power_save"},
     .meteo_alerts          = { .x = true, .name="meteo_alerts"},
+    .cb_knob               = { .x = true, .name="cb_knob"},
+    .cb_mode               = { .x = 0, .name="cb_mode"},
+    .cb_band               = { .x = 2, .name="cb_band"},
     .cluster_band_notify   = { .x = true, .name="cluster_band_notify"},
 };
 
@@ -309,6 +312,9 @@ static bool params_load() {
         if (params_load_bool(&params.clock_utc, name, i)) continue;
         if (params_load_bool(&params.power_save, name, i)) continue;
         if (params_load_bool(&params.meteo_alerts, name, i)) continue;
+        if (params_load_bool(&params.cb_knob, name, i)) continue;
+        if (params_load_uint8(&params.cb_mode, name, i)) continue;
+        if (params_load_uint8(&params.cb_band, name, i)) continue;
         if (params_load_bool(&params.cluster_band_notify, name, i)) continue;
     }
 
@@ -444,6 +450,9 @@ static void params_save() {
     params_save_bool(&params.clock_utc);
     params_save_bool(&params.power_save);
     params_save_bool(&params.meteo_alerts);
+    params_save_bool(&params.cb_knob);
+    params_save_uint8(&params.cb_mode);
+    params_save_uint8(&params.cb_band);
     params_save_bool(&params.cluster_band_notify);
 
     sql_query_exec("COMMIT");

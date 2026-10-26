@@ -266,6 +266,31 @@ static int _8_bands_region2() {
     return 0;   /* nunca impide arrancar */
 }
 
+/* CX8ANM: las bandas CB con sus 40 canales enteros (A 26.065 ... D 27.855) y la E hasta 27.995
+ * (de ahí para arriba es 10 m); al entrar, AM en el canal 19. Solo si siguen como venían. */
+static int _9_cb_bands() {
+    int rc = sqlite3_exec(db,
+        "BEGIN;"
+        "UPDATE bands SET start_freq = 26065000, stop_freq = 26505000 WHERE id = 201 AND start_freq = 26055000 AND stop_freq = 26295000;"
+        "UPDATE bands SET stop_freq = 26955000 WHERE id = 202 AND start_freq = 26515000 AND stop_freq = 26745000;"
+        "UPDATE bands SET stop_freq = 27405000 WHERE id = 203 AND start_freq = 26965000 AND stop_freq = 27195000;"
+        "UPDATE bands SET stop_freq = 27855000 WHERE id = 204 AND start_freq = 27415000 AND stop_freq = 27645000;"
+        "INSERT OR IGNORE INTO bands(id, name, start_freq, stop_freq, type) VALUES (205, 'CB E', 27865000, 27995000, 1);"
+        "UPDATE band_params SET val = 26285000 WHERE bands_id = 201 AND name = 'vfoa_freq' AND val = 26055000;"
+        "INSERT OR IGNORE INTO band_params(bands_id, name, val) VALUES "
+            "(201, 'vfoa_freq', 26285000), (201, 'vfoa_mode', 6),"
+            "(202, 'vfoa_freq', 26735000), (202, 'vfoa_mode', 6),"
+            "(203, 'vfoa_freq', 27185000), (203, 'vfoa_mode', 6),"
+            "(204, 'vfoa_freq', 27635000), (204, 'vfoa_mode', 6),"
+            "(205, 'vfoa_freq', 27935000), (205, 'vfoa_mode', 6);"
+        "COMMIT;", NULL, NULL, NULL);
+    if (rc != SQLITE_OK) {
+        printf("Cannot update the CB bands: %s\n", sqlite3_errmsg(db));
+        sqlite3_exec(db, "ROLLBACK;", NULL, NULL, NULL);
+    }
+    return 0;   /* nunca impide arrancar */
+}
+
 static int (*migrations[])() = {
     _0_init_migrations,
     _1_create_ftx_table,
@@ -276,6 +301,7 @@ static int (*migrations[])() = {
     _6_add_wspr_presets,
     _7_add_ft2_presets,
     _8_bands_region2,
+    _9_cb_bands,
 };
 
 int migrations_apply(void) {

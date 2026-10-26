@@ -369,6 +369,7 @@ static button_data_t btn_field   = make_app_btn("Field\nOps", ACTION_APP_FIELD);
 static button_data_t btn_bands   = make_app_btn("Bands", ACTION_APP_BANDS);
 static button_data_t btn_iradio  = make_app_btn("Internet\nRadio", ACTION_APP_IRADIO);
 static button_data_t btn_meteo   = make_app_btn("Weather", ACTION_APP_METEO);
+static button_data_t btn_cb      = make_app_btn("CB\nChannels", ACTION_APP_CB);
 
 /* RTTY */
 extern buttons_page_t buttons_page_rtty;
@@ -447,14 +448,23 @@ static buttons_page_t page_mfk_3 = {
 
 /* MEM pages */
 
-static button_data_t btn_mem_p1 = make_page_btn("(MEM 1:2)");
-static button_data_t btn_mem_p2 = make_page_btn("(MEM 2:2)");
+static button_data_t btn_mem_p1 = make_page_btn("(MEM 1:3)");
+static button_data_t btn_mem_p2 = make_page_btn("(MEM 2:3)");
+static button_data_t btn_mem_p3 = make_page_btn("(MEM 3:3)");
+/* CX8ANM: la lista de canales de memoria (100, con nombre) desde el panel, no solo desde el micrófono */
+static button_data_t btn_ch_save = {.type = BTN_TEXT, .label = "Save\nchannel",
+                                    .press = [](button_data_t *) { main_screen_save_channel(); }};
+static button_data_t btn_ch_list = {.type = BTN_TEXT, .label = "Channel\nlist",
+                                    .press = [](button_data_t *) { main_screen_open_channels(); }};
 
 static buttons_page_t page_mem_1 = {
     {&btn_mem_p1, &btn_mem_1, &btn_mem_2, &btn_mem_3, &btn_mem_4}
 };
 static buttons_page_t page_mem_2 = {
     {&btn_mem_p2, &btn_mem_5, &btn_mem_6, &btn_mem_7, &btn_mem_8}
+};
+static buttons_page_t page_mem_3 = {
+    {&btn_mem_p3, &btn_ch_save, &btn_ch_list, &btn_cb}
 };
 
 /* KEY pages */
@@ -514,9 +524,10 @@ static buttons_page_t page_dfl_1 = {
 };
 
 /* App pages */
-static button_data_t btn_app_p1 = make_page_btn("(APP 1:3)");
-static button_data_t btn_app_p2 = make_page_btn("(APP 2:3)");
-static button_data_t btn_app_p3 = make_page_btn("(APP 3:3)");
+static button_data_t btn_app_p1 = make_page_btn("(APP 1:4)");
+static button_data_t btn_app_p2 = make_page_btn("(APP 2:4)");
+static button_data_t btn_app_p3 = make_page_btn("(APP 3:4)");
+static button_data_t btn_app_p4 = make_page_btn("(APP 4:4)");
 
 /* The digital mode apps are in the Modes menu. */
 static buttons_page_t page_app_1 = {
@@ -527,6 +538,9 @@ static buttons_page_t page_app_2 = {
 };
 static buttons_page_t page_app_3 = {
     {&btn_app_p3, &btn_bands, &btn_gps, &btn_screen_rec, &btn_meteo}   /* the MFK 3:3 one too */
+};
+static buttons_page_t page_app_4 = {
+    {&btn_app_p4, &btn_cb}
 };
 
 /* RTTY */
@@ -550,6 +564,7 @@ buttons_group_t buttons_group_app = {
     &page_app_1,
     &page_app_2,
     &page_app_3,
+    &page_app_4,
 };
 
 buttons_group_t buttons_group_key = {
@@ -572,6 +587,7 @@ buttons_group_t buttons_group_dfl = {
 buttons_group_t buttons_group_vm = {
     &page_mem_1,
     &page_mem_2,
+    &page_mem_3,
 };
 
 static struct {

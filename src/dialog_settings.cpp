@@ -983,6 +983,7 @@ static action_items_t long_action_items[] = {
     { .label = " APP Bands ", .action = ACTION_APP_BANDS },
     { .label = " APP Internet radio ", .action = ACTION_APP_IRADIO },
     { .label = " APP Weather ", .action = ACTION_APP_METEO },
+    { .label = " APP CB channels ", .action = ACTION_APP_CB },
     { .label = " APP RX recorder ", .action = ACTION_APP_RECORDER },
     { .label = " APP SWR Scan ", .action = ACTION_APP_SWRSCAN },
     { .label = " APP GPS ", .action = ACTION_APP_GPS },

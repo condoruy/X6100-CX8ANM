@@ -1480,3 +1480,18 @@ No data: Update (needs WiFi)	Sin datos: Actualizar (necesita WiFi)
 updating...	actualizando...
 updated	actualizado
 No data: is WiFi connected?	Sin datos: ¿hay WiFi?
+
+## Banda Ciudadana y canales de memoria (CX8ANM)
+CB\nChannels	Canales\nCB
+APP CB channels	APP Canales CB
+CB BAND	BANDA CB
+Knob	Perilla
+Go	Ir
+Channel	Canal
+channels	canales
+free	libre
+Save\nchannel	Guardar\ncanal
+Channel\nlist	Lista\ncanales
+Main knob on CB	Perilla principal en la CB
+channel by channel	canal por canal
+free tuning	sintonía libre

@@ -52,6 +52,8 @@
 #include "dialog_navtex.h"
 #include "dialog_iradio.h"
 #include "dialog_meteo.h"
+#include "dialog_cb.h"
+#include "cb.h"
 #include "dialog_js8.h"
 #include "dialog_psk.h"
 #include "dialog_olivia.h"
@@ -462,8 +464,15 @@ static void broadcast_overlay_save_channel(void) {
     }
 
     uint16_t count = channels_count();
+    char     cb_label[24];
 
-    if (have_match && count > 0) {
+    /* CX8ANM: en un canal de la CB, el canal guardado se llama "CB C-19" */
+    if (!have_match && count > 0 && cb_name(cparam_i_get(cfg_fg_freq), cb_label, sizeof(cb_label))) {
+        if (channels_set_name(count - 1, cb_label)) {
+            snprintf(match.station, sizeof(match.station), "%s", cb_label);
+            have_match = true;
+        }
+    } else if (have_match && count > 0) {
         if (!channels_set_name(count - 1, match.station)) {
             /* channels_add_current() has already saved the new record with
              * an empty name. Remove it again if assigning the station name
@@ -508,6 +517,15 @@ static void broadcast_overlay_save_channel(void) {
 
         channel_overlay_show(message);
     }
+}
+
+/* CX8ANM: desde los botones (V/M, CB): guardar la frecuencia actual y abrir la lista de canales */
+void main_screen_save_channel(void) {
+    broadcast_overlay_save_channel();
+}
+
+void main_screen_open_channels(void) {
+    dialog_construct(dialog_channels, obj);
 }
 
 // Observers functions
@@ -604,6 +622,7 @@ static const char *app_name(press_action_t a) {
         case ACTION_APP_JTTY:       return "JTTY";
         case ACTION_APP_IRADIO:     return "Internet Radio";
         case ACTION_APP_METEO:      return "Weather";
+        case ACTION_APP_CB:         return "CB";
         default:                    return NULL;    /* Modes menu: a menu, not an app */
     }
 }
@@ -767,6 +786,10 @@ void main_screen_start_app(press_action_t app_action) {
             dialog_construct(dialog_meteo, obj);
             break;
 
+        case ACTION_APP_CB:
+            dialog_construct(dialog_cb, obj);
+            break;
+
         default:
             break;
     }
@@ -875,6 +898,7 @@ void main_screen_action(press_action_t action) {
         case ACTION_APP_JTTY:
         case ACTION_APP_IRADIO:
         case ACTION_APP_METEO:
+        case ACTION_APP_CB:
             main_screen_start_app(action);
             break;
 
@@ -1555,6 +1579,17 @@ static void freq_shift(int16_t diff, uint16_t dt) {
         return;
     }
     snap_hold = 0;
+
+    /* CX8ANM: en la CB, con el modo canales, la perilla salta de canal en canal */
+    if (params.cb_knob.x && cb_in_range(old)) {
+        char name[24];
+        freq = cb_step(old, diff > 0 ? 1 : -1);
+        if (freq != old) {
+            cparam_i_set(cfg_fg_freq, freq);
+            if (cb_name(freq, name, sizeof(name))) channel_overlay_show(name);
+        }
+        return;
+    }
 
     int32_t df = diff * param_i_get(cfg_mode_freq_step) * freq_accel(dt);
     freq = align_int(freq + df, abs(df));

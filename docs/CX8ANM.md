@@ -177,3 +177,26 @@ posición; para fijarlo a mano, el archivo `/mnt/meteo/departamento` con el nomb
 
 INUMET no tiene una API publicada: se usan los mismos datos públicos que alimentan su sitio
 (como hace el visor libre clima-uy). Si INUMET cambia su sitio, puede dejar de andar hasta corregirlo.
+
+## Banda Ciudadana (CB) por canales
+
+**APP → página 4 → Canales CB** (también en **V/M → página 3**).
+
+- La lista muestra los 40 canales de la banda elegida, con su frecuencia. El 9 es emergencias y el 19 rutas y viajeros.
+  **Banda** pasa por A, B, C (la oficial, 26.965–27.405 MHz), D y E.
+- Con la perilla MFK se elige el canal; al apretarla (o **Ir**) la radio va al canal en el **modo
+  predeterminado**. **Modo** lo cambia: AM, FM, USB o LSB. Después el modo se cambia como siempre.
+- **Perilla**: *canales* hace que en la CB la perilla principal salte de canal en canal (y muestra
+  "CB C-19"); *libre* sintoniza normal. Nunca actúa en 10 m (desde 28.000 MHz).
+- Las bandas CB del cambio de banda ahora cubren los 40 canales enteros y entran en AM en el canal 19.
+
+## Guardar cualquier frecuencia en memoria
+
+**V/M → página 3**:
+
+- **Guardar canal**: la frecuencia, el modo, AGC, PRE y ATT de ahora quedan en la lista de canales de
+  memoria (hasta 100). En un canal CB se guarda con el nombre "CB C-19"; en una emisora conocida, con
+  su nombre.
+- **Lista canales**: la lista para volver a cualquiera (MFK elige, apretar va), renombrar o borrar.
+  También se editan en la web, en **Memorias**.
+- Las 8 memorias rápidas de siempre siguen en las páginas 1 y 2 de V/M.
