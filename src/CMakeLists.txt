@@ -16,6 +16,8 @@ target_sources(${PROJECT_NAME} PUBLIC
     dialog_wefax.c
     dialog_navtex.c
     dialog_iradio.c
+    dialog_meteo.c
+    meteo_alerts.c
     dialog_js8.c
     dialog_psk.c psk_rx.c psk_tx.c psk_spec.c psk_macro.c digi_qso.c
     dialog_olivia.c olivia.c olivia_app.c olivia_demod.c olivia_macro.c olivia_mod.c olivia_resamp.c

@@ -121,6 +121,7 @@ params_t params = {
     .auto_log              = { .x = true, .name="auto_log"},
     .clock_utc             = { .x = true, .name="clock_utc"},
     .power_save            = { .x = false, .name="power_save"},
+    .meteo_alerts          = { .x = true, .name="meteo_alerts"},
     .cluster_band_notify   = { .x = true, .name="cluster_band_notify"},
 };
 
@@ -307,6 +308,7 @@ static bool params_load() {
         if (params_load_bool(&params.auto_log, name, i)) continue;
         if (params_load_bool(&params.clock_utc, name, i)) continue;
         if (params_load_bool(&params.power_save, name, i)) continue;
+        if (params_load_bool(&params.meteo_alerts, name, i)) continue;
         if (params_load_bool(&params.cluster_band_notify, name, i)) continue;
     }
 
@@ -441,6 +443,7 @@ static void params_save() {
     params_save_bool(&params.auto_log);
     params_save_bool(&params.clock_utc);
     params_save_bool(&params.power_save);
+    params_save_bool(&params.meteo_alerts);
     params_save_bool(&params.cluster_band_notify);
 
     sql_query_exec("COMMIT");

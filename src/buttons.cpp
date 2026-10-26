@@ -368,6 +368,7 @@ static button_data_t btn_cwt     = make_app_btn("CW\nTrainer", ACTION_APP_CWTRAI
 static button_data_t btn_field   = make_app_btn("Field\nOps", ACTION_APP_FIELD);
 static button_data_t btn_bands   = make_app_btn("Bands", ACTION_APP_BANDS);
 static button_data_t btn_iradio  = make_app_btn("Internet\nRadio", ACTION_APP_IRADIO);
+static button_data_t btn_meteo   = make_app_btn("Weather", ACTION_APP_METEO);
 
 /* RTTY */
 extern buttons_page_t buttons_page_rtty;
@@ -525,7 +526,7 @@ static buttons_page_t page_app_2 = {
     {&btn_app_p2, &btn_settings, &btn_cwt, &btn_field, &btn_iradio}
 };
 static buttons_page_t page_app_3 = {
-    {&btn_app_p3, &btn_bands, &btn_gps, &btn_screen_rec}   /* the MFK 3:3 one too */
+    {&btn_app_p3, &btn_bands, &btn_gps, &btn_screen_rec, &btn_meteo}   /* the MFK 3:3 one too */
 };
 
 /* RTTY */

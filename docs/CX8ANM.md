@@ -152,3 +152,28 @@ Vistas previas aproximadas: `docs/screenshots/themes_alta_gama/pro.png` y `estil
   También desde la radio: en **Buscar** se escribe la dirección completa (`http://...`) y queda en Favoritas.
 - Las favoritas quedan en `/mnt/iradio/favorites.tsv` (nombre, dirección, formato, kbps, país; una por
   línea, separadas por tabulador).
+
+## Estación meteorológica y alertas de INUMET
+
+**APP → (página 3) → Meteo.** Necesita WiFi. Se actualiza al abrir y cada 10 minutos (o con **Actualizar**).
+
+- **Ahora**: temperatura, cielo, sensación térmica, mínima y máxima del día, humedad, punto de rocío,
+  presión con su tendencia de 3 horas (↑ sube, ↓ baja, = estable), viento y dirección, ráfagas,
+  lluvia de la última hora y de 24 h, visibilidad, nubosidad, índice UV, salida y puesta del sol,
+  mínima y máxima de las últimas 24 h y la probabilidad de lluvia de mañana. Abajo, la alerta vigente.
+- **Pronóstico**: 5 días (máxima, mínima, cielo, probabilidad y milímetros de lluvia, viento) y el texto
+  de INUMET para la zona (hoy y mañana, mañana y tarde/noche).
+- **Alertas**: todas las advertencias de INUMET vigentes, primero las del departamento.
+- La perilla MFK pasa de una vista a otra; las flechas mueven el texto largo.
+
+Los valores medidos son de la **estación de INUMET más cercana** con datos de las últimas 3 horas
+(su nombre, distancia y hora se ven a la izquierda). Lo que INUMET no publica (cielo, nubes, UV, sol,
+pronóstico por días) sale de **Open-Meteo**. La posición es la del GPS si tiene, si no la del locator QTH.
+
+**Alertas en pantalla**: con WiFi, cada 15 minutos la radio consulta las advertencias de INUMET. Una nueva
+para tu departamento aparece en un recuadro del color de la alerta (amarilla, naranja, roja) durante un
+minuto, una sola vez. Se apaga en **Ajustes → Info → Alertas de INUMET**. El departamento sale de la
+posición; para fijarlo a mano, el archivo `/mnt/meteo/departamento` con el nombre (por ejemplo `CANELONES`).
+
+INUMET no tiene una API publicada: se usan los mismos datos públicos que alimentan su sitio
+(como hace el visor libre clima-uy). Si INUMET cambia su sitio, puede dejar de andar hasta corregirlo.

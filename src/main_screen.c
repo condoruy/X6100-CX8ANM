@@ -51,6 +51,7 @@
 #include "dialog_wefax.h"
 #include "dialog_navtex.h"
 #include "dialog_iradio.h"
+#include "dialog_meteo.h"
 #include "dialog_js8.h"
 #include "dialog_psk.h"
 #include "dialog_olivia.h"
@@ -602,6 +603,7 @@ static const char *app_name(press_action_t a) {
         case ACTION_APP_OLIVIA:     return "Olivia";
         case ACTION_APP_JTTY:       return "JTTY";
         case ACTION_APP_IRADIO:     return "Internet Radio";
+        case ACTION_APP_METEO:      return "Weather";
         default:                    return NULL;    /* Modes menu: a menu, not an app */
     }
 }
@@ -761,6 +763,10 @@ void main_screen_start_app(press_action_t app_action) {
             dialog_construct(dialog_iradio, obj);
             break;
 
+        case ACTION_APP_METEO:
+            dialog_construct(dialog_meteo, obj);
+            break;
+
         default:
             break;
     }
@@ -868,6 +874,7 @@ void main_screen_action(press_action_t action) {
         case ACTION_APP_OLIVIA:
         case ACTION_APP_JTTY:
         case ACTION_APP_IRADIO:
+        case ACTION_APP_METEO:
             main_screen_start_app(action);
             break;
 

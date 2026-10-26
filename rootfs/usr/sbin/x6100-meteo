@@ -1,0 +1,462 @@
+#!/usr/bin/env python3
+# CX8ANM: estación meteorológica y alertas de INUMET en el X6100.
+#
+#   x6100-meteo update LAT LON   todo (observación INUMET más cercana, Open-Meteo, pronóstico, alertas)
+#                                en /tmp/x6100-meteo.json; imprime "ok" o "error <motivo>"
+#   x6100-meteo alerts LAT LON   solo las alertas, en /tmp/x6100-meteo-alerts.json; imprime "ok <n mías>"
+#
+# INUMET no tiene una API documentada: se usan los mismos datos públicos que alimentan su sitio
+# (observaciones, pronóstico por zona y las advertencias embebidas en /alerta). Lo que INUMET no da
+# (UV, nubosidad, estado del cielo, salida y puesta del sol, probabilidad de lluvia) sale de Open-Meteo.
+import json
+import math
+import os
+import re
+import sys
+import time
+import unicodedata
+import urllib.parse
+import urllib.request
+
+OUT = "/tmp/x6100-meteo.json"
+OUT_ALERTS = "/tmp/x6100-meteo-alerts.json"
+UA = "X6100-CX8ANM/1.0 (radio de radioaficionado, datos publicos de INUMET)"
+INUMET = "https://www.inumet.gub.uy"
+OBS = INUMET + "/reportes/estadoActual/datos_inumet_ui_publica.mch"
+FORECAST = INUMET + "/reportes/pronosticos/pronosticoV4.json"
+OPEN_METEO = "https://api.open-meteo.com/v1/forecast"
+KNOT = 1.852
+_ssl_ctx = None
+
+
+class Fail(Exception):
+    pass
+
+
+def ssl_context():
+    global _ssl_ctx
+    if _ssl_ctx is None:
+        try:
+            import ssl
+        except ImportError:
+            raise Fail("Python sin SSL (actualice el firmware)")
+        _ssl_ctx = ssl.create_default_context()
+        for ca in ("/etc/ssl/certs/ca-certificates.crt", "/etc/ssl/cert.pem"):
+            if os.path.exists(ca):
+                _ssl_ctx.load_verify_locations(ca)
+                break
+    return _ssl_ctx
+
+
+def get(url, text=False, tries=2):
+    last = None
+    for i in range(tries):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": UA,
+                                                       "Accept": "text/html" if text else "application/json"})
+            with urllib.request.urlopen(req, timeout=25, context=ssl_context()) as r:
+                data = r.read()
+            return data.decode("utf-8", "replace") if text else json.loads(data.decode("utf-8", "replace"))
+        except Fail:
+            raise
+        except Exception as e:      # INUMET parpadea: un reintento
+            last = e
+            time.sleep(2)
+    raise Fail(" ".join(str(getattr(last, "reason", None) or last).split())[:60])
+
+
+def num(v):
+    if v is None or v == "":
+        return None
+    try:
+        n = float(str(v).replace(",", "."))
+    except ValueError:
+        return None     # "TRAZA"
+    return n if math.isfinite(n) else None
+
+
+def hhmm(iso):
+    m = re.search(r"T?(\d{2}):(\d{2})", str(iso or ""))
+    return f"{m.group(1)}:{m.group(2)}" if m else ""
+
+
+def dist_km(lat1, lon1, lat2, lon2):
+    r = math.pi / 180
+    a = math.sin((lat2 - lat1) * r / 2) ** 2 + math.cos(lat1 * r) * math.cos(lat2 * r) * math.sin((lon2 - lon1) * r / 2) ** 2
+    return 12742 * math.asin(math.sqrt(min(1, a)))
+
+
+CARD = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO"]
+
+
+def cardinal(deg):
+    return None if deg is None else CARD[int(round((deg % 360) / 22.5)) % 16]
+
+
+def feels(t, hr, kmh):
+    if t is None:
+        return None
+    if kmh is not None and t <= 10 and kmh >= 5:
+        v = kmh ** 0.16
+        return round(13.12 + 0.6215 * t - 11.37 * v + 0.3965 * t * v, 1)
+    if hr is not None and t >= 27 and hr >= 40:
+        f = t * 9 / 5 + 32
+        hi = (-42.379 + 2.04901523 * f + 10.14333127 * hr - 0.22475541 * f * hr - 6.83783e-3 * f * f
+              - 5.481717e-2 * hr * hr + 1.22874e-3 * f * f * hr + 8.5282e-4 * f * hr * hr - 1.99e-6 * f * f * hr * hr)
+        return round((hi - 32) * 5 / 9, 1)
+    return t
+
+
+# ---------- departamentos (para saber qué alertas son "mías") ----------
+DEPTS = [("ARTIGAS", "Artigas", -30.6, -56.9), ("SALTO", "Salto", -31.4, -57.0), ("PAYSANDU", "Paysandú", -32.1, -57.3),
+         ("RIO NEGRO", "Río Negro", -32.7, -57.4), ("SORIANO", "Soriano", -33.4, -57.8), ("COLONIA", "Colonia", -34.2, -57.6),
+         ("SAN JOSE", "San José", -34.3, -56.8), ("MONTEVIDEO", "Montevideo", -34.84, -56.18),
+         ("CANELONES", "Canelones", -34.6, -55.9), ("MALDONADO", "Maldonado", -34.6, -54.9), ("ROCHA", "Rocha", -34.1, -54.0),
+         ("TREINTA Y TRES", "Treinta y Tres", -33.1, -54.3), ("CERRO LARGO", "Cerro Largo", -32.4, -54.4),
+         ("RIVERA", "Rivera", -31.5, -55.4), ("TACUAREMBO", "Tacuarembó", -31.9, -55.9), ("DURAZNO", "Durazno", -33.1, -56.2),
+         ("FLORES", "Flores", -33.6, -56.9), ("FLORIDA", "Florida", -33.9, -55.9), ("LAVALLEJA", "Lavalleja", -33.8, -55.0)]
+
+
+def norm(s):
+    s = unicodedata.normalize("NFD", str(s or ""))
+    return "".join(c for c in s if unicodedata.category(c) != "Mn").upper().strip()
+
+
+def my_dept(lat, lon):
+    try:     # elegido a mano (página web o archivo)
+        with open("/mnt/meteo/departamento") as f:
+            want = norm(f.read())
+        for d in DEPTS:
+            if d[0] == want:
+                return d
+    except OSError:
+        pass
+    return min(DEPTS, key=lambda d: dist_km(lat, lon, d[2], d[3]))
+
+
+# ---------- alertas ----------
+LEVELS = {2: "amarilla", 3: "naranja", 4: "roja"}
+
+
+def extract_var(html, name):
+    m = re.search(r"var\s+" + name + r"\s*=\s*", html)
+    if not m or html[m.end():m.end() + 1] != "{":
+        return None
+    i = m.end()
+    depth, in_str, esc = 0, False, False
+    for k in range(i, len(html)):
+        c = html[k]
+        if esc:
+            esc = False
+            continue
+        if c == "\\":
+            esc = True
+            continue
+        if c == '"':
+            in_str = not in_str
+            continue
+        if in_str:
+            continue
+        if c == "{":
+            depth += 1
+        elif c == "}":
+            depth -= 1
+            if depth == 0:
+                try:
+                    return json.loads(html[i:k + 1])
+                except ValueError:
+                    return None
+    return None
+
+
+def split_zones(text):
+    out = []
+    for block in re.split(r"(?<=[.)])\s*,?\s*(?=[A-ZÁÉÍÓÚÑ][A-Za-zÁ-Úá-úñ]*(?:\s+[A-Za-zÁ-Úá-úñ]+)*\s*[:(])", text or ""):
+        m = re.match(r"^\s*([^:(]+?)\s*[:(]\s*(.*)$", block, re.S)
+        name = (m.group(1) if m else block).strip().rstrip(".,")
+        if name:
+            out.append(name)
+    return out
+
+
+def zones_of(a):
+    if isinstance(a.get("zonasArray"), list) and a["zonasArray"]:
+        return [str(z.get("label") or z.get("id") or "") for z in a["zonasArray"] if isinstance(z, dict)]
+    return split_zones(a.get("zonas"))
+
+
+PHEN = {"viento": "viento", "lluvia": "lluvia", "tormenta": "tormentas", "calor": "calor", "frio": "frío",
+        "niebla": "niebla", "granizo": "granizo", "nieve": "nieve"}
+
+
+def parse_alerts(html, dept_id):
+    out = []
+    for name in ("aviso", "alerta"):
+        d = extract_var(html, name)
+        if not isinstance(d, dict) or d.get("inactivo") or not isinstance(d.get("advertencias"), list):
+            continue
+        for a in d["advertencias"]:
+            if not isinstance(a, dict):
+                continue
+            risks = a.get("riesgoFenomeno") if isinstance(a.get("riesgoFenomeno"), dict) else {}
+            vals = [int(n) for n in (num(v) for v in risks.values()) if n is not None]
+            level = max(vals) if vals else 0
+            phen = [PHEN.get(k.replace("riesgo", "").lower(), k.replace("riesgo", "").lower())
+                    for k, v in sorted(risks.items(), key=lambda kv: -(num(kv[1]) or 0)) if (num(v) or 0) > 1]
+            zones = zones_of(a)
+            out.append({
+                "kind": "aviso" if name == "aviso" else "advertencia",
+                "level": level if level in LEVELS else 0,
+                "color": LEVELS.get(level, ""),
+                "fenomeno": " ".join(str(a.get("fenomeno") or ", ".join(phen) or "").split()),
+                "desc": " ".join(str(a.get("descripcion") or "").split()),
+                "prob": " ".join(str(a.get("probabilidad") or "").split()),
+                "zones": ", ".join(zones),
+                "from": str(a.get("comienzo") or ""),
+                "to": str(a.get("finalizacion") or ""),
+                "mine": any(norm(z) == dept_id or norm(z).startswith(dept_id + " ") for z in zones),
+            })
+    return out
+
+
+def fetch_alerts(dept_id):
+    """/alerta trae la lista completa; si falla o viene vacía, la portada (solo la destacada)."""
+    err = None
+    for url in (INUMET + "/alerta", INUMET + "/"):
+        try:
+            items = parse_alerts(get(url, text=True), dept_id)
+            if items or url.endswith("/"):
+                return items, None
+        except Fail as e:
+            err = str(e)
+    return [], err
+
+
+# ---------- observación de la estación INUMET más cercana ----------
+def nearest_station(lat, lon):
+    raw = get(OBS)
+    variables = raw.get("variables") or []
+    fechas = raw.get("fechas") or []
+    stations = raw.get("estaciones") or []
+    obs = raw.get("observaciones") or []
+    var_ix = {v.get("idStr"): i for i, v in enumerate(variables) if isinstance(v, dict)}
+
+    def series(var, ist):
+        iv = var_ix.get(var)
+        if iv is None or iv >= len(obs):
+            return []
+        o = obs[iv] or {}
+        col = (o.get("datos") or [])
+        col = col[ist] if ist < len(col) and col[ist] else []
+        ifs = o.get("iFechas") or []
+        out = []
+        for k, v in enumerate(col):
+            n = num(v)
+            if n is not None and k < len(ifs) and 0 <= ifs[k] < len(fechas):
+                out.append((fechas[ifs[k]], n))
+        return out
+
+    def epoch(iso):
+        try:
+            return time.mktime(time.strptime(str(iso)[:16], "%Y-%m-%dT%H:%M"))
+        except ValueError:
+            return 0
+    newest = max((epoch(f) for f in fechas), default=0)
+    best = None
+    for i, e in enumerate(stations):
+        la, lo = num(e.get("latitud")), num(e.get("longitud"))
+        if la is None or lo is None:
+            continue
+        temp = series("TempAire", i)
+        if not temp or (newest and epoch(temp[-1][0]) < newest - 3 * 3600):
+            continue        # sin datos de las últimas 3 horas: la siguiente más cercana
+        # las de afuera (Argentina, Brasil) no; una vieja de más de 6 h tampoco cuenta como cercana
+        d = dist_km(lat, lon, la, lo)
+        if best is None or d < best[0]:
+            best = (d, i, e, temp)
+    if not best:
+        raise Fail("sin estaciones")
+    d, i, e, temp = best
+    last = lambda var: (series(var, i) or [(None, None)])[-1][1]
+    t, hr = temp[-1][1], last("HumRelativa")
+    kn, gust = last("IntViento"), last("IntRafaga")
+    kmh = round(kn * KNOT) if kn is not None else None
+    wdir = last("DirViento")
+    pres = series("PresAtmMar", i)
+    trend = None
+    if len(pres) >= 4:
+        trend = round(pres[-1][1] - pres[-4][1], 1)     # tres horas antes
+    temps24 = [v for _, v in temp[-24:]]
+    rain24 = sum(v for _, v in series("precipHoraria", i)[-24:]) if series("precipHoraria", i) else None
+    r3 = series("R3", i)
+    return {
+        "name": e.get("displayNamePublic") or e.get("nombre") or "",
+        "dist_km": round(d),
+        "time": hhmm(temp[-1][0]),
+        "temp": t, "hum": hr, "dew": last("TempPtoRocio"), "feels": feels(t, hr, kmh),
+        "wind_kmh": kmh, "wind_dir": wdir, "wind_card": cardinal(wdir),
+        "gust_kmh": round(gust * KNOT) if gust is not None else None,
+        "press": pres[-1][1] if pres else None, "press_trend": trend,
+        "vis_km": last("Visibilidad"), "rain_1h": last("precipHoraria"),
+        "rain_24h": round(rain24, 1) if rain24 is not None else (r3[-1][1] if r3 else None),
+        "tmin24": min(temps24) if temps24 else None, "tmax24": max(temps24) if temps24 else None,
+    }
+
+
+# ---------- Open-Meteo: lo que INUMET no da ----------
+WMO = {0: "Despejado", 1: "Mayormente despejado", 2: "Parcialmente nublado", 3: "Cubierto", 45: "Niebla",
+       48: "Niebla con escarcha", 51: "Llovizna débil", 53: "Llovizna", 55: "Llovizna intensa", 56: "Llovizna helada",
+       57: "Llovizna helada intensa", 61: "Lluvia débil", 63: "Lluvia", 65: "Lluvia intensa", 66: "Lluvia helada",
+       67: "Lluvia helada intensa", 71: "Nevada débil", 73: "Nevada", 75: "Nevada intensa", 77: "Granos de nieve",
+       80: "Chaparrones débiles", 81: "Chaparrones", 82: "Chaparrones fuertes", 85: "Chaparrones de nieve",
+       86: "Chaparrones de nieve fuertes", 95: "Tormenta", 96: "Tormenta con granizo", 99: "Tormenta con granizo fuerte"}
+DOW = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
+
+
+def open_meteo(lat, lon):
+    q = {
+        "latitude": f"{lat:.3f}", "longitude": f"{lon:.3f}", "timezone": "America/Montevideo", "forecast_days": "5",
+        "wind_speed_unit": "kmh",
+        "current": "temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,"
+                   "cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,visibility,"
+                   "dew_point_2m",
+        "daily": "weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,"
+                 "precipitation_probability_max,sunrise,sunset,uv_index_max,wind_speed_10m_max,wind_gusts_10m_max",
+    }
+    r = get(OPEN_METEO + "?" + urllib.parse.urlencode(q))
+    c = r.get("current") or {}
+    code = c.get("weather_code")
+    vis = num(c.get("visibility"))
+    cur = {
+        "code": code, "text": WMO.get(code, ""), "is_day": c.get("is_day"), "cloud": c.get("cloud_cover"),
+        "uv": c.get("uv_index"), "precip": c.get("precipitation"), "temp": c.get("temperature_2m"),
+        "hum": c.get("relative_humidity_2m"), "feels": c.get("apparent_temperature"), "dew": c.get("dew_point_2m"),
+        "press": c.get("pressure_msl"), "wind_kmh": c.get("wind_speed_10m"), "wind_dir": c.get("wind_direction_10m"),
+        "wind_card": cardinal(num(c.get("wind_direction_10m"))), "gust_kmh": c.get("wind_gusts_10m"),
+        "vis_km": round(vis / 1000, 1) if vis is not None else None, "time": hhmm(c.get("time")),
+    }
+    dd = r.get("daily") or {}
+    days = []
+    for k, date in enumerate(dd.get("time") or []):
+        pick = lambda key: (dd.get(key) or [None] * 99)[k]
+        try:
+            dow = DOW[time.strptime(date, "%Y-%m-%d").tm_wday]
+        except ValueError:
+            dow = ""
+        days.append({"date": date, "dow": "Hoy" if k == 0 else "Mañana" if k == 1 else dow,
+                     "tmin": pick("temperature_2m_min"), "tmax": pick("temperature_2m_max"),
+                     "prob": pick("precipitation_probability_max"), "rain_mm": pick("precipitation_sum"),
+                     "code": pick("weather_code"), "text": WMO.get(pick("weather_code"), ""),
+                     "uv": pick("uv_index_max"), "wind_max": pick("wind_speed_10m_max"),
+                     "gust_max": pick("wind_gusts_10m_max")})
+    sun = {"rise": hhmm((dd.get("sunrise") or [""])[0]), "set": hhmm((dd.get("sunset") or [""])[0])}
+    return cur, days, sun
+
+
+# ---------- pronóstico de INUMET por zona ----------
+ZONES = [(88, -34.80, -56.10), (89, -34.95, -54.95), (65, -31.70, -54.90), (66, -31.50, -57.20),
+         (67, -33.40, -56.20), (68, -33.60, -54.30), (86, -33.90, -57.60)]
+
+
+def inumet_forecast(lat, lon):
+    raw = get(FORECAST)
+    zid = min(ZONES, key=lambda z: (z[1] - lat) ** 2 + ((z[2] - lon) * math.cos(lat * math.pi / 180)) ** 2)[0]
+    items = [it for it in raw.get("items") or [] if it.get("zonaId") == zid]
+    if not items:
+        return None
+    items.sort(key=lambda it: it.get("diaMasN") or 0)
+    days = []
+    for it in items[:4]:
+        n = it.get("diaMasN") or 0
+        periods = []
+        for s in sorted(it.get("subgrupos") or [], key=lambda s: s.get("orden") or 0):
+            text = " ".join(" ".join(str(s.get(k) or "") for k in ("descripcion", "evolucion")).split())
+            wind = " ".join(str(s.get("vientos") or "").split())
+            periods.append({"p": str(s.get("subgrupo") or ""), "text": text, "wind": wind})
+        days.append({"label": "Hoy" if n == 0 else "Mañana" if n == 1 else f"+{n} días",
+                     "tmin": num(it.get("tempMin")), "tmax": num(it.get("tempMax")), "periods": periods})
+    return {"name": items[0].get("zonaLarga") or items[0].get("zonaCorta") or "", "days": days,
+            "published": str(raw.get("fechaPublicacion") or "")}
+
+
+def no_hash(o):
+    """Sin "#": en la pantalla de la radio marca colores"""
+    if isinstance(o, str):
+        return o.replace("#", "")
+    if isinstance(o, list):
+        return [no_hash(x) for x in o]
+    if isinstance(o, dict):
+        return {k: no_hash(v) for k, v in o.items()}
+    return o
+
+
+def write(path, data):
+    tmp = path + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(no_hash(data), f, ensure_ascii=False)
+    os.replace(tmp, path)
+
+
+def args_pos(args):
+    try:
+        lat, lon = float(args[0]), float(args[1])
+    except (IndexError, ValueError):
+        raise Fail("falta la posición (lat lon)")
+    return lat, lon
+
+
+def cmd_alerts(args):
+    lat, lon = args_pos(args)
+    dept = my_dept(lat, lon)
+    alerts, err = fetch_alerts(dept[0])
+    if err and not alerts:
+        raise Fail("INUMET: " + err)
+    write(OUT_ALERTS, {"dept": dept[1], "time": time.strftime("%H:%M"), "alerts": alerts})
+    print("ok", sum(1 for a in alerts if a["mine"]))
+
+
+def cmd_update(args):
+    lat, lon = args_pos(args)
+    dept = my_dept(lat, lon)
+    data = {"time": time.strftime("%H:%M"), "dept": dept[1], "errors": []}
+    try:
+        data["station"] = nearest_station(lat, lon)
+    except Fail as e:
+        data["errors"].append("estación INUMET: " + str(e))
+    try:
+        data["om"], data["days"], data["sun"] = open_meteo(lat, lon)
+    except Fail as e:
+        data["errors"].append("Open-Meteo: " + str(e))
+    try:
+        data["zone"] = inumet_forecast(lat, lon)
+    except Fail as e:
+        data["errors"].append("pronóstico INUMET: " + str(e))
+    alerts, err = fetch_alerts(dept[0])
+    data["alerts"] = alerts
+    if err and not alerts:
+        data["errors"].append("alertas INUMET: " + err)
+    write(OUT, data)
+    write(OUT_ALERTS, {"dept": dept[1], "time": data["time"], "alerts": alerts})
+    if "station" not in data and "om" not in data:
+        raise Fail(data["errors"][0] if data["errors"] else "sin datos")
+    print("ok")
+
+
+def main(argv):
+    cmds = {"update": cmd_update, "alerts": cmd_alerts}
+    if len(argv) < 2 or argv[1] not in cmds:
+        print("uso: x6100-meteo update LAT LON | alerts LAT LON", file=sys.stderr)
+        return 2
+    try:
+        cmds[argv[1]](argv[2:])
+        return 0
+    except Fail as e:
+        print("error", e)
+        return 1
+    except Exception as e:
+        print("error", " ".join(str(e).split())[:80])
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

@@ -6,6 +6,7 @@
  *  Copyright (c) 2022-2023 Belousov Oleg aka R1CBU
  */
 
+#include "meteo_alerts.h"
 #include "update_check.h"
 #include "power_save.h"
 #include "lvgl/lvgl.h"
@@ -231,6 +232,7 @@ int main(void) {
     qso_log_import_adif("/mnt/incoming_log.adi");
     dialog_cluster_start_client();
     update_check_start();
+    meteo_alerts_init();     /* alertas de INUMET con WiFi */
 
     pthread_t thread;
     pthread_create(&thread, NULL, tick_thread, NULL);

@@ -982,6 +982,7 @@ static action_items_t long_action_items[] = {
     { .label = " APP Field Ops ", .action = ACTION_APP_FIELD },
     { .label = " APP Bands ", .action = ACTION_APP_BANDS },
     { .label = " APP Internet radio ", .action = ACTION_APP_IRADIO },
+    { .label = " APP Weather ", .action = ACTION_APP_METEO },
     { .label = " APP RX recorder ", .action = ACTION_APP_RECORDER },
     { .label = " APP SWR Scan ", .action = ACTION_APP_SWRSCAN },
     { .label = " APP GPS ", .action = ACTION_APP_GPS },
@@ -5106,6 +5107,24 @@ static void power_save_changed_cb(lv_event_t *e) {
                                             : "Power save off");
 }
 
+/* CX8ANM: alertas de INUMET en pantalla (meteo_alerts.c) */
+static uint8_t make_meteo_alerts(uint8_t row) {
+    lv_obj_t *obj = lv_label_create(grid);
+
+    lv_label_set_text(obj, "INUMET weather alerts");
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_CENTER, row, 1);
+
+    obj = lv_obj_create(grid);
+    lv_obj_set_size(obj, SMALL_3, ROW_H);
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 4, 3, LV_GRID_ALIGN_CENTER, row, 1);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_TRANSP, LV_PART_MAIN);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_center(obj);
+    obj = switch_bool(obj, &params.meteo_alerts);
+    lv_obj_set_width(obj, SMALL_3 - 30);
+    return row + 1;
+}
+
 static uint8_t make_power_save(uint8_t row) {
     lv_obj_t *obj = lv_label_create(grid);
 
@@ -5236,6 +5255,7 @@ static void make_info_page() {
     row = info_row(row, "Baseband", power_save_baseband_text(x6100_control_get_fw_version_str()));
     row = make_update_alert(row);
     row = make_power_save(row);
+    row = make_meteo_alerts(row);
     row = make_update(row);
     row = make_diag(row);
     card_end(row);
