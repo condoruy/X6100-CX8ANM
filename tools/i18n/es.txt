@@ -314,14 +314,7 @@ Clients	Clientes
 Port	Puerto
 SPP, channel 1	SPP, canal 1
 status	estado
-not accepted now: ask IU1WXY first	no se acepta ahora: consulte antes a IU1WXY
-too many today, try tomorrow	demasiados hoy, pruebe mañana
-not sent: no internet?	no enviado: ¿sin internet?
-sending...	enviando...
 could not collect them	no se pudieron reunir
-Send these diagnostics to IU1WXY?	¿Enviar este diagnóstico a IU1WXY?
-Thanks for helping! This is only read by IU1WXY to understand the problem, and deleted within 90 days. It is a friendly, best-effort help: the firmware comes as it is, with no warranty, and sending is always up to you.	¡Gracias por ayudar! Solo lo lee IU1WXY para entender el problema, y se borra antes de 90 días. Es una ayuda amistosa y sin compromiso: el firmware viene tal cual, sin garantía, y enviar es siempre decisión suya.
-MFK: scroll - press: send - ESC: cancel	MFK: desplazar - pulsar: enviar - ESC: cancelar
 Send	Enviar
 collecting...	reuniendo...
 Diagnostics	Diagnóstico
@@ -1495,3 +1488,11 @@ Channel\nlist	Lista\ncanales
 Main knob on CB	Perilla principal en la CB
 channel by channel	canal por canal
 free tuning	sintonía libre
+
+saved: diag/%.40s	guardado: diag/%.40s
+could not save them	no se pudo guardar
+saving...	guardando...
+Save these diagnostics?	¿Guardar este diagnóstico?
+They are saved on the SD card, in the diag folder: nothing leaves the radio. Attach the file to a report on GitHub (condoruy/X6100-CX8ANM) if you want help. The firmware comes as it is, with no warranty.	Se guarda en la tarjeta SD, en la carpeta diag: nada sale de la radio. Adjunte el archivo a un reporte en GitHub (condoruy/X6100-CX8ANM) si quiere ayuda. El firmware viene tal cual, sin garantía.
+MFK: scroll - press: save - ESC: cancel	MFK: desplazar - pulsar: guardar - ESC: cancelar
+Save...	Guardar...

@@ -1,8 +1,9 @@
 #!/bin/sh
-# Diagnostics for IU1WXY (Settings > Info > Diagnostics), sent only after the
-# user has read them on the screen and pressed Send.
+# Diagnostics (Settings > Info > Diagnostics), saved only after the user has
+# read them on the screen and pressed Save.
 #   x6100-diag collect VERSION BASEBAND   writes /tmp/x6100-diag.txt
-#   x6100-diag send                       posts it to x6100-link.it, prints the code
+#   x6100-diag send                       CX8ANM: copies it to /mnt/diag/ (nothing leaves the
+#                                         radio) and prints the file name, to attach to a report
 # Bluetooth, base I2C and system state only: no WiFi networks, no positions, no logbook.
 
 OUT=/tmp/x6100-diag.txt
@@ -42,17 +43,11 @@ collect() {
 
 send() {
 	[ -s $OUT ] || { echo "Nothing to send"; exit 1; }
-	# the code, or CLOSED (IU1WXY has not asked for them) or LIMIT (too many today)
-	python3 -c "
-import sys, urllib.request as u, urllib.error as e
-d = open('$OUT', 'rb').read()
-try:
-    r = u.urlopen(u.Request('https://x6100-link.it/api/diag.php?id=$(cat /mnt/device_id 2>/dev/null | tr -cd 'A-Za-z0-9-')', data=d, headers={'Content-Type': 'text/plain'}), timeout=20)
-    print(r.read().decode().strip())
-except e.HTTPError as x:
-    print({403: 'CLOSED', 429: 'LIMIT'}.get(x.code, 'ERROR')); sys.exit(2)
-" 2>/dev/null || exit 1
+	mkdir -p /mnt/diag || exit 1
+	f=diag-$(date +%Y%m%d-%H%M).txt
+	cp $OUT /mnt/diag/$f && sync || exit 1
 	rm -f $OUT
+	echo "$f"
 }
 
 case "$1" in

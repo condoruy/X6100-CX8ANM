@@ -36,9 +36,9 @@ HOTA_API = os.environ.get("X6100_HOTA_API", "https://cqhota.app/api/v1")
 POTA_API = os.environ.get("X6100_POTA_API", "https://api.pota.app")
 QRZ_API = os.environ.get("X6100_QRZ_API", "https://logbook.qrz.com/api")
 TIMEOUT = 30
-user_agent = "X6100-IU1WXY/unknown"
+user_agent = "X6100-CX8ANM/unknown"
 # wwbota.org and cqhota.app: the firmware version (the GUI sets X6100_FW) and a contact
-site_agent = f"X6100-IU1WXY/{os.environ.get('X6100_FW') or 'unknown'} (info@x6100-link.it)"
+site_agent = f"X6100-CX8ANM/{os.environ.get('X6100_FW') or 'unknown'} (github.com/condoruy/X6100-CX8ANM)"
 
 
 class Fail(Exception):
@@ -256,7 +256,7 @@ def spot_args(args, ref_re):
 def cmd_pota_spot(args):
     call, ref, mode, _ = spot_args(args, r"[A-Z0-9]{1,4}-\d{4,5}")
     body = json.dumps({"activator": call, "spotter": call, "frequency": args.freq_khz.strip(), "reference": ref,
-                       "mode": mode, "source": "X6100-IU1WXY", "comments": args.comments})
+                       "mode": mode, "source": "X6100-CX8ANM", "comments": args.comments})
     code, text = post(POTA_API.rstrip("/") + "/spot", body, "application/json")
     if code not in (200, 201):
         raise Fail(f"HTTP {code} {one_line(text, 60)}")
@@ -379,7 +379,7 @@ def main(argv):
     p.set_defaults(func=cmd_qrz_upload)
     try:
         args = parser.parse_args(argv)
-        user_agent = f"X6100-IU1WXY/{args.call.strip().upper() or 'unknown'}"
+        user_agent = f"X6100-CX8ANM/{args.call.strip().upper() or 'unknown'}"
         print(args.func(args))
         return 0
     except Fail as e:

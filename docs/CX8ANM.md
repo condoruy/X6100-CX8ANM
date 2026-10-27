@@ -200,3 +200,10 @@ INUMET no tiene una API publicada: se usan los mismos datos públicos que alimen
 - **Lista canales**: la lista para volver a cualquiera (MFK elige, apretar va), renombrar o borrar.
   También se editan en la web, en **Memorias**.
 - Las 8 memorias rápidas de siempre siguen en las páginas 1 y 2 de V/M.
+
+## Privacidad (sin envíos a x6100-link.it)
+La edición original avisa cada 5 minutos al servidor de IU1WXY (x6100-link.it) con el id de la
+radio, la versión, el locator y el indicativo, y el diagnóstico se enviaba a ese servidor. En esta
+edición no: no se manda nada a ese servidor. Ajustes > Info > Diagnóstico ahora guarda el archivo
+en la tarjeta SD (carpeta diag, por ejemplo diag/diag-20261027-1655.txt) para adjuntarlo a un
+reporte. Las consultas a POTA/SOTA se identifican como X6100-CX8ANM.

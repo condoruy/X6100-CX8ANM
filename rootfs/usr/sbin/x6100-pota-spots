@@ -7,10 +7,10 @@ import os
 import urllib.request
 from datetime import datetime, timedelta, timezone
 
-SITE_AGENT = f"X6100-IU1WXY/{os.environ.get('X6100_FW') or 'unknown'} (info@x6100-link.it)"
+SITE_AGENT = f"X6100-CX8ANM/{os.environ.get('X6100_FW') or 'unknown'} (github.com/condoruy/X6100-CX8ANM)"
 
 
-def get(url, agent="X6100-IU1WXY"):
+def get(url, agent="X6100-CX8ANM"):
     try:
         req = urllib.request.Request(url, headers={"User-Agent": agent})
         data = json.load(urllib.request.urlopen(req, timeout=20))

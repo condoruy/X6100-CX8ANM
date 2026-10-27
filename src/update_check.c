@@ -218,7 +218,9 @@ void update_check_start(void) {
 
     if (pthread_create(&t, NULL, check_thread, NULL) == 0)
         pthread_detach(t);
-    if (pthread_create(&t, NULL, ping_thread, NULL) == 0)
-        pthread_detach(t);
+    /* CX8ANM: la edición original avisa cada 5 minutos al servidor de IU1WXY (x6100-link.it) con
+     * el id de la radio, la versión, el locator y el indicativo. Esta edición no lo hace: no es
+     * nuestro servidor y quien la instala no lo eligió. ping_thread queda sin usar. */
+    (void)ping_thread;
 }
 #endif

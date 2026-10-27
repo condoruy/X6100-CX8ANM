@@ -4912,7 +4912,7 @@ static uint8_t info_row(uint8_t row, const char *label, const char *val) {
     return row + 1;
 }
 
-/* Diagnostics (Info): x6100-diag collects them, they are shown here and go to x6100-link.it only
+/* Diagnostics (Info): x6100-diag collects them, they are shown here and (CX8ANM) saved to the SD card only
  * with Send. The first time a short note says what they are for. */
 #define DIAG_CTL "/usr/sbin/x6100-diag"
 #define DIAG_ACK "/mnt/x6100-diag.ack"
@@ -4938,18 +4938,15 @@ static void diag_close(void *arg) {
 }
 
 static void diag_sent(const char *out, int status, void *user) {
-    char s[64];
+    char s[96];
 
     diag_busy = false;
     if (status == 0 && *out) {
-        snprintf(s, sizeof(s), "sent, code %.12s", out);
+        snprintf(s, sizeof(s), "saved: diag/%.40s", out);
+        s[strcspn(s, "\r\n")] = '\0';
         diag_say(s);
-    } else if (!strncmp(out, "CLOSED", 6)) {
-        diag_say("not accepted now: ask IU1WXY first");
-    } else if (!strncmp(out, "LIMIT", 5)) {
-        diag_say("too many today, try tomorrow");
     } else {
-        diag_say("not sent: no internet?");
+        diag_say("could not save them");
     }
 }
 
@@ -4959,7 +4956,7 @@ static void diag_send(void *arg) {
     diag_close(NULL);
     if ((f = fopen(DIAG_ACK, "w"))) fclose(f);
     diag_busy = true;
-    diag_say("sending...");
+    diag_say("saving...");
     sh_run(DIAG_CTL " send", diag_sent, NULL);
 }
 
@@ -5038,15 +5035,15 @@ static void diag_collected(const char *out, int status, void *user) {
     lv_obj_clear_flag(diag_panel, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_t *obj = wl_label(diag_panel, SF(22), theme_hex(TC_text_head), 0);
-    lv_label_set_text(obj, "Send these diagnostics to IU1WXY?");
+    lv_label_set_text(obj, "Save these diagnostics?");
 
     if (access(DIAG_ACK, F_OK) != 0) {     /* the first time only */
         obj = wl_label(diag_panel, SF(18), theme_hex(TC_text_value), 0);
         lv_obj_set_width(obj, lv_pct(100));
         lv_label_set_long_mode(obj, LV_LABEL_LONG_WRAP);
-        lv_label_set_text(obj, "Thanks for helping! This is only read by IU1WXY to understand the problem, and "
-                               "deleted within 90 days. It is a friendly, best-effort help: the firmware comes "
-                               "as it is, with no warranty, and sending is always up to you.");
+        lv_label_set_text(obj, "They are saved on the SD card, in the diag folder: nothing leaves the radio. "
+                               "Attach the file to a report on GitHub (condoruy/X6100-CX8ANM) if you want help. "
+                               "The firmware comes as it is, with no warranty.");
     }
 
     lv_obj_t *box = lv_obj_create(diag_panel);
@@ -5069,10 +5066,10 @@ static void diag_collected(const char *out, int status, void *user) {
     lv_obj_set_flex_align(row, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_pad_column(row, 12, 0);
     obj = wl_label(row, SF(16), theme_hex(TC_text_dim), 0);
-    lv_label_set_text(obj, "MFK: scroll - press: send - ESC: cancel");
+    lv_label_set_text(obj, "MFK: scroll - press: save - ESC: cancel");
     lv_obj_set_flex_grow(obj, 1);
     diag_panel_btn(row, "Cancel", false);
-    diag_panel_btn(row, "Send", true);
+    diag_panel_btn(row, "Save", true);
 
     lv_group_add_obj(keyboard_group, diag_panel);
     lv_obj_add_event_cb(diag_panel, diag_key_cb, LV_EVENT_KEY, box);
@@ -5093,7 +5090,7 @@ static void diag_btn_cb(lv_event_t *e) {
 
 static uint8_t make_diag(uint8_t row) {
     wl_row_label(row, "Diagnostics");
-    diag_btn = wl_button(row, "Send...", diag_btn_cb);
+    diag_btn = wl_button(row, "Save...", diag_btn_cb);
     lv_obj_add_event_cb(diag_btn, diag_ptr_clear_cb, LV_EVENT_DELETE, &diag_btn);
     diag_note = wl_note(row);
     lv_obj_add_event_cb(diag_note, diag_ptr_clear_cb, LV_EVENT_DELETE, &diag_note);
