@@ -1,0 +1,38 @@
+name: Reportar un problema
+description: Algo no funciona en la edición CX8ANM
+labels: [problema]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por reportar. Esta es la **edición CX8ANM**, basada en el firmware de IU1WXY:
+        reporte aquí los problemas de esta edición, no a los autores originales.
+  - type: input
+    id: version
+    attributes:
+      label: Versión
+      description: Ajustes > Info (por ejemplo v1.0.25)
+    validations:
+      required: true
+  - type: textarea
+    id: que_paso
+    attributes:
+      label: ¿Qué pasó?
+      description: Qué hizo, qué esperaba y qué pasó. Copie los mensajes de error tal cual aparecen.
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para repetirlo
+      placeholder: |
+        1. Ir a...
+        2. Tocar...
+        3. Aparece...
+  - type: textarea
+    id: diagnostico
+    attributes:
+      label: Diagnóstico (opcional)
+      description: |
+        En la radio: Ajustes > Info > Diagnóstico > Guardar. Queda en la tarjeta SD, carpeta diag.
+        Arrastre aquí el archivo o una foto de la pantalla.

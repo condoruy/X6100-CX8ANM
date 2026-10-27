@@ -1,0 +1,14 @@
+name: Proponer una idea
+description: Una función nueva o una mejora
+labels: [idea]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: ¿Qué le gustaría que haga la radio?
+    validations:
+      required: true
+  - type: textarea
+    id: para_que
+    attributes:
+      label: ¿Para qué lo usaría?
