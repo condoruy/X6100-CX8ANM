@@ -267,8 +267,10 @@ jobs:
           Desde la radio: Ajustes > Info > Actualizar (baja update.tar.gz).
 
           Edición CX8ANM, basada en el firmware X6100 de IU1WXY (https://github.com/IU1WXY/X6100-IU1WXY),
-          que a su vez se basa en x6100_gui de R1CBU y R2RFE. No es una versión oficial de ellos:
-          los problemas de esta edición se reportan en este repositorio.
+          que nació como derivado del firmware 1KO125 de Hany El Imam, basado a su vez en x6100_gui de
+          R1CBU y R2RFE. Las apps SSTV, WEFAX, DSC, NAVTEX y SITOR-B se crearon originalmente en 1KO125.
+          No es una versión oficial de ninguno de ellos: los problemas de esta edición se reportan en
+          este repositorio.
           Qué agrega: https://github.com/condoruy/X6100-CX8ANM/blob/main/docs/CX8ANM.md
           Sin garantía; se usa bajo tu propia responsabilidad. Licencia: LGPL-2.1 (interfaz) / GPLv3 (imagen).
         files: |

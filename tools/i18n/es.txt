@@ -1496,3 +1496,7 @@ Save these diagnostics?	¿Guardar este diagnóstico?
 They are saved on the SD card, in the diag folder: nothing leaves the radio. Attach the file to a report on GitHub (condoruy/X6100-CX8ANM) if you want help. The firmware comes as it is, with no warranty.	Se guarda en la tarjeta SD, en la carpeta diag: nada sale de la radio. Adjunte el archivo a un reporte en GitHub (condoruy/X6100-CX8ANM) si quiere ayuda. El firmware viene tal cual, sin garantía.
 MFK: scroll - press: save - ESC: cancel	MFK: desplazar - pulsar: guardar - ESC: cancelar
 Save...	Guardar...
+Edition	Edición
+Derived from	Deriva de
+Created in 1KO125	Creadas en 1KO125
+Reports	Reportes

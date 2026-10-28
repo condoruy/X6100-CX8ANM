@@ -4,16 +4,31 @@
 
 > **Esta es una versión derivada, no un firmware original.**
 > Está basada en el **[firmware X6100 de Giovanni Ricciardi IU1WXY](https://github.com/IU1WXY/X6100-IU1WXY)**,
-> que a su vez se basa en **[x6100_gui de Oleg Belousov R1CBU y Georgy Dyuldin R2RFE](https://github.com/gdyuldin/x6100_gui)**
-> y en **[AetherX6100Buildroot](https://github.com/gdyuldin/AetherX6100Buildroot)**.
+> que nació como derivado del **firmware 1KO125 de Hany El Imam (TheMurusTeam)**, que a su vez parte de
+> **[x6100_gui de Oleg Belousov R1CBU y Georgy Dyuldin R2RFE](https://github.com/gdyuldin/x6100_gui)**
+> y de **[AetherX6100Buildroot](https://github.com/gdyuldin/AetherX6100Buildroot)**.
 > Todo el mérito del diseño de base es de ellos. Esta edición agrega funciones, el idioma español
-> y ajustes para la Región 2 / Uruguay. **No es una versión oficial de IU1WXY ni de R1CBU/R2RFE:**
+> y ajustes para la Región 2 / Uruguay. **No es una versión oficial de IU1WXY, 1KO125 ni R1CBU/R2RFE:**
 > los problemas de esta edición se reportan aquí, no a ellos.
+
+## De dónde viene
+
+```
+x6100_gui (R1CBU / R2RFE)
+  └─ 1KO125 (Hany El Imam, TheMurusTeam)      ← origen de SSTV, WEFAX, DSC, NAVTEX y SITOR-B
+       └─ firmware IU1WXY (Giovanni Ricciardi)
+            └─ edición CX8ANM (Daniel Niño)   ← este repositorio
+```
+
+Las aplicaciones **SSTV, WEFAX, DSC, NAVTEX y SITOR-B** fueron concebidas, desarrolladas y
+puestas en funcionamiento originalmente por **Hany El Imam en el firmware 1KO125**. Esta edición
+las hereda a través del firmware de IU1WXY, y el crédito de su creación corresponde a 1KO125.
 
 <p align="center"><img src="docs/screenshots/main_screen.png" alt="Pantalla principal" width="720"></p>
 
-*English summary: this is a community edition of the IU1WXY X6100 firmware (itself based on the
-R1CBU/R2RFE x6100_gui), adding a Spanish interface, Region 2 band plans and extra apps. All credit
+*English summary: this is a community edition of the IU1WXY X6100 firmware, which was forked from
+Hany El Imam's 1KO125 firmware (itself based on the R1CBU/R2RFE x6100_gui). The SSTV, WEFAX, DSC,
+NAVTEX and SITOR-B apps were originally conceived and developed in 1KO125. This edition adds a Spanish interface, Region 2 band plans and extra apps. All credit
 for the base firmware goes to its original authors; please report issues with this edition here,
 not upstream.*
 
@@ -76,13 +91,16 @@ Todo lo demás (ajustes, logs, fotos) queda en la tarjeta SD.
 
 ## Créditos
 
-- **Giovanni Ricciardi IU1WXY**: el firmware en el que se basa esta edición (reescritura de la
+- **Giovanni Ricciardi IU1WXY**: el firmware en el que se basa directamente esta edición (reescritura de la
   interfaz y sistema de temas, X6100 Link y control remoto, Field Ops, DX Cluster, WSPR, SSTV TX,
   RTTY, WeFax TX, Bluetooth, servidor wfview y mucho más). Ver [sus créditos completos](docs/README_IU1WXY.md#credits).
-- **Oleg Belousov R1CBU** y **Georgy Dyuldin R2RFE**: la interfaz x6100_gui original y el sistema
-  de compilación [AetherX6100Buildroot](https://github.com/gdyuldin/AetherX6100Buildroot).
-- **1KO125** de Hany El Imam / TheMurusTeam (decodificadores WeFax, NavTex, SSTV);
-  **JS8** de randal007 sobre JS8Call (Jordan Sherer KN4CRD); **wsprd** y **JTTY** de WSJT-X
+- **Hany El Imam (1KO125 / TheMurusTeam)**: el firmware **1KO125**, del que nació el de IU1WXY,
+  y las aplicaciones **SSTV, WEFAX, DSC, NAVTEX y SITOR-B**, concebidas y desarrolladas
+  originalmente por él en 1KO125.
+- **Oleg Belousov R1CBU** y **Georgy Dyuldin R2RFE**: la interfaz x6100_gui original sobre la que
+  se construyó 1KO125, y el sistema de compilación
+  [AetherX6100Buildroot](https://github.com/gdyuldin/AetherX6100Buildroot).
+- **JS8** de randal007 sobre JS8Call (Jordan Sherer KN4CRD); **wsprd** y **JTTY** de WSJT-X
   (K1JT, K9AN y el equipo de WSJT-X).
 - Bibliotecas: LVGL, cJSON, FFTW, liquid-dsp, libpng, bottle, PulseAudio, BlueZ, FFmpeg.
 - Datos: Reverse Beacon Network, POTA, SOTA, radio-browser.info, Open-Meteo, INUMET.

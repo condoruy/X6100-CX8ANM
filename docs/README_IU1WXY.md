@@ -1,3 +1,8 @@
+> **Nota de la edición CX8ANM:** esta es una copia del README original de IU1WXY, sin cambios.
+> Aclaración: el firmware de IU1WXY nació como derivado del firmware **1KO125 de Hany El Imam**
+> (no directamente de R1CBU), y las aplicaciones **SSTV, WEFAX, DSC, NAVTEX y SITOR-B** fueron
+> concebidas y desarrolladas originalmente en 1KO125. Ver los [créditos de esta edición](../README.md#créditos).
+
 <h1 align="center">X6100 custom firmware</h1>
 
 <p align="center"><i>by Giovanni Ricciardi IU1WXY</i> · <a href="https://iu1wxy.com"><b>iu1wxy.com</b></a></p>

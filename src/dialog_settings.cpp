@@ -5248,8 +5248,11 @@ static void make_info_page() {
     row = card_begin("FIRMWARE");
     row = info_row(row, "Version", CX8ANM_NAME " v" CX8ANM_VERSION);
     row = info_row(row, "Based on", strrchr(VERSION, ' ') + 1);
-    row = info_row(row, "Author", "Giovanni Ricciardi IU1WXY");
-    row = info_row(row, "Contact", "giovanni@iu1wxy.com");
+    /* CX8ANM: edición derivada. Origen: x6100_gui (R1CBU/R2RFE) > 1KO125 (Hany El Imam) > IU1WXY */
+    row = info_row(row, "Edition", "CX8ANM (Daniel Niño)");
+    row = info_row(row, "Derived from", "IU1WXY < 1KO125 < R1CBU/R2RFE");
+    row = info_row(row, "Created in 1KO125", "SSTV WEFAX DSC NAVTEX SITOR-B");
+    row = info_row(row, "Reports", "github.com/condoruy/X6100-CX8ANM");
     row = info_row(row, "Baseband", power_save_baseband_text(x6100_control_get_fw_version_str()));
     row = make_update_alert(row);
     row = make_power_save(row);
