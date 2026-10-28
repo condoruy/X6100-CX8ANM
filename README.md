@@ -90,7 +90,7 @@ La radio solo se conecta a servicios externos cuando usás la función correspon
 Todo lo demás (ajustes, logs, fotos) queda en la tarjeta SD.
 
 ## Créditos
-
+Gracias por la aclaración, Hany. Ya lo corregí: el repositorio, las notas de cada versión y la pantalla de información de la radio ahora indican que el firmware de IU1WXY nació como derivado de 1KO125, y que SSTV, WEFAX, DSC, NAVTEX y SITOR-B fueron concebidas y desarrolladas originalmente por vos en 1KO125. Si tenés un enlace oficial de 1KO125, lo agrego en los créditos. 73 de CX8ANM
 - **Giovanni Ricciardi IU1WXY**: el firmware en el que se basa directamente esta edición (reescritura de la
   interfaz y sistema de temas, X6100 Link y control remoto, Field Ops, DX Cluster, WSPR, SSTV TX,
   RTTY, WeFax TX, Bluetooth, servidor wfview y mucho más). Ver [sus créditos completos](docs/README_IU1WXY.md#credits).
