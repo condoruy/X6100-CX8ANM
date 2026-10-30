@@ -26,7 +26,7 @@ callsign() {
     c=$(echo "$CALL_ARG" | tr -cd 'A-Za-z0-9/' | tr 'a-z/' 'A-Z-')
     [ -n "$c" ] && { echo "$c"; return; }
     c=$(sqlite3 /mnt/params.db "SELECT val FROM params WHERE name='callsign'" 2>/dev/null | tr -cd 'A-Za-z0-9/' | tr 'a-z/' 'A-Z-')
-    [ -n "$c" ] && echo "$c" || echo "CX8ANM"
+    [ -n "$c" ] && echo "$c" || echo "RADIO"
 }
 
 load_conf() {

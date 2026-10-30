@@ -39,6 +39,8 @@ typedef struct {
 
 
 void dialog_construct(dialog_t *dialog, lv_obj_t *parent);
+/* CX8ANM: abre el dialog sobre la pantalla principal (main_screen.c) */
+void main_screen_open_dialog(dialog_t *d);
 void dialog_destruct();
 
 /* The open app changed the mode from mode to forced: back to mode when it closes */

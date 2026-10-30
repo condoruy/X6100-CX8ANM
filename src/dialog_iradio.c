@@ -2,7 +2,7 @@
  *  SPDX-License-Identifier: LGPL-2.1-or-later
  *
  *  CX8ANM: radio por Internet. Las emisoras salen del directorio abierto radio-browser.info
- *  (favoritas, las de un país, las más escuchadas o una búsqueda); x6100-iradio baja la emisora y la
+ *  (favoritas, las de un país, la banda aérea, las más escuchadas o una búsqueda); x6100-iradio baja la emisora y la
  *  decodifica a PCM 44,1 kHz, que va al parlante (o a los auriculares Bluetooth) como el grabador.
  *  Al transmitir, la emisora se corta.
  */
@@ -20,6 +20,8 @@
 #include "textarea_window.h"
 #include "theme.h"
 #include "i18n.h"
+#include "countries.h"
+#include "params/params.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -49,12 +51,13 @@ typedef struct {
     char cc[3];
 } station_t;
 
-typedef enum { L_FAV, L_COUNTRY, L_TOP, L_SEARCH, L_COUNT } list_kind_t;
+typedef enum { L_FAV, L_COUNTRY, L_AIR, L_TOP, L_SEARCH, L_COUNT } list_kind_t;
 
 static station_t   list[MAX_ST];
 static int         list_n;
 static list_kind_t kind = L_FAV;
-static char        country[3] = "UY";
+static char        country[3] = "US";
+static bool        picking;             /* la tabla muestra los países para elegir uno */
 static char        query[48];
 static char        list_err[96];
 
@@ -77,18 +80,18 @@ static void construct_cb(lv_obj_t *parent);
 static void destruct_cb(void);
 static void key_cb(lv_event_t *e);
 static void play_cb(button_data_t *b);
-static void stop_cb(button_data_t *b);
+static void country_cb(button_data_t *b);
 static void fav_cb(button_data_t *b);
 static void list_cb(button_data_t *b);
 static void search_cb(button_data_t *b);
 
-static button_data_t btn_play   = {.type = BTN_TEXT, .label = "Play", .press = play_cb};
-static button_data_t btn_stop   = {.type = BTN_TEXT, .label = "Stop", .press = stop_cb};
+static button_data_t btn_play   = {.type = BTN_TEXT, .label = "Play /\nStop", .press = play_cb};
+static button_data_t btn_country = {.type = BTN_TEXT, .label = "Country", .press = country_cb};
 static button_data_t btn_fav    = {.type = BTN_TEXT, .label = "Favorite", .press = fav_cb};
 static button_data_t btn_list   = {.type = BTN_TEXT, .label = "List", .press = list_cb};
 static button_data_t btn_search = {.type = BTN_TEXT, .label = "Search", .press = search_cb};
 
-static buttons_page_t btn_page = {{&btn_play, &btn_stop, &btn_fav, &btn_list, &btn_search}};
+static buttons_page_t btn_page = {{&btn_play, &btn_fav, &btn_list, &btn_country, &btn_search}};
 
 static dialog_t dialog = {
     .run          = false,
@@ -156,10 +159,18 @@ static bool is_fav(const char *url) {
     return false;
 }
 
+static void set_country(const char *cc) {
+    country[0] = toupper((unsigned char)cc[0]);
+    country[1] = toupper((unsigned char)cc[1]);
+    country[2] = 0;
+}
+
+/* el elegido acá (CC_FILE) o, si no, el país de la radio (asistente del primer encendido) */
 static void load_country(void) {
     FILE *f = fopen(CC_FILE, "r");
     char  cc[8] = "";
 
+    if (params.country.x[0]) set_country(params.country.x);
     if (f) {
         if (fgets(cc, sizeof(cc), f) && isalpha((unsigned char)cc[0]) && isalpha((unsigned char)cc[1])) {
             country[0] = toupper((unsigned char)cc[0]);
@@ -185,7 +196,10 @@ static const char *kind_name(void) {
     static char buf[80];
     switch (kind) {
         case L_FAV:     return tr("Favorites");
-        case L_COUNTRY: snprintf(buf, sizeof(buf), "%s %s", tr("Country"), country); return buf;
+        case L_COUNTRY:
+            snprintf(buf, sizeof(buf), "%s: %s", tr("Country"), country_find(country) ? country_name_cc(country) : country);
+            return buf;
+        case L_AIR:     return tr("Air band (air traffic control)");
         case L_TOP:     return tr("Most listened worldwide");
         default:        snprintf(buf, sizeof(buf), "%s: %s", tr("Search"), query); return buf;
     }
@@ -193,12 +207,17 @@ static const char *kind_name(void) {
 
 static void show_title(void) {
     if (!title_lbl) return;
+    if (picking) {
+        lv_label_set_text_fmt(title_lbl, "#%06x %s#   #%06x %s#", theme_hex(TC_text_head), tr("INTERNET RADIO"),
+                              theme_hex(TC_accent), tr("Choose the country and press the MFK knob"));
+        return;
+    }
     lv_label_set_text_fmt(title_lbl, "#%06x %s#   #%06x %s#", theme_hex(TC_text_head), tr("INTERNET RADIO"),
                           theme_hex(TC_accent), kind_name());
 }
 
 static void show_list(void) {
-    if (!table) return;
+    if (!table || picking) return;
     lv_table_set_row_cnt(table, 1);
     if (fetching && kind != L_FAV) {
         lv_table_set_cell_value(table, 0, 0, tr("Loading stations..."));
@@ -207,7 +226,7 @@ static void show_list(void) {
     }
     if (!list_n) {
         lv_table_set_cell_value(table, 0, 0, list_err[0] ? list_err :
-                                kind == L_FAV ? tr("No favorites yet: List shows Uruguay's stations, Favorite saves one")
+                                kind == L_FAV ? tr("No favorites yet: List shows your country's stations, Favorite saves one")
                                               : tr("No stations"));
         lv_table_set_cell_value(table, 0, 1, "");
         return;
@@ -310,6 +329,7 @@ static void load_list(void) {
     }
     switch (kind) {
         case L_COUNTRY: snprintf(cmd, sizeof(cmd), HELPER " country %s 2>/dev/null", country); break;
+        case L_AIR:     snprintf(cmd, sizeof(cmd), HELPER " air %s 2>/dev/null", country); break;
         case L_TOP:     snprintf(cmd, sizeof(cmd), HELPER " top 2>/dev/null"); break;
         default:        snprintf(cmd, sizeof(cmd), HELPER " search '%s' 2>/dev/null", query); break;
     }
@@ -491,9 +511,27 @@ static void status_cb(lv_timer_t *t) {
 
 /* ---------- botones y teclas ---------- */
 
+static void stop_cb(button_data_t *b) {
+    (void)b;
+    pending_on = false;
+    stop_play();
+    show_list();
+}
+
+static void pick_country(void);
+
+/* Play/Stop: la elegida suena; si ya es la que suena, se para */
 static void play_cb(button_data_t *b) {
     (void)b;
+    if (picking) {
+        pick_country();
+        return;
+    }
     int i = selected();
+    if (i >= 0 && (play_on || pending_on) && !strcmp(list[i].url, playing.url)) {
+        stop_cb(NULL);
+        return;
+    }
     if (i < 0) {
         msg_update_text_fmt("%s", tr("Choose a station first"));
         return;
@@ -502,15 +540,9 @@ static void play_cb(button_data_t *b) {
     start_play(&list[i]);
 }
 
-static void stop_cb(button_data_t *b) {
-    (void)b;
-    pending_on = false;
-    stop_play();
-    show_list();
-}
-
 static void fav_cb(button_data_t *b) {
     (void)b;
+    if (picking) return;
     static station_t favs[MAX_ST];
     int i = selected();
     if (i < 0) return;
@@ -530,8 +562,53 @@ static void fav_cb(button_data_t *b) {
     else show_list();
 }
 
+/* ---------- elegir el país ---------- */
+
+static void show_countries(void) {
+    int n = countries_count(), cur = country_sorted_index(0, country);
+
+    lv_table_set_row_cnt(table, n);
+    for (int i = 0; i < n; i++) {
+        const country_t *c = country_sorted(0, i);
+        lv_table_set_cell_value(table, i, 0, country_name(c));
+        lv_table_set_cell_value(table, i, 1, c->cc);
+    }
+    if (cur < 0) cur = 0;
+    ((lv_table_t *)table)->row_act = cur;
+    ((lv_table_t *)table)->col_act = 0;
+    lv_obj_invalidate(table);
+    lv_coord_t h = lv_obj_get_height(table), y = cur * 34 - h / 2 + 17;
+    lv_obj_scroll_to_y(table, y > 0 ? y : 0, LV_ANIM_OFF);
+}
+
+static void country_cb(button_data_t *b) {
+    (void)b;
+    if (picking) {          /* otra vez: sin cambiar */
+        picking = false;
+        load_list();
+        return;
+    }
+    picking = true;
+    show_title();
+    show_countries();
+}
+
+static void pick_country(void) {
+    uint16_t row = 0, col = 0;
+
+    lv_table_get_selected_cell(table, &row, &col);
+    picking = false;
+    if (row != LV_TABLE_CELL_NONE && row < countries_count()) {
+        set_country(country_sorted(0, row)->cc);
+        save_country();
+        kind = L_COUNTRY;
+    }
+    load_list();
+}
+
 static void list_cb(button_data_t *b) {
     (void)b;
+    picking = false;
     kind = (kind + 1) % L_COUNT;
     if (kind == L_SEARCH && !query[0]) kind = L_FAV;
     load_list();
@@ -566,9 +643,7 @@ static bool search_ok_cb(void) {
     if ((!strncasecmp(clean, "pais ", 5) || !strncasecmp(clean, "país ", 6) || !strncasecmp(clean, "country ", 8))) {
         const char *cc = strrchr(clean, ' ') + 1;
         if (strlen(cc) == 2 && isalpha((unsigned char)cc[0]) && isalpha((unsigned char)cc[1])) {
-            country[0] = toupper((unsigned char)cc[0]);
-            country[1] = toupper((unsigned char)cc[1]);
-            country[2] = 0;
+            set_country(cc);
             save_country();
             kind = L_COUNTRY;
             textarea_window_close();
@@ -597,6 +672,7 @@ static bool search_cancel_cb(void) {
 
 static void search_cb(button_data_t *b) {
     (void)b;
+    picking = false;
     lv_group_remove_obj(table);
     textarea_window_open_w_label(search_ok_cb, search_cancel_cb, tr("Station, genre, \"pais AR\" or a stream address (http://...)"));
     textarea_window_set(query);
@@ -607,7 +683,12 @@ static void key_cb(lv_event_t *e) {
 
     switch (key) {
         case LV_KEY_ESC:
-            dialog_destruct();
+            if (picking) {
+                picking = false;
+                load_list();
+            } else {
+                dialog_destruct();
+            }
             break;
         case LV_KEY_ENTER:
             play_cb(NULL);
@@ -704,5 +785,6 @@ static void destruct_cb(void) {
     list_gen++;             /* una lista que llega tarde ya no se muestra */
     pthread_mutex_unlock(&fetch_mux);
     fetching = false;
+    picking   = false;
     title_lbl = now_lbl = info_lbl = table = NULL;
 }

@@ -74,6 +74,7 @@ typedef enum {
     ACTION_APP_IRADIO,  /* 124, CX8ANM: radio por Internet */
     ACTION_APP_METEO,   /* 125, CX8ANM: estación meteorológica e INUMET */
     ACTION_APP_CB,      /* 126, CX8ANM: canales de la Banda Ciudadana */
+    ACTION_APP_AERO,    /* 127, CX8ANM: banda aérea de HF */
 } press_action_t;
 
 typedef enum {
@@ -212,7 +213,10 @@ typedef struct {
     params_uint8_t       cb_band;       /* banda CB del app: 0 A ... 4 E (2: la oficial) */
     params_bool_t        clock_utc;     /* el reloj alterna hora local y UTC (clock.c) */
     params_bool_t        auto_log;      /* QSO guardados solos al mandar 73/SK (auto_log.c) */
-    params_uint8_t       language;      /* LANG_EN, LANG_ES (i18n.h) */
+    params_uint8_t       language;      /* LANG_EN, LANG_ES, LANG_DE, LANG_FR, LANG_IT (i18n.h) */
+    params_uint8_t       region;        /* región IARU 1, 2 o 3 (countries.h) */
+    params_str_t         country;       /* país ISO 3166 ("UY"), vacío: sin elegir */
+    params_bool_t        setup_done;    /* el asistente del primer encendido ya se completó */
 
     /* durty flags */
 

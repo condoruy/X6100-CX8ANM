@@ -53,6 +53,7 @@
 #include "dialog_iradio.h"
 #include "dialog_meteo.h"
 #include "dialog_cb.h"
+#include "dialog_aero.h"
 #include "cb.h"
 #include "dialog_js8.h"
 #include "dialog_psk.h"
@@ -528,6 +529,11 @@ void main_screen_open_channels(void) {
     dialog_construct(dialog_channels, obj);
 }
 
+void main_screen_open_dialog(dialog_t *d) {
+    if (dialog_is_run()) dialog_destruct();     /* Ajustes, si se abrió desde ahí */
+    dialog_construct(d, obj);
+}
+
 // Observers functions
 
 static void on_fg_freq_change(Subject *subj, void *user_data);
@@ -623,6 +629,7 @@ static const char *app_name(press_action_t a) {
         case ACTION_APP_IRADIO:     return "Internet Radio";
         case ACTION_APP_METEO:      return "Weather";
         case ACTION_APP_CB:         return "CB";
+        case ACTION_APP_AERO:       return "HF Air Band";
         default:                    return NULL;    /* Modes menu: a menu, not an app */
     }
 }
@@ -789,6 +796,9 @@ void main_screen_start_app(press_action_t app_action) {
         case ACTION_APP_CB:
             dialog_construct(dialog_cb, obj);
             break;
+        case ACTION_APP_AERO:
+            dialog_construct(dialog_aero, obj);
+            break;
 
         default:
             break;
@@ -899,6 +909,7 @@ void main_screen_action(press_action_t action) {
         case ACTION_APP_IRADIO:
         case ACTION_APP_METEO:
         case ACTION_APP_CB:
+        case ACTION_APP_AERO:
             main_screen_start_app(action);
             break;
 

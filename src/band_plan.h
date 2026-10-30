@@ -1,7 +1,7 @@
 /*
  *  SPDX-License-Identifier: LGPL-2.1-or-later
  *
- *  IARU Region 1 band plan (160 m .. 10 m, 6 m) as a thin coloured strip at
+ *  IARU band plan of the chosen region (params.region: 2200 m .. 10 m, 6 m) as a thin coloured strip at
  *  the bottom of the spectrum (top of the waterfall when the spectrum is off), lined up with the frequency row.
  */
 

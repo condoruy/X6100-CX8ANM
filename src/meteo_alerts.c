@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/stat.h>
 #include <time.h>
 
@@ -252,6 +253,7 @@ static void timer_cb(lv_timer_t *t) {
     char   cmd[160];
 
     if (busy || !params.meteo_alerts.x || wifi_get_status() != WIFI_CONNECTED) return;
+    if (params.country.x[0] && strcasecmp(params.country.x, "UY") != 0) return;   /* INUMET: solo Uruguay */
     if (last_check && now - last_check < CHECK_S) return;
     last_check = now;
     meteo_position(&lat, &lon);

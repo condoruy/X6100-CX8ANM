@@ -19,6 +19,10 @@ target_sources(${PROJECT_NAME} PUBLIC
     dialog_meteo.c
     dialog_cb.c
     cb.c
+    countries.c
+    dialog_setup.c
+    dialog_aero.c
+    aero.c
     meteo_alerts.c
     dialog_js8.c
     dialog_psk.c psk_rx.c psk_tx.c psk_spec.c psk_macro.c digi_qso.c

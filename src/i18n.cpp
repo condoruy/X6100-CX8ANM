@@ -24,12 +24,29 @@ struct entry_t {
 const entry_t table_es[] = {
 #include "i18n_es.inc"
 };
+const entry_t table_de[] = {
+#include "i18n_de.inc"
+};
+const entry_t table_fr[] = {
+#include "i18n_fr.inc"
+};
+const entry_t table_it[] = {
+#include "i18n_it.inc"
+};
 
 typedef std::unordered_map<std::string_view, const char *> dict_t;
 
+struct lang_tab_t {
+    const entry_t *rows;
+    size_t         n;
+    dict_t         dict;
+    std::once_flag once;
+};
+
+#define TAB(t) { t, sizeof(t) / sizeof(t[0]), {}, {} }
+lang_tab_t tabs[LANG_COUNT] = { {nullptr, 0, {}, {}}, TAB(table_es), TAB(table_de), TAB(table_fr), TAB(table_it) };
+
 volatile uint8_t cur_lang = LANG_EN;
-dict_t           dict_es;
-std::once_flag   dict_once;
 
 /* Resultados armados línea por línea: un anillo por hilo. LVGL copia el texto
  * al momento (lv_label_set_text y compañía), así que alcanza con que el
@@ -43,20 +60,18 @@ thread_local int  ring_pos;
 std::mutex                                   perm_mutex;
 std::unordered_map<std::string, std::string> perm;
 
-void build_dicts() {
-    for (const entry_t &e : table_es) {
-        dict_es.emplace(std::string_view(e.en), e.tr);
+void build_dict(lang_tab_t *t) {
+    for (size_t i = 0; i < t->n; i++) {
+        t->dict.emplace(std::string_view(t->rows[i].en), t->rows[i].tr);
     }
 }
 
 const dict_t *cur_dict() {
-    switch (cur_lang) {
-    case LANG_ES:
-        std::call_once(dict_once, build_dicts);
-        return &dict_es;
-    default:
-        return nullptr;
-    }
+    uint8_t l = cur_lang;
+    if (l == LANG_EN || l >= LANG_COUNT) return nullptr;
+    lang_tab_t *t = &tabs[l];
+    std::call_once(t->once, build_dict, t);
+    return &t->dict;
 }
 
 const char *find(const dict_t *d, std::string_view key) {
@@ -151,4 +166,9 @@ extern "C" void i18n_set_lang(uint8_t lang) {
 
 extern "C" uint8_t i18n_get_lang(void) {
     return cur_lang;
+}
+
+extern "C" const char *i18n_lang_name(uint8_t lang) {
+    static const char *const names[LANG_COUNT] = {"English", "Español", "Deutsch", "Français", "Italiano"};
+    return lang < LANG_COUNT ? names[lang] : "";
 }

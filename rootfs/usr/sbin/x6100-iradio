@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # CX8ANM: radio por Internet en el X6100.
 #
-#   x6100-iradio country <CC> | top | search <texto>
+#   x6100-iradio country <CC> | top | air [CC] | search <texto>
 #        lista de emisoras (directorio abierto radio-browser.info), una por línea:
 #        nombre<TAB>url<TAB>códec<TAB>kbps<TAB>país   ("error <motivo>" si no hay red)
 #   x6100-iradio play <url>
@@ -135,6 +135,24 @@ def cmd_country(args):
 
 def cmd_top(args):
     print_list(api("/json/stations/search", dict(COMMON, limit="100")))
+
+
+# Banda aérea: emisoras que retransmiten el control de tránsito aéreo (torres, aproximación),
+# las del país primero. El X6100 no recibe la banda aérea de VHF (118-137 MHz) por radio.
+AIR_TAGS = ["atc", "air traffic control", "aviation", "airband", "air band", "liveatc"]
+
+
+def cmd_air(args):
+    cc = (args[0] if args else "").upper()[:2]
+    rows = []
+    for tag in AIR_TAGS:
+        try:
+            rows += api("/json/stations/search", dict(COMMON, tag=tag, limit="80"))
+        except Fail:
+            if not rows and tag == AIR_TAGS[-1]:
+                raise
+    rows.sort(key=lambda s: (clean(s.get("countrycode")).upper() != cc, -(s.get("clickcount") or 0)))
+    print_list(rows)
 
 
 def cmd_search(args):
@@ -301,9 +319,9 @@ def cmd_play(args):
 
 
 def main(argv):
-    cmds = {"country": cmd_country, "top": cmd_top, "search": cmd_search, "play": cmd_play}
+    cmds = {"country": cmd_country, "top": cmd_top, "search": cmd_search, "air": cmd_air, "play": cmd_play}
     if len(argv) < 2 or argv[1] not in cmds:
-        print("uso: x6100-iradio country CC | top | search TEXTO | play URL", file=sys.stderr)
+        print("uso: x6100-iradio country CC | top | air [CC] | search TEXTO | play URL", file=sys.stderr)
         return 2
     try:
         return cmds[argv[1]](argv[2:]) or 0

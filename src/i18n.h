@@ -21,6 +21,9 @@ extern "C" {
 typedef enum {
     LANG_EN = 0,
     LANG_ES = 1,
+    LANG_DE = 2,
+    LANG_FR = 3,
+    LANG_IT = 4,
     LANG_COUNT
 } lang_t;
 
@@ -30,6 +33,8 @@ const char *tr(const char *s);
 const char *tr_static(const char *s);
 
 void   i18n_set_lang(uint8_t lang);
+/* El nombre de cada idioma en ese idioma ("Deutsch"), para elegirlo */
+const char *i18n_lang_name(uint8_t lang);
 uint8_t i18n_get_lang(void);
 
 #ifdef __cplusplus

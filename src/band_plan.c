@@ -7,6 +7,7 @@
 #include "cfg/cfg_api.h"
 #include "styles.h"
 #include "theme.h"
+#include "params/params.h"
 
 #include <stddef.h>
 #include <string.h>
@@ -28,27 +29,64 @@ typedef struct {
     bp_type_t type;
 } bp_seg_t;
 
-/* IARU Región 2 (Uruguay), rangos vecinos del mismo tipo juntos */
-static const bp_seg_t plan[] = {
-    {   135700,   137800, BP_CW  }, {   472000,   479000, BP_CW  },
+/* Planes de banda IARU por región (params.region), rangos vecinos del mismo tipo juntos.
+ * De 30 m para arriba son iguales en las tres; cambian 160, 80, 40 y 6 m. */
+#define LOW_COMMON \
+    {   135700,   137800, BP_CW  }, {   472000,   479000, BP_CW  }, \
+    {  5351500,  5354000, BP_CW  }, {  5354000,  5366000, BP_ALL }, {  5366000,  5366500, BP_DIG },
+#define HIGH_COMMON \
+    { 10100000, 10130000, BP_CW  }, { 10130000, 10150000, BP_DIG }, \
+    { 14000000, 14070000, BP_CW  }, { 14070000, 14099000, BP_DIG }, { 14099000, 14101000, BP_BCN }, \
+    { 14101000, 14112000, BP_DIG }, { 14112000, 14350000, BP_ALL }, \
+    { 18068000, 18095000, BP_CW  }, { 18095000, 18109000, BP_DIG }, { 18109000, 18111000, BP_BCN }, \
+    { 18111000, 18120000, BP_DIG }, { 18120000, 18168000, BP_ALL }, \
+    { 21000000, 21070000, BP_CW  }, { 21070000, 21120000, BP_DIG }, { 21120000, 21149000, BP_CW  }, \
+    { 21149000, 21151000, BP_BCN }, { 21151000, 21450000, BP_ALL }, \
+    { 24890000, 24915000, BP_CW  }, { 24915000, 24929000, BP_DIG }, { 24929000, 24931000, BP_BCN }, \
+    { 24931000, 24990000, BP_ALL }, \
+    { 28000000, 28070000, BP_CW  }, { 28070000, 28190000, BP_DIG }, { 28190000, 28225000, BP_BCN }, \
+    { 28225000, 29700000, BP_ALL }, \
+
+
+static const bp_seg_t plan_r1[] = {
+    LOW_COMMON
+    {  1810000,  1838000, BP_CW  }, {  1838000,  1843000, BP_DIG }, {  1843000,  2000000, BP_ALL },
+    {  3500000,  3570000, BP_CW  }, {  3570000,  3600000, BP_DIG }, {  3600000,  3800000, BP_ALL },
+    {  7000000,  7040000, BP_CW  }, {  7040000,  7050000, BP_DIG }, {  7050000,  7200000, BP_ALL },
+    HIGH_COMMON
+    { 50000000, 50100000, BP_CW  }, { 50100000, 50300000, BP_ALL }, { 50300000, 50400000, BP_DIG },
+    { 50400000, 50500000, BP_BCN }, { 50500000, 52000000, BP_ALL },
+};
+
+static const bp_seg_t plan_r2[] = {
+    LOW_COMMON
     {  1800000,  1838000, BP_CW  }, {  1838000,  1843000, BP_DIG }, {  1843000,  2000000, BP_ALL },
     {  3500000,  3570000, BP_CW  }, {  3570000,  3600000, BP_DIG }, {  3600000,  4000000, BP_ALL },
-    {  5351500,  5354000, BP_CW  }, {  5354000,  5366000, BP_ALL }, {  5366000,  5366500, BP_DIG },
     {  7000000,  7040000, BP_CW  }, {  7040000,  7050000, BP_DIG }, {  7050000,  7300000, BP_ALL },
-    { 10100000, 10130000, BP_CW  }, { 10130000, 10150000, BP_DIG },
-    { 14000000, 14070000, BP_CW  }, { 14070000, 14099000, BP_DIG }, { 14099000, 14101000, BP_BCN },
-    { 14101000, 14112000, BP_DIG }, { 14112000, 14350000, BP_ALL },
-    { 18068000, 18095000, BP_CW  }, { 18095000, 18109000, BP_DIG }, { 18109000, 18111000, BP_BCN },
-    { 18111000, 18120000, BP_DIG }, { 18120000, 18168000, BP_ALL },
-    { 21000000, 21070000, BP_CW  }, { 21070000, 21120000, BP_DIG }, { 21120000, 21149000, BP_CW  },
-    { 21149000, 21151000, BP_BCN }, { 21151000, 21450000, BP_ALL },
-    { 24890000, 24915000, BP_CW  }, { 24915000, 24929000, BP_DIG }, { 24929000, 24931000, BP_BCN },
-    { 24931000, 24990000, BP_ALL },
-    { 28000000, 28070000, BP_CW  }, { 28070000, 28190000, BP_DIG }, { 28190000, 28225000, BP_BCN },
-    { 28225000, 29700000, BP_ALL },
+    HIGH_COMMON
     { 50000000, 50100000, BP_CW  }, { 50100000, 50300000, BP_ALL }, { 50300000, 50400000, BP_DIG },
     { 50400000, 50500000, BP_BCN }, { 50500000, 54000000, BP_ALL },
 };
+
+static const bp_seg_t plan_r3[] = {
+    LOW_COMMON
+    {  1800000,  1830000, BP_CW  }, {  1830000,  1840000, BP_DIG }, {  1840000,  2000000, BP_ALL },
+    {  3500000,  3535000, BP_CW  }, {  3535000,  3600000, BP_DIG }, {  3600000,  3900000, BP_ALL },
+    {  7000000,  7025000, BP_CW  }, {  7025000,  7040000, BP_DIG }, {  7040000,  7200000, BP_ALL },
+    HIGH_COMMON
+    { 50000000, 50100000, BP_CW  }, { 50100000, 50300000, BP_ALL }, { 50300000, 50400000, BP_DIG },
+    { 50400000, 50500000, BP_BCN }, { 50500000, 54000000, BP_ALL },
+};
+
+#define N(a) (sizeof(a) / sizeof(a[0]))
+
+static const bp_seg_t *plan_of(size_t *n) {
+    switch (params.region.x) {
+        case 1:  *n = N(plan_r1); return plan_r1;
+        case 3:  *n = N(plan_r3); return plan_r3;
+        default: *n = N(plan_r2); return plan_r2;
+    }
+}
 
 static const theme_color_t colors[] = { TC_bp_cw, TC_bp_dig, TC_bp_ssb, TC_bp_bcn };
 /* Longest first: the first label that fits the segment is used */
@@ -75,7 +113,10 @@ static void redraw(void) {
         int32_t left = span_center - span_half;
         int64_t span = 2 * (int64_t)span_half;
 
-        for (size_t i = 0; i < sizeof(plan) / sizeof(plan[0]) && n < POOL; i++) {
+        size_t          np;
+        const bp_seg_t *plan = plan_of(&np);
+
+        for (size_t i = 0; i < np && n < POOL; i++) {
             const bp_seg_t *p    = &plan[i];
             int64_t         a    = (int64_t)(p->start - left) * WIDTH / span;
             int64_t         b    = (int64_t)(p->end - left) * WIDTH / span;
@@ -163,7 +204,10 @@ void band_plan_refresh(void) {
 }
 
 bool band_plan_is_cw(int32_t freq) {
-    for (size_t i = 0; i < sizeof(plan) / sizeof(plan[0]); i++) {
+    size_t          np;
+    const bp_seg_t *plan = plan_of(&np);
+
+    for (size_t i = 0; i < np; i++) {
         if (freq >= plan[i].start && freq < plan[i].end) {
             return plan[i].type == BP_CW;
         }

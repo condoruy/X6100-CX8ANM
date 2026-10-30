@@ -28,7 +28,7 @@ las hereda a través del firmware de IU1WXY, y el crédito de su creación corre
 
 *English summary: this is a community edition of the IU1WXY X6100 firmware, which was forked from
 Hany El Imam's 1KO125 firmware (itself based on the R1CBU/R2RFE x6100_gui). The SSTV, WEFAX, DSC,
-NAVTEX and SITOR-B apps were originally conceived and developed in 1KO125. This edition adds a Spanish interface, Region 2 band plans and extra apps. All credit
+NAVTEX and SITOR-B apps were originally conceived and developed in 1KO125. This edition adds Spanish, German, French and Italian interfaces, a first-start assistant (language, callsign, IARU region, country), HF air band and extra apps. All credit
 for the base firmware goes to its original authors; please report issues with this edition here,
 not upstream.*
 
@@ -37,11 +37,15 @@ not upstream.*
 Todo lo del firmware de IU1WXY (modos digitales en la radio, DX Cluster en la cascada, SOTA/POTA,
 control remoto, temas…, ver [su README](docs/README_IU1WXY.md)) y además:
 
-- **Interfaz en español**, elegible en Ajustes.
-- **Planes de banda de la Región 2 / Uruguay.**
+- **Interfaz en español, alemán, francés e italiano** (además del inglés).
+- **Asistente del primer encendido**: idioma, licencia (indicativo), región IARU y país. La imagen
+  no trae ningún indicativo cargado.
+- **Regiones IARU 1, 2 y 3**, con sus límites de banda, su plan de banda y la lista de países de cada una.
+- **Banda aérea**: frecuencias de aviación en HF (rutas oceánicas y VOLMET) y control de tránsito
+  aéreo por Internet.
 - **Actualizar desde la propia radio** (Ajustes > Info > Actualizar), sin volver a grabar la tarjeta.
 - **Temas** estilo equipos de alta gama y de transceptores conocidos, con variantes *Deck*.
-- **Radio por Internet**, con emisoras que se agregan a mano desde la radio o desde el navegador.
+- **Radio por Internet**, por país, con emisoras que se agregan a mano desde la radio o desde el navegador.
 - **Estación meteorológica** en pantalla y **alertas de INUMET**.
 - **Banda Ciudadana (CB) por canales** (bandas A a E), con modo predeterminado y la perilla
   saltando de canal en canal.
@@ -103,7 +107,9 @@ Gracias por la aclaración, Hany. Ya lo corregí: el repositorio, las notas de c
 - **JS8** de randal007 sobre JS8Call (Jordan Sherer KN4CRD); **wsprd** y **JTTY** de WSJT-X
   (K1JT, K9AN y el equipo de WSJT-X).
 - Bibliotecas: LVGL, cJSON, FFTW, liquid-dsp, libpng, bottle, PulseAudio, BlueZ, FFmpeg.
-- Datos: Reverse Beacon Network, POTA, SOTA, radio-browser.info, Open-Meteo, INUMET.
+- Datos: Reverse Beacon Network, POTA, SOTA, radio-browser.info, Open-Meteo, INUMET; nombres de
+  países de Unicode CLDR (Babel) y zonas horarias de tzdata; frecuencias de aviación de HFUnderground y
+  DX Info Centre.
 - Hardware: Xiegu. Y gracias a toda la comunidad del X6100.
 
 ## Licencia

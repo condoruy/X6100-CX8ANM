@@ -110,7 +110,7 @@ params_t params = {
     .rec_gain_db_f          = { .x = 0.0f, .name = "rec_gain_db_f"},
 
     .qth                    = { .x = "",  .max_len = 6, .name = "qth" },
-    .callsign               = { .x = "CX8ANM",  .max_len = 12, .name = "callsign" },
+    .callsign               = { .x = "",  .max_len = 12, .name = "callsign" },   /* lo pide el asistente del primer encendido */
 
     .wifi_enabled           = { .x = false, .name="wifi_enabled" },
 
@@ -118,6 +118,9 @@ params_t params = {
     .theme_name             = { .x = "CX8ANM", .max_len = 31, .name = "theme_name" },
     .font                  = { .x = 2, .name="font"},     /* FONT_DEJAVU */
     .language              = { .x = 1, .name="language"}, /* LANG_ES */
+    .region                = { .x = 2, .name="region"},
+    .country               = { .x = "", .max_len = 2, .name = "country" },
+    .setup_done            = { .x = false, .name="setup_done"},
     .auto_log              = { .x = true, .name="auto_log"},
     .clock_utc             = { .x = true, .name="clock_utc"},
     .power_save            = { .x = false, .name="power_save"},
@@ -308,6 +311,9 @@ static bool params_load() {
         if (params_load_uint8(&params.theme, name, i)) continue;
         if (params_load_uint8(&params.font, name, i)) continue;
         if (params_load_uint8(&params.language, name, i)) continue;
+        if (params_load_uint8(&params.region, name, i)) continue;
+        if (params_load_str(&params.country, name, t)) continue;
+        if (params_load_bool(&params.setup_done, name, i)) continue;
         if (params_load_bool(&params.auto_log, name, i)) continue;
         if (params_load_bool(&params.clock_utc, name, i)) continue;
         if (params_load_bool(&params.power_save, name, i)) continue;
@@ -446,6 +452,9 @@ static void params_save() {
     params_save_uint8(&params.theme);
     params_save_uint8(&params.font);
     params_save_uint8(&params.language);
+    params_save_uint8(&params.region);
+    params_save_str(&params.country);
+    params_save_bool(&params.setup_done);
     params_save_bool(&params.auto_log);
     params_save_bool(&params.clock_utc);
     params_save_bool(&params.power_save);

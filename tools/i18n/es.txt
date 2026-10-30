@@ -1500,3 +1500,67 @@ Edition	Edición
 Derived from	Deriva de
 Created in 1KO125	Creadas en 1KO125
 Reports	Reportes
+Next	Siguiente
+Finish	Terminar
+Type\ncallsign	Escribir\nindicativo
+No license\n(listen)	Sin licencia\n(escucha)
+Countries in this region	Países de esta región
+ISO code	Código ISO
+Locator of the capital	Locator de la capital
+The clock takes this country's time, and Internet radio its stations.	El reloj toma la hora de este país, y la radio por Internet sus emisoras.
+License (callsign)	Licencia (indicativo)
+Region	Región
+Choose the language with the MFK knob and press it	Elija el idioma con la perilla MFK y apriétela
+Your amateur radio callsign: it is used by FT8, JS8, the log, the cluster and the spots. Without a license you can still listen	Su indicativo de radioaficionado: lo usan FT8, JS8, el libro de guardia, el cluster y los spots. Sin licencia igual puede escuchar
+The IARU region sets the band edges and the band plan shown under the spectrum	La región IARU fija los límites de las bandas y el plan de banda que se ve bajo el espectro
+Choose your country: it sets the clock and the Internet radio stations	Elija su país: ajusta el reloj y las emisoras de la radio por Internet
+Welcome	Bienvenido
+none (listener)	ninguno (escucha)
+Saved	Guardado
+IARU Region 1	Región IARU 1
+IARU Region 2	Región IARU 2
+IARU Region 3	Región IARU 3
+Europe, Africa, the Middle East, Russia and the former Soviet republics, and Mongolia	Europa, África, Medio Oriente, Rusia y las ex repúblicas soviéticas, y Mongolia
+North, Central and South America, the Caribbean, Greenland and Hawaii	América del Norte, Central y del Sur, el Caribe, Groenlandia y Hawái
+Asia and the Pacific: China, Japan, India, Iran, Pakistan, South-East Asia, Australia, New Zealand and the Pacific islands	Asia y el Pacífico: China, Japón, India, Irán, Pakistán, el Sudeste Asiático, Australia, Nueva Zelanda y las islas del Pacífico
+Area	Zona
+Europe, Africa, Middle East	Europa, África, Medio Oriente
+Americas	Américas
+Asia and Pacific	Asia y Pacífico
+All areas	Todas las zonas
+HF AIR BAND	BANDA AÉREA HF
+USB. By day 8-18 MHz, at night 3-6 MHz. VHF air band (118-137 MHz): Internet radio > List	USB. De día 8-18 MHz, de noche 3-6 MHz. Banda aérea VHF (118-137 MHz): Radio por Internet > Lista
+South America	Sudamérica
+South Atlantic	Atlántico Sur
+South America (weather)	Sudamérica (meteorología)
+Ezeiza, Argentina (weather)	Ezeiza, Argentina (meteorología)
+Argentina, regional (weather)	Argentina, regionales (meteorología)
+Caribbean	Caribe
+North Atlantic	Atlántico Norte
+Central East Pacific	Pacífico centro-este
+Europe	Europa
+Shannon, Ireland (weather)	Shannon, Irlanda (meteorología)
+RAF, United Kingdom (weather)	RAF, Reino Unido (meteorología)
+Africa	África
+Africa (weather)	África (meteorología)
+Middle East	Medio Oriente
+North Central Asia	Asia centro-norte
+East Asia	Asia oriental
+China (weather)	China (meteorología)
+South-East Asia	Sudeste Asiático
+Bangkok, India, Singapore (weather)	Bangkok, India, Singapur (meteorología)
+Central West Pacific	Pacífico centro-oeste
+Tokyo, Hong Kong, Auckland (weather)	Tokio, Hong Kong, Auckland (meteorología)
+North Pacific	Pacífico Norte
+South Pacific	Pacífico Sur
+Search and rescue (worldwide)	Búsqueda y rescate (mundial)
+Play /\nStop	Escuchar /\nParar
+Air band (air traffic control)	Banda aérea (control de tránsito aéreo)
+Choose the country and press the MFK knob	Elija el país y apriete la perilla MFK
+No favorites yet: List shows your country's stations, Favorite saves one	Sin favoritas todavía: Lista muestra las emisoras de su país, Favorita guarda una
+IARU region	Región IARU
+First-start assistant	Asistente inicial
+Open...	Abrir...
+APP HF air band	APP Banda aérea HF
+HF Air\nBand	Banda\naérea HF
+HF Air Band	Banda aérea HF

@@ -1,0 +1,1453 @@
+# Traducción al francés: texto original (inglés) <TAB> traducción
+Spectrum	Spectre
+Spectrum\nZoom	Zoom\nspectre
+Set 1	Mém 1
+Set 2	Mém 2
+Set 3	Mém 3
+Set 4	Mém 4
+Set 5	Mém 5
+Set 6	Mém 6
+Set 7	Mém 7
+Set 8	Mém 8
+Recorder	Enregistreur
+SWR\nScan	Balayage\nROS
+RX\nRecorder	Enreg.\nRX
+CW\nTrainer	Entraîn.\nCW
+Field\nOps	SOTA\nPOTA
+Log\nQSO	Noter\nQSO
+Stop\nrec	Arrêter\nenreg.
+Screen\nrec	Enreg.\nécran
+WF\nFixed	Cascade\nfixe
+WF\nCenter	Cascade\ncentre
+Span +\nmax	Largeur +\nmax
+Span -\nmin	Largeur -\nmin
+Test\nbeacon	Tester\nbalise
+Use\nband	Utiliser\nbande
+Change\npassword	Changer\nmot de passe
+Scan	Chercher
+Settings	Réglages
+Modes	Modes
+Bands	Bandes
+Rate	Vitesse
+Shift	Décalage
+Center	Centre
+Reverse	Inverser
+Parse	Analyser
+Added to VOL encoder	Ajouté au bouton VOL
+Moved to MFK encoder	Déplacé vers le bouton MFK
+Removed from MFK encoder	Retiré du bouton MFK
+Slow	Lent
+Fast	Rapide
+Fixed	Fixe
+Span +	Largeur +
+Span -	Largeur -
+Power	Puissance
+Volume	Volume
+Squelch	Squelch
+RF gain	Gain RF
+TX power	Puissance TX
+Filter low	Filtre bas
+Filter high	Filtre haut
+Filter BW	Largeur filtre
+Moni level	Niveau moni.
+IF shift	Décalage FI
+WF ref	Réf. cascade
+Speed	Vitesse
+Train	Entraînement
+Tone	Tonalité
+Mode	Mode
+Iambic	Iambique
+QSK time	Délai QSK
+Ratio	Rapport
+Decoder	Décodeur
+Tuner	Accord
+Dec SNR	SNR décod.
+CW peak	Pic CW
+CW peak Q	Q pic CW
+DNF freq	Fréq. DNF
+DNF width	Largeur DNF
+NB level	Niveau NB
+NB width	Largeur NB
+NR level	Niveau NR
+(SETTINGS	(RÉGLAGES
+CHANNEL	CANAL
+Language: %s     Target: %s	Langue : %s     Cible : %s
+ITU: %s     Days: %s	UIT : %s     Jours : %s
+Daily	Quotidien
+NO STATION SCHEDULED	AUCUNE STATION PROGRAMMÉE
+SAVE ERROR	ERREUR D'ENREGISTREMENT
+Unable to load channels	Impossible de charger les canaux
+Channel save error	Erreur d'enregistrement du canal
+Unable to add channel	Impossible d'ajouter le canal
+Unable to set channel name	Impossible de nommer le canal
+CHANNEL SAVED	CANAL ENREGISTRÉ
+Nothing to load for memory %i	La mémoire %i est vide
+Loaded from memory %i	Chargé depuis la mémoire %i
+Saved in memory %i	Enregistré dans la mémoire %i
+Power off	Éteindre
+Freq step: %i Hz	Pas de fréquence : %i Hz
+SWR Scan	Balayage ROS
+CW Trainer	Entraînement CW
+CW Keyboard	Clavier CW
+Field Ops	SOTA/POTA
+Snake	Serpent
+Centered	Centrée
+Not used in this mode	Non utilisé dans ce mode
+Clone VFO %s	Copier VFO %s
+Low battery! Turning off in 30s.	Batterie faible ! Extinction dans 30 s.
+Waterfall	Cascade
+IF shift is not supported	Décalage FI non disponible
+Unknown	Inconnu
+BANDS   %.4f MHz	BANDES   %.4f MHz
+Display	Affichage
+Wireless	Sans fil
+Keys	Touches
+TX Cal	Calib. TX
+Font: this theme has its own	Police : ce thème a la sienne
+Date	Date
+Time	Heure
+Timeout, Brightness	Délai, luminosité
+Buttons brightness	Luminosité des touches
+Always Off	Toujours éteint
+Always On	Toujours allumé
+Temporarily On	Allumé un moment
+Line-in, Line-out	Entrée, sortie ligne
+Popups Freq/Info/ALC	Fenêtres Fréq/Info/ALC
+None	Aucun
+Screenshot	Capture d'écran
+RX recorder on/off	Enreg. RX oui/non
+Screen rec on/off	Enreg. écran oui/non
+Mute	Muet
+WF mode	Mode cascade
+ATT on/off	ATT oui/non
+PRE on/off	PRE oui/non
+Tuner on/off	Coupleur oui/non
+Tuner: tune	Coupleur : accorder
+APP CW Trainer	APP Entraînement CW
+APP Field Ops	APP SOTA/POTA
+APP Bands	APP Bandes
+APP RX recorder	APP Enregistreur RX
+APP SWR Scan	APP Balayage ROS
+APP QTH grid	APP Locator QTH
+APP Settings	APP Réglages
+Step up	Pas plus
+Step down	Pas moins
+NR toggle	NR oui/non
+NB toggle	NB oui/non
+F1 long	F1 long
+F2 long	F2 long
+Play, Rec gain	Gain lecture, enreg.
+%i: from, to, shift	%i : de, à, décalage
+Fill, peaks	Remplissage, pics
+Cluster spots	Spots du cluster
+Band plan	Plan de bande
+S-meter type	Type de S-mètre
+Bars	Barres
+Needle	Aiguille
+S-meter colours	Couleurs du S-mètre
+Theme	Thème
+Scale	Échelle
+Level	Niveau
+Decoder text	Texte décodé
+Large	Grand
+Compact	Compact
+FT8/FT4 info	Info FT8/FT4
+Country	Pays
+Country + km	Pays + km
+Country + mi	Pays + mi
+Cluster column	Colonne du cluster
+Auto level, offset	Niveau auto, décalage
+Manual min, max	Min, max manuel
+Line, zoom	Ligne, zoom
+Smooth scroll	Défilement fluide
+Update alert	Avis de mise à jour
+Knob info	Info boutons
+Speaker mode	Mode haut-parleur
+Compressor, makeup	Compresseur, gain
+IQ offsets	Réglages IQ
+Codec gain	Gain du codec
+Band output gain	Gain de sortie par bande
+FM pre/de-emphasis	Pré/désaccentuation FM
+CESSB on, level	CESSB oui, niveau
+Pairing %i:%02i	Appairage %i:%02i
+Pairing (3 min)	Appairer (3 min)
+Charger	Chargeur
+Shadow	Ombre
+Freq acceleration	Accélération fréquence
+Lite	Légère
+Strong	Forte
+Font	Police
+Language	Langue
+connected	connecté
+headphones	casque
+phone	téléphone
+keyboard	clavier
+new	nouveau
+MFK: choose - press: confirm - %s: close	MFK : choisir - appuyer : confirmer - %s : fermer
+off	éteint
+on	allumé
+starting	démarrage
+disconnected	déconnecté
+connecting	connexion
+saved	enregistré
+scanning...	recherche...
+last scan %i s ago	dernière recherche il y a %i s
+Turning on	Allumage
+Incorrect password	Mot de passe incorrect
+Password	Mot de passe
+Disconnect	Déconnecter
+Connect	Connecter
+Change password	Changer le mot de passe
+Delete	Supprimer
+Connection deleted	Connexion supprimée
+WiFi/BT power	Alimentation WiFi/BT
+Status	État
+IP / Gateway	IP / Passerelle
+Networks	Réseaux
+press to pair	appuyer pour appairer
+not connected	non connecté
+yes	oui
+no headphones or keyboards found	aucun casque ni clavier trouvé
+Connect at startup	Connecter au démarrage
+Forget	Oublier
+Cancel	Annuler
+pair again to use it	appairer à nouveau pour l'utiliser
+rx on	rx oui
+rx off	rx non
+Headphones, keyboards	Casques, claviers
+Activity	Activité
+RX to headphones	RX vers le casque
+Mute speaker	Couper le haut-parleur
+AF 0 while connected	AF à 0 pendant la connexion
+no client	aucun client
+User	Utilisateur
+Server	Serveur
+Port / Status	Port / État
+Too long	Trop long
+IP address	Adresse IP
+Netmask, 255.255.255.0 or /24	Masque, 255.255.255.0 ou /24
+Gateway (optional)	Passerelle (facultatif)
+DNS (optional)	DNS (facultatif)
+Ethernet settings saved	Réglages Ethernet enregistrés
+Netmask	Masque
+Gateway	Passerelle
+Gateway in use	Passerelle utilisée
+Address in use	Adresse utilisée
+Static	Fixe
+Apply	Appliquer
+Callsign	Indicatif
+QTH locator	Locator QTH
+S-METER CALIBRATION	CALIBRATION DU S-MÈTRE
+-22 dB matches an IC-7300. Change it only reading the same signal on a calibrated reference (radio or generator).	-22 dB correspond à un IC-7300. Ne le changez qu'en comparant le même signal avec une référence calibrée (poste ou générateur).
+Built-in	Intégré
+Hand	À main
+Zone	Fuseau horaire
+STATION	STATION
+DATE / TIME	DATE / HEURE
+CONTROLS	COMMANDES
+Accel. onset	Début accél.
+S-meter cal	Calib. S-mètre
+WFVIEW SERVER	SERVEUR WFVIEW
+Main knob steps channels	Le bouton principal saute les canaux
+Microphone	Microphone
+FRONT KEYS, LONG PRESS	TOUCHES AVANT, APPUI LONG
+HAND MIC KEYS	TOUCHES DU MICRO À MAIN
+CLUSTER FILTERS	FILTRES DU CLUSTER
+Bands (m)	Bandes (m)
+For the app, the column and the waterfall. Alerts always show.	Pour l'app, la colonne et la cascade. Les alertes s'affichent toujours.
+Activity: none lit = all spots. Max age, spotters, alerts: web Cluster page.	Activité : aucune cochée = tous les spots. Âge max, spotters, alertes : page web Cluster.
+CLUSTER VIEW	VUE DU CLUSTER
+Newest first	Plus récents d'abord
+All bands	Toutes les bandes
+Spot snap hold	Maintien d'accrochage
+Spot snap speed	Vitesse d'accrochage
+Report decodes	Signaler les décodages
+SWR protection	Protection ROS
+TX CALIBRATION	CALIBRATION TX
+TX PROTECTION	PROTECTION TX
+BACKLIGHT	RÉTROÉCLAIRAGE
+SPECTRUM	SPECTRE
+Fill gradient	Remplissage dégradé
+Height	Hauteur
+WATERFALL	CASCADE
+MAIN SCREEN	ÉCRAN PRINCIPAL
+Needle lamp	Lampe d'aiguille
+INTERFACE	INTERFACE
+RX AUDIO	AUDIO RX
+TX AUDIO	AUDIO TX
+MICROPHONE	MICROPHONE
+Input	Entrée
+Hand mic	Micro à main
+Gain	Gain
+Delay	Délai
+Hang	Maintien
+Knee	Coude
+Slope	Pente
+Bluetooth service not running	Le service Bluetooth n'est pas actif
+no adapter	aucun adaptateur
+WiFi/BT chip off (Wireless)	Puce WiFi/BT éteinte (Sans fil)
+pairing	appairage
+visible and pairable	visible et appairable
+hidden	caché
+bridge not running	pont arrêté
+none connected	aucun connecté
+%i connected	%i connectés
+ADAPTER	ADAPTATEUR
+Address	Adresse
+DEVICES	APPAREILS
+HEADPHONES	CASQUE
+BLUETOOTH CAT	CAT PAR BLUETOOTH
+Clients	Clients
+Port	Port
+SPP, channel 1	SPP, canal 1
+status	état
+could not collect them	impossible de les réunir
+Send	Envoyer
+collecting...	collecte...
+Diagnostics	Diagnostic
+Send...	Envoyer...
+Version	Version
+Author	Auteur
+Contact	Contact
+Baseband	Bande de base
+Modes menu overlaps the buttons	Le menu des modes cache les boutons
+DIGITAL MODES	MODES NUMÉRIQUES
+last used	dernier utilisé
+MFK: choose - press: open - Modes: close	MFK : choisir - appuyer : ouvrir - Modes : fermer
+Voice SQL	Squelch voix
+Filter bw	Largeur filtre
+Compressor	Compresseur
+Cluster order	Ordre du cluster
+Freq	Fréq.
+Cluster bands	Bandes du cluster
+Band	Bande
+All	Toutes
+Notch filter	Filtre coupe-bande
+DNF center	Centre DNF
+DNF auto	DNF auto
+Noise blanker	Suppresseur de bruit (NB)
+Noise reduction	Réduction de bruit (NR)
+Key speed	Vitesse CW
+Key train	Entraînement CW
+Key mode	Mode manipulateur
+Iambic mode	Mode iambique
+Key tone	Tonalité CW
+Key vol	Volume CW
+Key ratio	Rapport CW
+CW decoder	Décodeur CW
+CW tuner	Accord CW
+CW decoded snr	SNR décodé CW
+IP address:	Adresse IP :
+Already scanning	Recherche déjà en cours
+Start scan	Lancer la recherche
+Can't update new connection	Impossible de mettre à jour la nouvelle connexion
+Password is not used	Pas de mot de passe
+Starting...	Démarrage...
+Scanning...	Recherche...
+Connecting...	Connexion...
+Password is required	Mot de passe requis
+Connected	Connecté
+Disconnected	Déconnecté
+ACCESS POINT	POINT D'ACCÈS
+Access point	Point d'accès
+Network name	Nom du réseau
+Web page	Page web
+The radio makes its own WiFi network: connect the PC or phone to it and open the web page. No router needed. The home WiFi pauses while it is on.	La radio crée son propre réseau WiFi : connectez le PC ou le téléphone et ouvrez la page web. Pas besoin de routeur. Le WiFi de la maison est en pause pendant ce temps.
+Access point: %s	Point d'accès : %s
+error	erreur
+Access point on: connect the PC to it	Point d'accès allumé : connectez-y le PC
+Access point off	Point d'accès éteint
+Turn on WiFi/BT power first	Allumez d'abord le WiFi/BT
+stopping	arrêt
+Comp	Compresseur
+Reply	Répondre
+Heart-\nbeat	Battement\n(HB)
+Query >	Demander >
+Clear	Effacer
+Time\nSync	Synchro\nheure
+Settings...	Réglages...
+Log QSO	Noter le QSO
+Alerts >	Alertes >
+Map	Carte
+  (bad checksum)	  (somme de contrôle erronée)
+Listening for JS8...	Écoute JS8...
+now	maintenant
+heard you %+03d (%s)	vous a entendu %+03d (%s)
+heard you (%s)	vous a entendu (%s)
+No stations heard yet	Aucune station entendue pour l'instant
+%s at %.0f Hz, %+d dB	%s à %.0f Hz, %+d dB
+AUTO/HB PAUSED (idle)  	AUTO/HB EN PAUSE (inactif)  
+HB paused (Turbo)  	HB en pause (Turbo)  
+HB %um next %02d:%02d  	HB %um prochain %02d:%02d  
+ drift %+.1fs	 dérive %+.1fs
+JS8: cannot start decoder	JS8 : impossible de lancer le décodeur
+TX stopped	TX arrêtée
+JS8: cannot start transmitter	JS8 : impossible de lancer l'émetteur
+Auto CQ %u min after each CQ: turn the knob (%d-%d), press CQ when done	CQ auto %u min après chaque CQ : tournez le bouton (%d-%d), puis appuyez sur CQ
+HB every %u min: turn the knob (5-30), press HB when done	HB toutes les %u min : tournez le bouton (5-30), puis appuyez sur HB
+starts in	commence dans
+next in	prochain dans
+TX %4.0f Hz %s  sending %d/%d   %s	TX %4.0f Hz %s  envoi %d/%d   %s
+TX %4u Hz %s   ready%s%s	TX %4u Hz %s   prêt%s%s
+  (set your callsign: Settings > General)	  (indiquez votre indicatif : Réglages > Général)
+      selected: 	      choisie : 
+      auto CQ	      CQ auto
+Already sending - Stop TX first	Émission en cours : arrêtez d'abord la TX
+%sQueued: %d frame%s, %.0f s	%sEn file : %d trame%s, %.0f s
+Auto: 	Auto : 
+replying	réponse
+%d frame%s, %.0f s	%d trame%s, %.0f s
+Saved message %d saved	Message enregistré %d enregistré
+Saved message %d cleared	Message enregistré %d effacé
+Groups: %s	Groupes : %s
+No groups	Aucun groupe
+%s saved	%s enregistré
+Set your callsign first: Settings > General	Indiquez d'abord votre indicatif : Réglages > Général
+CALL MESSAGE / @ALLCALL ...	INDICATIF MESSAGE / @ALLCALL ...
+STATUS, e.g. PORTABLE QRV	ÉTAT, p. ex. PORTABLE QRV
+Your groups, e.g. @NET @CANADA	Vos groupes, p. ex. @NET @FRANCE
+Message, e.g. <CALL> TNX FER QSO 73 GL	Message, p. ex. <CALL> TNX FER QSO 73 GL
+Their grid, e.g. DN17	Son locator, p. ex. JN18
+Their name	Son nom
+Comment for the log	Commentaire pour le log
+Your park, e.g. CA-1234	Votre parc, p. ex. FR-0001
+Your summit, e.g. VE7/LM-001	Votre sommet, p. ex. F/AB-001
+Calls or words, e.g. VE7ABC @POTA SOTA	Indicatifs ou mots, p. ex. F4ABC @POTA SOTA
+Dial frequency in kHz, e.g. 7107	Fréquence cadran en kHz, p. ex. 7107
+Park CA-1234 / summit VE7/LM-001	Parc FR-0001 / sommet F/AB-001
+kHz, e.g. 7185 - empty: the JS8 dial	kHz, p. ex. 7185 - vide : la fréquence JS8
+Comment, e.g. QRT or CQ	Commentaire, p. ex. QRT ou CQ
+Message (optional) - Enter sends	Message (facultatif) - Entrée envoie
+band changed	bande changée
+End of the %s list	Fin de la liste %s
+Power is limited to %0.0fW	La puissance est limitée à %0.0fW
+Show:\nAll	Afficher :\nTout
+Show:\nNo HB	Afficher :\nSans HB
+Show:\nDirected	Afficher :\nDirigés
+Messages (%s)	Messages (%s)
+all	tous
+directed	dirigés
+no HB	sans HB
+Not while sending - Stop TX first	Pas pendant l'émission : arrêtez d'abord la TX
+Time Sync needs %d decodes in the last 2 min (have %u). Clock far off? Set it in SETTINGS first	La synchro demande %d décodages dans les 2 dernières min (il y en a %u). Horloge très décalée ? Réglez-la d'abord dans RÉGLAGES
+stations	stations
+decodes	décodages
+JS8 time is on (within 0.05 s of %u %s)	L'heure JS8 est juste (à 0,05 s près de %u %s)
+JS8 time moved %+.2f s (median of %u %s); drift now %+.2f s	Heure JS8 décalée de %+.2f s (médiane de %u %s) ; dérive maintenant %+.2f s
+Time Sync: JS8 time %+.2f s, drift %+.2f s	Synchro : heure JS8 %+.2f s, dérive %+.2f s
+No drift: JS8 is on the radio's clock	Pas de dérive : JS8 suit l'horloge de la radio
+Drift reset: JS8 back on the radio's clock	Dérive annulée : JS8 revient à l'horloge de la radio
+Time Sync: drift reset	Synchro : dérive annulée
+Select a station first (MFK)	Choisissez d'abord une station (MFK)
+Not sending	Pas d'émission
+Stopping TX	Arrêt de la TX
+CQ: knob	CQ : bouton
+CQ auto	CQ auto
+sending	envoi
+Auto CQ %u min after each CQ (press CQ to stop)	CQ auto %u min après chaque CQ (appuyez sur CQ pour arrêter)
+manual	manuel
+Auto CQ on	CQ auto activé
+Auto CQ on: turn the knob to set the minutes, press CQ when done	CQ auto activé : tournez le bouton pour les minutes, puis appuyez sur CQ
+Auto CQ off: %s	CQ auto désactivé : %s
+idle for an hour	une heure sans activité
+could not send	envoi impossible
+No heartbeats in Turbo, as in desktop JS8Call	Pas de battements en Turbo, comme dans JS8Call sur PC
+HB timer restarted: next in %u min	Minuterie HB relancée : prochain dans %u min
+Hold	Fixer
+Replies stay on your offset	Les réponses restent sur votre décalage
+Replies move to their offset	Les réponses vont sur le décalage de l'autre
+Show\nMessages	Voir\nmessages
+Show\nStations	Voir\nstations
+Set your grid first: Settings > General	Indiquez d'abord votre locator : Réglages > Général
+Nothing to send	Rien à envoyer
+List closed	Liste fermée
+Message...	Message...
+Message for %s's inbox: type it and press Enter	Message pour la boîte de %s : tapez-le et appuyez sur Entrée
+Message via them...	Message par eux...
+Left at %s for someone: type their call, a space, the message	Laissé chez %s pour quelqu'un : tapez son indicatif, un espace, le message
+Any messages?	Des messages ?
+Fetch message #...	Récupérer le message n°...
+Type the number of the message %s holds for you	Tapez le numéro du message que %s garde pour vous
+Relay via them...	Relayer par eux...
+Passed on by %s: type the call it's for, a space, the message	Transmis par %s : tapez l'indicatif destinataire, un espace, le message
+Can they reach...?	Atteignent-ils... ?
+Ask %s if they hear a station: type its call and ?	Demandez à %s s'il entend une station : tapez l'indicatif et ?
+To %s (%+d dB)	À %s (%+d dB)
+No station selected	Aucune station choisie
+Saved messages >	Messages enregistrés >
+Close	Fermer
+Can't write %s	Impossible d'écrire %s
+Message %d: Enter saves, empty clears. Macros: <CALL> <SNR> <TDELTA> <MYCALL> <MYGRID4> <MYGRID12> <MYINFO> <MYSTATUS> <MYIDLE> <MYVERSION>	Message %d : Entrée enregistre, vide efface. Macros : <CALL> <SNR> <TDELTA> <MYCALL> <MYGRID4> <MYGRID12> <MYINFO> <MYSTATUS> <MYIDLE> <MYVERSION>
+Select a station first: message %d has <CALL>, <SNR> or <TDELTA>	Choisissez d'abord une station : le message %d contient <CALL>, <SNR> ou <TDELTA>
+Nothing to send: message %d has only macros that are empty now	Rien à envoyer : le message %d n'a que des macros vides pour l'instant
+Message %d is empty: press or hold to write one	Le message %d est vide : appuyez ou maintenez pour l'écrire
+%d: %s (select a station first)	%d : %s (choisissez d'abord une station)
+Saved: press sends, hold edits	Enregistrés : appui envoie, maintien modifie
+%d  (empty)	%d  (vide)
+< Back	< Retour
+Relaying %s's message	Relais du message de %s
+Auto: %s	Auto : %s
+Heartbeats off: %s	Battements désactivés : %s
+HB and HB ACK off: %s	HB et HB ACK désactivés : %s
+QSO with %s	QSO avec %s
+%s answered	%s a répondu
+%s asks you to relay to %s - select it and press Reply to pass it on	%s vous demande de relayer vers %s : choisissez-le et appuyez sur Répondre
+%s: Reply passes on "%s" (AUTO does it by itself)	%s : Répondre transmet "%s" (AUTO le fait seul)
+Relayed message via %s - select it and press Reply to send ACK	Message relayé par %s : choisissez-le et appuyez sur Répondre pour l'ACK
+%s: Reply sends "%s" (AUTO sends it by itself)	%s : Répondre envoie "%s" (AUTO l'envoie seul)
+Message from %s - select it and press Reply to send ACK	Message de %s : choisissez-le et appuyez sur Répondre pour l'ACK
+%s asks for the message held for them - select it and press Reply to send it	%s demande le message gardé pour lui : choisissez-le et appuyez sur Répondre
+%s asks for held message %d: Reply sends it	%s demande le message gardé %d : Répondre l'envoie
+%s asks how you copy - select it and press Reply	%s demande comment vous le recevez : choisissez-le et appuyez sur Répondre
+%s asked HW CPY?: Reply has "%s"	%s a demandé HW CPY? : Répondre contient "%s"
+%s holds a message for you - select it and press Reply to fetch it	%s garde un message pour vous : choisissez-le et appuyez sur Répondre pour le récupérer
+%s holds a message for you: Reply sends "%s"	%s garde un message pour vous : Répondre envoie "%s"
+%s asked %s - select it and press Reply to answer	%s a demandé %s : choisissez-le et appuyez sur Répondre
+%s asked %s: Reply sends "%s"	%s a demandé %s : Répondre envoie "%s"
+AUTO on: answers SNR? GRID? INFO? STATUS? HEARING? AGN?	AUTO activé : répond à SNR? GRID? INFO? STATUS? HEARING? AGN?
+AUTO off: answers are offered on Reply	AUTO désactivé : les réponses sont proposées sur Répondre
+HB: knob	HB : bouton
+HB every %u min	HB toutes les %u min
+HB off	HB désactivé
+On (idle)	On (inactif)
+HB ACK acts only while AUTO and HB are on	HB ACK n'agit que si AUTO et HB sont activés
+Relay: On	Relais : On
+Relay: Off	Relais : Off
+Relay on: relays (>) are passed on and MSG TO: messages held, as desktop JS8Call	Relais activé : les relais (>) sont transmis et les MSG TO: gardés, comme dans JS8Call sur PC
+Relay off: relays (>) and MSG TO: messages for others are ignored	Relais désactivé : les relais (>) et les MSG TO: pour d'autres sont ignorés
+(not set)	(non défini)
+(none)	(aucun)
+Spot my grid	Spot de mon locator
+Spot GPS position	Spot de la position GPS
+POTA spot	Spot POTA
+SOTA spot	Spot SOTA
+SMS text	Texte SMS
+Email	E-mail
+Winlink: start	Winlink : début
+Winlink: text	Winlink : texte
+Winlink: send	Winlink : envoyer
+APRS: the addressee is 9 characters, then ':'	APRS : le destinataire fait 9 caractères, puis ':'
+APRS: nothing to send to %s	APRS : rien à envoyer à %s
+APRS allows %d characters after the addressee, this is %u: shorten it	APRS accepte %d caractères après le destinataire, ceci en a %u : raccourcissez
+No GPS fix: plug in a GPS and wait for a fix (APP > GPS shows it)	Pas de position GPS : branchez un GPS et attendez la position (APP > GPS l'affiche)
+No current GPS fix (last one %d min ago)	Pas de position GPS actuelle (la dernière il y a %d min)
+GPS position out of range	Position GPS hors limites
+APRS: spotting %s at %s%s	APRS : spot de %s à %s%s
+APRS: position %s (%s%s) with "%s"	APRS : position %s (%s%s) avec "%s"
+Position + message: %d frames, %.0f s	Position + message : %d trames, %.0f s
+Plain position: %d frames, %.0f s - type a message, or Enter	Position seule : %d trames, %.0f s - tapez un message, ou Entrée
+SMS (NA7Q gateway): 10-digit number, space, message	SMS (passerelle NA7Q) : numéro à 10 chiffres, espace, message
+Email: address, space, message	E-mail : adresse, espace, message
+Winlink 1/3: address (or call), space, subject. Spot your grid first	Winlink 1/3 : adresse (ou indicatif), espace, objet. Faites d'abord le spot de votre locator
+Winlink 2/3: one line of the message; repeat for more lines	Winlink 2/3 : une ligne du message ; répétez pour d'autres lignes
+Winlink 3/3: sending /EX	Winlink 3/3 : envoi de /EX
+Type the frequency in kHz, e.g. 7185	Tapez la fréquence en kHz, p. ex. 7185
+Out of range: 1800 kHz - 1300 MHz	Hors limites : 1800 kHz - 1300 MHz
+Send spot	Envoyer le spot
+Summit: %s	Sommet : %s
+(type it)	(à saisir)
+Park: %s	Parc : %s
+Frequency: %s MHz (%s)	Fréquence : %s MHz (%s)
+typed	saisie
+JS8 dial	cadran JS8
+Mode: %s	Mode : %s
+Comment: %s	Commentaire : %s
+Comment: %s (auto)	Commentaire : %s (auto)
+Comment: (none)	Commentaire : (aucun)
+Type the %s first	Saisissez d'abord %s
+summit	le sommet
+park	le parc
+%s spot: %s. A JS8Call APRS gateway must hear it; the reply goes to APRS, not here	Spot %s : %s. Une passerelle APRS JS8Call doit l'entendre ; la réponse va à APRS, pas ici
+Summit, e.g. VE7/LM-001	Sommet, p. ex. F/AB-001
+Park, e.g. CA-1234 (POTA uses US- and CA- now, not K- or VE-)	Parc, p. ex. FR-0001 (POTA utilise maintenant US- et CA-, pas K- ou VE-)
+Frequency in kHz (7185) or MHz for VHF (144.2); clear it and Enter for the JS8 dial	Fréquence en kHz (7185) ou MHz en VHF (144.2) ; effacez et Entrée pour le cadran JS8
+Comment (optional; with none, a JS8 dial spot says JS8)	Commentaire (facultatif ; sans, un spot sur le cadran JS8 indique JS8)
+SOTA spot via APRS2SOTA (registration needed)	Spot SOTA par APRS2SOTA (inscription requise)
+POTA spot via APSPOT (your pota.app account)	Spot POTA par APSPOT (votre compte pota.app)
+POTA park numbers are US-/CA- now (was K-/VE-): check yours	Les parcs POTA sont maintenant US-/CA- (avant K-/VE-) : vérifiez le vôtre
+Nothing to log	Rien à noter
+Not logged: %s	Non noté : %s
+Logged %s%s%s	Noté %s%s%s
+Logged %s %s %s/%s%s%s	Noté %s %s %s/%s%s%s
+Sent %s  Rcvd %s  %.3f MHz  %.0f W	Env. %s  Reçu %s  %.3f MHz  %.0f W
+Grid: %s	Locator : %s
+Log %s  %s  %s-%s UTC	Log %s  %s  %s-%s UTC
+Save to log	Enregistrer dans le log
+Name: %s	Nom : %s
+Activating %s %s	Activation %s %s
+Position not sent	Position non envoyée
+QSO with %s ended: Log QSO (page 5) to log it	QSO avec %s terminé : Noter QSO (page 5) pour le noter
+QSO with %s ended - Save to log?	QSO avec %s terminé : l'enregistrer dans le log ?
+Log\nprompt: On	Demander\nlog : On
+Log\nprompt: Off	Demander\nlog : Off
+Offer to log when a QSO ends with 73 or SK	Proposer de noter quand un QSO finit par 73 ou SK
+No log prompt: use Log QSO	Pas de demande : utilisez Noter QSO
+(hold: set)	(maintenir : choisir)
+Activ.	Activ.
+Not activating: no park or summit in the log	Pas d'activation : ni parc ni sommet dans le log
+Hold this button to set your %s	Maintenez ce bouton pour choisir votre %s
+Logging as %s %s (hold to change)	Noté comme %s %s (maintenir pour changer)
+Press to choose POTA or SOTA first	Appuyez pour choisir d'abord POTA ou SOTA
+Inbox\n%d new	Boîte\n%d nouveaux
+Inbox	Boîte de réception
+Message from %s - can't save %s	Message de %s : impossible d'enregistrer %s
+New message to %s from %s - Inbox on page 3	Nouveau message pour %s de %s : Boîte en page 3
+New message from %s - Inbox on page 3	Nouveau message de %s : Boîte en page 3
+Message from %s in the Inbox: %s	Message de %s dans la boîte : %s
+Can't save %s	Impossible d'enregistrer %s
+Holding a message from %s for %s (Inbox)	Message de %s gardé pour %s (Boîte)
+Holding message %d from %s for %s: %s	Message %d de %s gardé pour %s : %s
+Held message %d delivered	Message gardé %d remis
+Held message %d stopped before the end: still held	Message gardé %d arrêté avant la fin : toujours gardé
+Message deleted	Message supprimé
+Left at %s for %s: type the message and press Enter	Laissé chez %s pour %s : tapez le message et appuyez sur Entrée
+APRS message to %s: type it and press Enter	Message APRS pour %s : tapez-le et appuyez sur Entrée
+Type their call, then MSG and the message	Tapez son indicatif, puis MSG et le message
+For %s from %s  %s	Pour %s de %s  %s
+For any %s member to fetch for 2 days; fetched by %d	Récupérable 2 jours par tout membre de %s ; récupéré par %d
+Delivered to %s	Remis à %s
+Waiting for %s to ask (QUERY MSGS)	En attente de la demande de %s (QUERY MSGS)
+Back	Retour
+From %s to %s  %s	De %s pour %s  %s
+From %s  %s	De %s  %s
+Reply by APRS to %s	Répondre par APRS à %s
+Reply: MSG to %s	Répondre : MSG à %s
+Reply to %s via %s (MSG TO:)	Répondre à %s par %s (MSG TO:)
+Reply to %s	Répondre à %s
+Fetch the next: QUERY MSG %d	Récupérer le suivant : QUERY MSG %d
+Inbox: %d message%s, %d new	Boîte : %d message%s, %d nouveaux
+New message to %s...	Nouveau message pour %s...
+New message...	Nouveau message...
+No messages yet	Pas encore de messages
+Held for others: %d waiting	Gardés pour d'autres : %d en attente
+ (%d got it)	 (%d l'ont reçu)
+%sfor %s%s from %s  %s	%spour %s%s de %s  %s
+(sent) 	(envoyé) 
+high SWR	ROS élevé
+High SWR %.1f:1: AUTO, HB, HB ACK and auto CQ off	ROS élevé %.1f:1 : AUTO, HB, HB ACK et CQ auto désactivés
+High SWR %.1f:1: AUTO, HB, HB ACK and auto CQ off. Check the antenna	ROS élevé %.1f:1 : AUTO, HB, HB ACK et CQ auto désactivés. Vérifiez l'antenne
+Alert %s: %s	Alerte %s : %s
+New station: %s	Nouvelle station : %s
+Beep	Bip
+Message to me	Message pour moi
+Inbox message	Message dans la boîte
+Someone calls CQ	Quelqu'un appelle CQ
+New station (not in log)	Nouvelle station (absente du log)
+Beep is off	Le bip est désactivé
+Not while transmitting	Pas pendant l'émission
+Calls or words to watch for, separated by spaces	Indicatifs ou mots à surveiller, séparés par des espaces
+Alerts: beep, and alert words in purple	Alertes : bip, et mots d'alerte en violet
+Alert words: %s	Mots d'alerte : %s
+Test beep	Tester le bip
+%s was heard on %s, you send %s - hold Speed (page 6) to match	%s a été entendu en %s, vous émettez en %s : maintenez Vitesse (page 6) pour égaler
+Sending %s: %d s slots, %d Hz wide%s	Émission %s : créneaux de %d s, %d Hz de large%s
+, no heartbeats (as desktop)	, sans battements (comme sur PC)
+Sending at %s speed	Émission en vitesse %s
+Already sending %s	Déjà en %s
+Decode:\nAll speeds	Décoder :\nToutes
+Decode:\nMy speed	Décoder :\nLa mienne
+Decoding every speed (Normal, Fast, Turbo, Slow)	Décodage de toutes les vitesses (Normal, Fast, Turbo, Slow)
+Decoding %s only	Décodage de %s seulement
+Type the dial frequency in kHz, e.g. 7107	Tapez la fréquence cadran en kHz, p. ex. 7107
+Out of range: 1800 - 54000 kHz	Hors limites : 1800 - 54000 kHz
+Dial frequency in kHz, then Enter	Fréquence cadran en kHz, puis Entrée
+Now: %s	Maintenant : %s
+JS8Call frequencies (7.078, 14.078...)	Fréquences JS8Call (7.078, 14.078...)
+GhostNet (3.575, 7.107, 14.107)	GhostNet (3.575, 7.107, 14.107)
+Custom kHz... (last %s)	kHz au choix... (dernier %s)
+Custom kHz...	kHz au choix...
+%s: not heard on this band	%s : pas entendu sur cette bande
+Not enough memory for the map	Pas assez de mémoire pour la carte
+Activity\nRBN, beacon	Activité\nRBN, balise
+Activation\nlog	Log\nd'activation
+Field: wait, still busy	Terrain : patientez, encore occupé
+Select	Choisir
+Ref...	Réf...
+Update\nlist	Mettre à jour\nla liste
+Log\nbook	Carnet\nde trafic
+LOGBOOK	CARNET DE TRAFIC
+Upload\nQRZ	Envoyer\nà QRZ
+Start here\nOn	Démarrer ici\nOn
+Start here\nOff	Démarrer ici\nOff
+Rec\nCQ	Enreg.\nCQ
+CQ level	Niveau CQ
+CQ level %+d dB: MFK or VOL to change, press to finish	Niveau CQ %+d dB : MFK ou VOL pour changer, appuyer pour finir
+CQ level %+d dB	Niveau CQ %+d dB
+Start	Démarrer
+End?	Terminer ?
+End	Terminer
+Spot?	Spot ?
+FIELD OPERATIONS	OPÉRATION SUR LE TERRAIN
+MFK: choose, press to open.   GEN: back to the radio, nothing is lost	MFK : choisir, appuyer pour ouvrir.   GEN : retour à la radio, rien n'est perdu
+No reference list	Pas de liste de références
+No position	Pas de position
+None in the list: Update list	Aucune dans la liste : Mettre à jour la liste
+Looking...	Recherche...
+GPS, phone or locator needed	GPS, téléphone ou locator nécessaire
+ (old)	 (ancienne)
+NOT ACTIVE	INACTIF
+STATUS	ÉTAT
+SUMMIT\tKM\tNAME	SOMMET\tKM\tNOM
+PARK\tKM\tNAME	PARC\tKM\tNOM
+BUNKER\tKM\tNAME	BUNKER\tKM\tNOM
+SITE\tKM\tNAME	SITE\tKM\tNOM
+Downloading the reference lists: about 3 minutes...	Téléchargement des listes de références : environ 3 minutes...
+No reference list yet: Update list (page 2), with WiFi	Pas encore de liste de références : Mettre à jour la liste (page 2), avec le WiFi
+MFK: choose the reference, press to use it.  Start: begin the activation	MFK : choisissez la référence, appuyez pour l'utiliser.  Démarrer : début de l'activation
+%s - ACTIVATION (%s)	%s - ACTIVATION (%s)
+CQ calls in CW.  Log QSO: call [rst rcvd [rst sent]]	CQ appelle en CW.  Noter QSO : indicatif [rst reçu [rst env.]]
+CQ sends your voice CQ (Rec CQ: page 2).  Log QSO: call [rst...]	CQ envoie votre CQ vocal (Enreg. CQ : page 2).  Noter QSO : indicatif [rst...]
+Nobody heard you in the last 10 min: Test beacon (CW)	Personne ne vous a entendu ces 10 dernières min : Tester balise (CW)
+Heard by 	Entendu par 
+BAND OVERVIEW	APERÇU DES BANDES
+Skimmer data: Reverse Beacon Network (reversebeacon.net)	Données skimmers : Reverse Beacon Network (reversebeacon.net)
+BAND\tACTIVITY\t\tSPOTS\tRBN\tHEARD YOU\t	BANDE\tACTIVITÉ\t\tSPOTS\tRBN\tVOUS ENTEND\t
+%s LOGBOOK  %s	CARNET %s  %s
+N\tTIME\tCALL\tBAND\tMODE\tRST S / R	N\tHEURE\tINDICATIF\tBANDE\tMODE\tRST E / R
+No activation yet	Pas encore d'activation
+Choose the %s reference first	Choisissez d'abord la référence %s
+Set your callsign in Settings	Indiquez votre indicatif dans Réglages
+Activation started: %s	Activation démarrée : %s
+Activation complete: %s, %d QSO%s, %d min	Activation terminée : %s, %d QSO%s, %d min
+Press End again to end the activation	Appuyez encore sur Terminer pour finir l'activation
+%s spot: %s	Spot %s : %s
+SOTA spot on the DX clusters: %s %.1f %s	Spot SOTA sur les DX clusters : %s %.1f %s
+DX cluster not running: no SOTA spot	DX cluster arrêté : pas de spot SOTA
+HOTA spot on the DX clusters only: no HOTA key (web page, Field Ops)	Spot HOTA sur les DX clusters seulement : pas de clé HOTA (page web, Field Ops)
+No HOTA spot: no HOTA key (web page, Field Ops)	Pas de spot HOTA : pas de clé HOTA (page web, Field Ops)
+%s spot: %s %.1f %s...	Spot %s : %s %.1f %s...
+Press Spot again to post %s %.1f %s	Appuyez encore sur Spot pour publier %s %.1f %s
+Recording "%s": speak, then Stop rec	Enregistrement de "%s" : parlez, puis Arrêter enreg.
+Saved "%s": CQ sends it in SSB	"%s" enregistré : CQ l'envoie en BLU
+CQ: sending "%s" (CQ again: stop, hold CQ: level)	CQ : envoi de "%s" (CQ à nouveau : arrêt, maintenir CQ : niveau)
+No voice CQ yet: Rec CQ on page 2, speak, Stop rec	Pas encore de CQ vocal : Enreg. CQ en page 2, parlez, Arrêter enreg.
+Log: can't write %s	Log : impossible d'écrire %s
+Log from the phone: "%s" not logged	Log depuis le téléphone : "%s" non noté
+QSO logged: %s %s %s	QSO noté : %s %s %s
+Log: "%s" is not a callsign	Log : "%s" n'est pas un indicatif
+Start the activation first	Démarrez d'abord l'activation
+Call [rst rcvd [sent]]: 	Indicatif [rst reçu [env.]] : 
+%s: not in the reference list	%s : absent de la liste de références
+End the activation to change the reference	Terminez l'activation pour changer de référence
+Reference: 	Référence : 
+Reference list: %d parks, %d summits, %d bunkers, %d HOTA	Liste de références : %d parcs, %d sommets, %d bunkers, %d HOTA
+Reference list: %s	Liste de références : %s
+Downloading the reference lists: about 3 minutes	Téléchargement des listes de références : environ 3 minutes
+Test beacon: switch to CW first	Tester balise : passez d'abord en CW
+Test beacon on the air: watch who hears you	Balise de test en l'air : regardez qui vous entend
+The frequency is locked	La fréquence est verrouillée
+QRZ: %d sent, %d already there	QRZ : %d envoyés, %d déjà présents
+No log to upload	Pas de log à envoyer
+Uploading the log to QRZ...	Envoi du log à QRZ...
+%s%s\n%s\n#%06x Position from %s%s#	%s%s\n%s\n#%06x Position de %s%s#
+MFK: choose - press: confirm - Cancel TX: back	MFK : choisir - appuyer : confirmer - Annuler TX : retour
+Freq.: calling frequencies   Pictures in /mnt/sstv	Fréq. : fréquences d'appel   Images dans /mnt/sstv
+SSTV - calling frequencies	SSTV - fréquences d'appel
+Stand by.\n\n- Press Start Auto RX to start Autodecoder.\n\n- Press Start Manual RX to start Manual decoder, press RX Mode button to cycle Auto (mode from the line syncs) and all available modes for the Manual decoder.	En attente.\n\n- Appuyez sur Démarrer RX auto pour le décodeur automatique.\n\n- Appuyez sur Démarrer RX manuel pour le décodeur manuel ; le bouton Mode RX passe par Auto (mode selon les synchros de ligne) et tous les modes du décodeur manuel.
+Start\nAuto RX	Démarrer\nRX auto
+SSTV Autodecoder is running.\n\nAwaiting signal...	Décodeur SSTV automatique en marche.\n\nEn attente de signal...
+Stop\nAuto RX	Arrêter\nRX auto
+Decoding %s	Décodage %s
+Halt\nDecoding	Arrêter\ndécodage
+Start\nManual RX	Démarrer\nRX manuel
+RX Mode\nAuto	Mode RX\nAuto
+RX Pics\nBrowser	Voir images\nRX
+Delete\npicture	Supprimer\nimage
+Auto RX\nRestart ON	RX auto\nrelance ON
+Test RX	Tester RX
+Denoise\nON	Débruitage\nON
+Freq.	Fréq.
+Stand by.\nPress Start Auto RX to start Autodecoder.\nPress Start Manual RX to start Manual decoder, press RX Mode button to cycle Auto (mode from the line syncs) and all available modes for the Manual decoder.	En attente.\nAppuyez sur Démarrer RX auto pour le décodeur automatique.\nAppuyez sur Démarrer RX manuel pour le décodeur manuel ; le bouton Mode RX passe par Auto (mode selon les synchros de ligne) et tous les modes du décodeur manuel.
+Auto RX\nRestart OFF	RX auto\nrelance OFF
+Denoise\nOFF	Débruitage\nOFF
+No SSTV picture found	Aucune image SSTV trouvée
+Decoding failed	Le décodage a échoué
+RX Mode	Mode RX
+SSTV mode not supported (VIS %d)	Mode SSTV non pris en charge (VIS %d)
+SSTV Manual decoder is running\n\n%s line syncs found\n\nPress Stop Manual RX to render received picture	Décodeur SSTV manuel en marche\n\n%s synchros de ligne trouvées\n\nAppuyez sur Arrêter RX manuel pour afficher l'image reçue
+SSTV picture %s saved	Image SSTV %s enregistrée
+Transmitting %s...	Émission %s...
+SSTV %s TX complete	SSTV %s TX terminée
+SSTV TX halted	SSTV TX interrompue
+SSTV TX failed (%d)	SSTV TX échouée (%d)
+%s test TX complete.	%s TX de test terminée.
+SSTV %s test TX complete	SSTV %s TX de test terminée
+SSTV test TX aborted.	SSTV TX de test annulée.
+SSTV test TX failed (%d).	SSTV TX de test échouée (%d).
+Decoding Cont %s	Décodage continu %s
+Decoding Test WAV	Décodage du WAV de test
+<TARGET CALLSIGN>	<INDICATIF DESTINATAIRE>
+No TX templates found	Aucun modèle de TX trouvé
+Target callsign	Indicatif destinataire
+SSTV TX: no final image.	SSTV TX : pas d'image finale.
+SSTV TX: cannot prepare image.	SSTV TX : impossible de préparer l'image.
+Halt TX	Arrêter TX
+TX Mode	Mode TX
+Preparing %s TX...	Préparation TX %s...
+SSTV TX: thread creation failed.	SSTV TX : impossible de créer le fil.
+REPLAY	RENVOYER
+REPEAT LAST	RÉPÉTER LA DERNIÈRE
+TEXT COLORS	COULEURS DU TEXTE
+MFK: choose - press: start the transmission - Cancel TX: back	MFK : choisir - appuyer : démarrer l'émission - Annuler TX : retour
+A picture, then CQ CQ SSTV and your callsign on it	Une image, avec CQ CQ SSTV et votre indicatif dessus
+A picture and a text template, with the target callsign	Une image et un modèle de texte, avec l'indicatif destinataire
+Set the target callsign first	Indiquez d'abord l'indicatif destinataire
+As Reply, with a miniature of the last received picture	Comme Répondre, avec une miniature de la dernière image reçue
+A picture, sent without any text	Une image, envoyée sans texte
+The last transmission again, same picture and mode	La dernière émission à nouveau, même image et même mode
+No transmission to repeat yet	Pas encore d'émission à répéter
+It goes in the text of Reply and Replay	Il va dans le texte de Répondre et Renvoyer
+REPLAY TO %s	RENVOYER À %s
+REPLAY TO...	RENVOYER À...
+REPEAT LAST TX	RÉPÉTER LA DERNIÈRE TX
+SET TARGET CALLSIGN	DÉFINIR L'INDICATIF DESTINATAIRE
+<not set>	<non défini>
+TX PICTURE	IMAGE À ÉMETTRE
+MFK: choose - press: confirm - TX Mode: mode - Cancel TX: back	MFK : choisir - appuyer : confirmer - Mode TX : mode - Annuler TX : retour
+No TX pictures found	Aucune image à émettre
+Put PNG pictures in 	Mettez des images PNG dans 
+No saved pictures	Aucune image enregistrée
+Done	Terminé
+Close\nBrowser	Fermer\nvisionneuse
+%s Mode	Mode %s
+SSTV Manual decoder is running\n\nSearching the line syncs for the SSTV mode\n\nPress Stop Manual RX to render received picture	Décodeur SSTV manuel en marche\n\nRecherche des synchros de ligne du mode SSTV\n\nAppuyez sur Arrêter RX manuel pour afficher l'image reçue
+SSTV Manual decoder is running\n\nDecoding %s signal\n\nPress Stop Manual RX to render received picture	Décodeur SSTV manuel en marche\n\nDécodage du signal %s\n\nAppuyez sur Arrêter RX manuel pour afficher l'image reçue
+Stop\nManual RX	Arrêter\nRX manuel
+end of picture	fin de l'image
+time limit	limite de temps
+Stopping SSTV TX...	Arrêt SSTV TX...
+ with Auto RX	 avec RX auto
+ to stand-by	 en attente
+Cancel TX	Annuler TX
+TX setup\n\nChoose TX action	Préparer TX\n\nChoisissez l'action TX
+SSTV TX busy	SSTV TX occupée
+SSTV TX: can't load %s	SSTV TX : impossible de charger %s
+View\nBig	Voir\ngrand
+Save	Enregistrer
+Fax\nBrowser	Voir\nfax
+Fix\nAlign	Corriger\nalignement
+Fix\nTilt	Corriger\ninclinaison
+View\nSmall	Voir\npetit
+MFK: align   Freq.: stations   View: Small shows the waterfall	MFK : aligner   Fréq. : stations   Voir : petit montre la cascade
+Saving fax...	Enregistrement du fax...
+Fax saved	Fax enregistré
+Fax save failed	Échec de l'enregistrement du fax
+Save\nFax	Enreg.\nfax
+Delete\nFax	Suppr.\nfax
+No saved faxes	Aucun fax enregistré
+Editing saved fax	Modification du fax enregistré
+Align	Aligner
+Tilt	Incliner
+Receiving Fax	Réception du fax
+View\nFull Size	Voir\ntaille réelle
+Waiting for Fax	En attente de fax
+WeFax TX: bad file name	WeFax TX : nom de fichier invalide
+WeFax TX busy	WeFax TX occupée
+WeFax TX done	WeFax TX terminée
+WeFax TX stopped	WeFax TX arrêtée
+WeFax TX failed (%i)	WeFax TX échouée (%i)
+RX Cont	RX continu
+RX Auto	RX auto
+Fax Started	Fax démarré
+RX\nCont	RX\ncontinu
+WEFAX - stations	WEFAX - stations
+Key train is off: not playing	L'entraînement CW est désactivé : pas de lecture
+Level %i: new character %c	Niveau %i : nouveau caractère %c
+Stats reset	Statistiques remises à zéro
+Replay	Rejouer
+Pause	Pause
+Mode:\nLearn	Mode :\nApprendre
+Mode:\nPractice	Mode :\nPratique
+Mode:\nCalls	Mode :\nIndicatifs
+Skip	Passer
+Stats	Stats
+Sure?	Sûr ?
+Reset\nstats	Effacer\nstats
+Level +	Niveau +
+Level -	Niveau -
+Group	Groupe
+CW TRAINER - #%06x Calls#	ENTRAÎNEMENT CW - #%06x Indicatifs#
+Call %i/%i - %i WPM	Indicatif %i/%i - %i MPM
+Listen...	Écoutez...
+Your turn	À vous
+Press Start	Appuyez sur Démarrer
+%s - speed %i -> %i WPM	%s - vitesse %i -> %i MPM
+Right	Juste
+Wrong	Faux
+\n#%06x Run complete - final score %s#	\n#%06x Série terminée - score final %s#
+Start: a new run of 50 callsigns	Démarrer : une nouvelle série de 50 indicatifs
+Key back the callsign with the paddle. Right: +1 WPM, wrong: -1 WPM.	Renvoyez l'indicatif au manipulateur. Juste : +1 MPM, faux : -1 MPM.
+Right %i / %i\nBest speed %i WPM\nBest score %s	Juste %i / %i\nMeilleure vitesse %i MPM\nMeilleur score %s
+CW TRAINER - #%06x Stats#	ENTRAÎNEMENT CW - #%06x Statistiques#
+Level %i - %i WPM	Niveau %i - %i MPM
+Today: %u tries, %u%% right, %u min	Aujourd'hui : %u essais, %u%% justes, %u min
+Last 20 tries per character. Weak ones (red, yellow) come up more often in Learn.	20 derniers essais par caractère. Les faibles (rouge, jaune) reviennent plus souvent dans Apprendre.
+CW TRAINER - #%06x Practice#	ENTRAÎNEMENT CW - #%06x Pratique#
+%i WPM (keyer %i)	%i MPM (manipulateur %i)
+Key with the paddle: the text appears here	Manipulez avec le paddle : le texte apparaît ici
+No transmission: key train is on. Clear: page 3	Pas d'émission : l'entraînement est activé. Effacer : page 3
+CW TRAINER - #%06x Learn (Koch)#	ENTRAÎNEMENT CW - #%06x Apprendre (Koch)#
+%i WPM - group %i	%i MPM - groupe %i
+Press Play	Appuyez sur Lecture
+Start: groups follow each other, key each one back with the paddle	Démarrer : les groupes se suivent, renvoyez chacun au manipulateur
+The radio keys the group (sidetone only)	La radio manipule le groupe (tonalité locale seulement)
+Sent:   #%06x %s#   %s	Envoyé :   #%06x %s#   %s
+Key the group with the paddle. Replay: hear it again	Manipulez le groupe au paddle. Rejouer : l'entendre à nouveau
+Heard: #%06x %s#   %s	Entendu : #%06x %s#   %s
+Heard: #%s %s#   %s	Entendu : #%s %s#   %s
+Next group follows. Pause: stop after this one	Groupe suivant. Pause : arrêter après celui-ci
+Start: resume. Skip: another group	Démarrer : reprendre. Passer : autre groupe
+Score  %i / %i\nLast %i: %i / %i\nNext level at %i%%	Score  %i / %i\n%i derniers : %i / %i\nNiveau suivant à %i%%
+Level %i\n%s	Niveau %i\n%s
+Next new character:	Prochain nouveau caractère :
+(at %i%% on the current set)	(à %i%% du jeu actuel)
+Force QSO\nsave	Forcer\nl'enreg. QSO
+CQ\nModifier	Modificateur\nCQ
+Log\nMap	Carte\ndu log
+Live\nMap	Carte\nen direct
+Saved QSO de %s %d %d (%.0f km)	QSO enregistré de %s %d %d (%.0f km)
+Saved QSO de %s %d %d	QSO enregistré de %s %d %d
+Freq:\nPreset	Fréq :\nPréréglage
+Retries	Tentatives
+Hound:\nOn	Hound :\nOn
+Hound mode is for FT8 only	Le mode Hound est réservé au FT8
+Hound on: select the Fox's CQ and press, calls go above %d Hz	Hound activé : choisissez le CQ du Fox et appuyez, les appels vont au-dessus de %d Hz
+Hound on: select the Fox's CQ and press	Hound activé : choisissez le CQ du Fox et appuyez
+Hound off	Hound désactivé
+Not while sending	Pas pendant l'envoi
+%s frequencies - hold Freq to type	Fréquences %s - maintenir Fréq pour saisir
+14091 or 14.091, empty: presets	14091 ou 14.091, vide : préréglages
+Dial frequency (14091 or 14.091), empty for the presets	Fréquence cadran (14091 ou 14.091), vide pour les préréglages
+Show	Afficher
+Enabled	Activé
+Disabled	Désactivé
+TX Call	TX indicatif
+Hold Freq	Fixer fréq.
+No CQ in Hound mode	Pas de CQ en mode Hound
+Call sign required	Indicatif requis
+Next TX: CQ %s	Prochaine TX : CQ %s
+Next TX: %s	Prochaine TX : %s
+Can't save incomplete QSO	Impossible d'enregistrer un QSO incomplet
+What should I do about it?	Que dois-je en faire ?
+Select the Fox's CQ	Choisissez le CQ du Fox
+Hound: calling %s above %d Hz	Hound : appel de %s au-dessus de %d Hz
+Start QSO with %s	Démarrer le QSO avec %s
+Invalid message	Message invalide
+CQ modifier	Modificateur de CQ
+Type 1800 - 54000 kHz, e.g. 14091	Tapez 1800 - 54000 kHz, p. ex. 14091
+Unsupported CQ modifier	Modificateur de CQ non pris en charge
+Hound: %s sent %+03d, answering R%+03d at %d Hz	Hound : %s a envoyé %+03d, réponse R%+03d à %d Hz
+Hound: QSO with %s logged	Hound : QSO avec %s noté
+Hound: %s sent RR73 but its report was missed, not logged	Hound : %s a envoyé RR73 mais son report a été manqué, non noté
+calling %s	appel de %s
+R%+03d to %s	R%+03d à %s
+select the Fox	choisissez le Fox
+Hound: no answer from %s, TX stopped	Hound : pas de réponse de %s, TX arrêtée
+RX %s %s  Hound: %s	RX %s %s  Hound : %s
+FT8: that message is too old	FT8 : ce message est trop ancien
+Volume: %i	Volume : %i
+RF gain: %i	Gain RF : %i
+WEFAX Align: %i	WEFAX alignement : %i
+WEFAX Tilt: %i	WEFAX inclinaison : %i
+Voice SQL: %i	Squelch voix : %i
+Filter low: %i Hz	Filtre bas : %i Hz
+Filter high: %i Hz	Filtre haut : %i Hz
+Filter bw: %i Hz	Largeur filtre : %i Hz
+Power: %0.1f W	Puissance : %0.1f W
+Moni level: %i	Niveau moni. : %i
+Zoom: x%i	Zoom : x%i
+Compressor ratio: %s	Rapport compresseur : %s
+Key speed: %i wpm	Vitesse CW : %i mpm
+Key mode: %s	Mode manipulateur : %s
+Iambic mode: %s	Mode iambique : %s
+Key tone: %i Hz	Tonalité CW : %i Hz
+Key volume: %i	Volume CW : %i
+Key train: %s	Entraînement CW : %s
+QSK time: %i ms	Délai QSK : %i ms
+Key ratio: %0.1f	Rapport CW : %0.1f
+CW peak: %s	Pic CW : %s
+CW peak Q: %i	Q pic CW : %i
+DNF center: %i Hz	Centre DNF : %i Hz
+DNF width: %i Hz	Largeur DNF : %i Hz
+DNF auto: %s	DNF auto : %s
+NB level: %i	Niveau NB : %i
+NB width: %i	Largeur NB : %i
+NR level: %i	Niveau NR : %i
+CW decoder: %s	Décodeur CW : %s
+CW tune: %s	Accord CW : %s
+CW decoder SNR: %0.1f dB	SNR décodeur CW : %0.1f dB
+RTTY rate: %0.2f	Vitesse RTTY : %0.2f
+RTTY shift: %i Hz	Décalage RTTY : %i Hz
+RTTY center: %i Hz	Centre RTTY : %i Hz
+RTTY reverse: %s	RTTY inversé : %s
+Waterfall ref: %+i dB	Réf. cascade : %+i dB
+Waterfall: %s	Cascade : %s
+Cluster: %s	Cluster : %s
+Cluster order: %s	Ordre du cluster : %s
+newest first	plus récents d'abord
+frequency	fréquence
+all bands	toutes les bandes
+current band	bande actuelle
+IF shift: %i Hz	Décalage FI : %i Hz
+Test	Tester
+DSC distress / safety	ASN détresse / sécurité
+area	zone
+distress	détresse
+group	groupe
+all ships	tous navires
+individual	individuel
+automatic	automatique
+DISTRESS ALERT	ALERTE DE DÉTRESSE
+%s%s %s  distress ack	%s%s %s  accusé de détresse
+%s group %s	%s groupe %s
+position unknown	position inconnue
+  at 	  à 
+Coast, %s	Côtière, %s
+DISTRESS	DÉTRESSE
+URGENCY	URGENCE
+SAFETY	SÉCURITÉ
+ROUTINE	ROUTINE
+DSC 100 Bd / 170 Hz   MFK: scroll   Freq.: channels	ASN 100 Bd / 170 Hz   MFK : défiler   Fréq. : canaux
+SITOR-B 100 Bd / 170 Hz   MFK: scroll   Freq.: stations	SITOR-B 100 Bd / 170 Hz   MFK : défiler   Fréq. : stations
+NAVTEX ready - 100 baud / 170 Hz shift	NAVTEX prêt - 100 bauds / 170 Hz de décalage
+Nothing to save	Rien à enregistrer
+NAVTEX: save failed	NAVTEX : échec de l'enregistrement
+Saved %s	%s enregistré
+DSC - channels	ASN - canaux
+NAVTEX - frequencies	NAVTEX - fréquences
+(CLUSTER	(CLUSTER
+Tune	Accorder
+CLUSTER ALERT	ALERTE DU CLUSTER
+MFK: tune	MFK : accorder
+no callsign	pas d'indicatif
+Filtered	Filtré
+CW only	CW seul.
+SSB only	BLU seul.
+DIG only	NUM seul.
+%d spots - %02d:%02dZ	%d spots - %02d:%02dZ
+Cluster error	Erreur du cluster
+Stopped	Arrêté
+MFK: browse - press: tune - VFO: follow	MFK : parcourir - appuyer : accorder - VFO : suivre
+Band /	Bande /
+Order /\nTime	Ordre /\nHeure
+Order /\nFreq	Ordre /\nFréq
+by frequency	par fréquence
+Mode /\nAll	Mode /\nTous
+Mode /\nCW	Mode /\nCW
+Mode /\nSSB	Mode /\nBLU
+Mode /\nDIG	Mode /\nNUM
+Cannot save %s	Impossible d'enregistrer %s
+CLUSTER SERVERS	SERVEURS DE CLUSTER
+MFK: choose - press: use - Server: close - add servers from the web page	MFK : choisir - appuyer : utiliser - Serveur : fermer - ajoutez des serveurs depuis la page web
+20m wide	20m large
+Free\nText	Texte\nlibre
+Stop\nTX	Arrêter\nTX
+Band up\nhold: down	Bande plus\nmaintenir : moins
+Knob: fine tuning	Bouton : accord fin
+Dial\nstandard	Cadran\nstandard
+Dial	Cadran
+Knob: dial, 1 kHz steps	Bouton : cadran, pas de 1 kHz
+RX off	RX éteinte
+Search	Chercher
+best %.1f	meilleur %.1f
+DX call	Indicatif DX
+RST snt	RST env.
+Olivia %s TX...	Olivia %s TX...
+Olivia msg:	Message Olivia :
+Olivia: stopping after this block	Olivia : arrêt après ce bloc
+Olivia RX resync	Olivia RX resynchronisée
+Empty slot - hold to create a macro	Emplacement vide - maintenir pour créer une macro
+Macro deleted	Macro supprimée
+Macro saved	Macro enregistrée
+Macro text:	Texte de la macro :
+Macro name:	Nom de la macro :
+DX call:	Indicatif DX :
+QSO cleared	QSO effacé
+SQL off	SQL désactivé
+Knob: squelch on the quality - noise reads about 50, default 68	Bouton : squelch sur la qualité - le bruit donne environ 50, défaut 68
+%s squelch %s	%s squelch %s
+PSK msg:	Message PSK :
+%s RX resync	%s RX resynchronisée
+Rename	Renommer
+No messages yet: press Rec	Pas encore de messages : appuyez sur Enreg.
+%i message%s	%i message%s
+Message %i	Message %i
+Cannot create %s	Impossible de créer %s
+No audio: recording uses the hand mic	Pas d'audio : l'enregistrement utilise le micro à main
+Rec	Enreg.
+Listen	Écouter
+Auto\nStop	Auto\nArrêt
+Auto\ncall	Appel\nauto
+Interval	Intervalle
+Mic level: keep out of the red\nMax %i s	Niveau micro : rester hors du rouge\nMax %i s
+Stop: save the message	Arrêt : enregistrer le message
+Single transmission	Émission unique
+Next call in %i s\nInterval %i s	Prochain appel dans %i s\nIntervalle %i s
+Auto call: repeats every %i s	Appel auto : répète toutes les %i s
+Auto call, TX or PTT: stop	Appel auto, TX ou PTT : arrêter
+TX or PTT: stop	TX ou PTT : arrêter
+LISTEN	ÉCOUTER
+Playing on the speaker only	Lecture sur le haut-parleur seulement
+Listen: stop	Écouter : arrêter
+Auto call every %i s\nInterval: page 2	Appel auto toutes les %i s\nIntervalle : page 2
+MFK or VOL: interval - press MFK: done	MFK ou VOL : intervalle - appuyer MFK : terminé
+MFK: choose - press MFK: listen	MFK : choisir - appuyer MFK : écouter
+Rec: record the first message	Enreg. : enregistrez le premier message
+Press Delete again to delete "%s"	Appuyez encore sur Supprimer pour supprimer "%s"
+Deleted "%s"	"%s" supprimé
+Empty name	Nom vide
+"%s" already exists	"%s" existe déjà
+Cannot rename	Impossible de renommer
+Name: 	Nom : 
+F2\nCall 599	F2\nAppel 599
+F4\nMy call	F4\nMon indicatif
+F5\nHis call	F5\nSon indicatif
+Serial	Série
+Rx tol	Tol. RX
+JTTY msg:	Message JTTY :
+JTTY RX restart	JTTY RX relancée
+WSPR TX: "%s %.4s" can't be sent (plain call and locator only)	WSPR TX : "%s %.4s" ne peut pas être envoyé (indicatif simple et locator seulement)
+WSPR: %d spot%s	WSPR : %d spot%s
+Decoding	Décodage
+Wait	Attendez
+Upload off	Envoi désactivé
+Upload: no callsign	Envoi : pas d'indicatif
+Uploaded %d, #%06x %d failed#	Envoyés %d, #%06x %d échoués#
+Uploaded %d	Envoyés %d
+Last: %d spot%s (%.1f s)   	Dernier : %d spot%s (%.1f s)   
+%sTX %d%% at %d Hz, %.1f W = %d dBm   %s	%sTX %d%% à %d Hz, %.1f W = %d dBm   %s
+TX next\n(armed)	TX suivante\n(armée)
+TX next	TX suivante
+WSPR TX: set the callsign in Settings	WSPR TX : indiquez l'indicatif dans Réglages
+Upload\nOn	Envoi\nOn
+Upload\nOff	Envoi\nOff
+WSPR: wait for the end of the beacon	WSPR : attendez la fin de la balise
+WSPR TX at %d Hz	WSPR TX à %d Hz
+Call	Indicatif
+Grid	Locator
+Power limited to %.0f W	Puissance limitée à %.0f W
+Wrong WiFi password	Mot de passe WiFi incorrect
+no cable	pas de câble
+IP address is not valid	L'adresse IP n'est pas valide
+Netmask is not valid (255.255.255.0 or /24)	Le masque n'est pas valide (255.255.255.0 ou /24)
+Gateway is not valid	La passerelle n'est pas valide
+DNS is not valid	Le DNS n'est pas valide
+Static needs an IP address and a netmask	Fixe demande une adresse IP et un masque
+The IP address is the network or broadcast address of its subnet	L'adresse IP est l'adresse réseau ou de diffusion de son sous-réseau
+The gateway is not in the subnet of the IP address	La passerelle n'est pas dans le sous-réseau de l'adresse IP
+Ethernet: %s	Ethernet : %s
+NetworkManager is not running	NetworkManager n'est pas actif
+heard	entendues
+hears me	m'entendent
+by prefix	par préfixe
+selected	choisie
+me	moi
+Main knob: zoom  MFK: select, press: QSO  ESC: close	Bouton principal : zoom  MFK : choisir, appuyer : QSO  ESC : fermer
+Main knob: zoom  MFK: select  ESC: close	Bouton principal : zoom  MFK : choisir  ESC : fermer
+ESC: close	ESC : fermer
+%d heard  %d hear me	%d entendues  %d m'entendent
+QSO map - %d station%s	Carte des QSO - %d station%s
+World	Monde
+Auto: world	Auto : monde
+New	Nouveau
+Edit	Modifier
+No messages yet: press New	Pas encore de messages : appuyez sur Nouveau
+Beacon\nOff	Balise\nOff
+Beacon	Balise
+BEACON %i s	BALISE %i s
+MFK: choose - press MFK: edit	MFK : choisir - appuyer MFK : modifier
+New: write the first message	Nouveau : écrivez le premier message
+About %.0f s at %i WPM\nBeacon: %s	Environ %.0f s à %i MPM\nBalise : %s
+off (page 2)	désactivée (page 2)
+Empty message	Message vide
+Press Delete again to delete the message	Appuyez encore sur Supprimer pour supprimer le message
+This firmware is too old: please update to %s or later (x6100-link.it)	Ce firmware est trop ancien : mettez à jour vers %s ou plus récent (x6100-link.it)
+Firmware %s available	Firmware %s disponible
+Saved channel %s	Canal %s enregistré
+Saved channel	Canal enregistré
+waiting	en attente
+working	en marche
+restarting	redémarrage
+exited	terminé
+Sat in view/in use:	Satellites visibles/utilisés :
+Fix:	Position :
+Date, time:	Date, heure :
+Latitude:	Latitude :
+Longitude:	Longitude :
+QTH Grid:	Locator QTH :
+GPS status	État du GPS
+Band +	Bande +
+Band -	Bande -
+Step	Pas
+Lock	Verrouiller
+Exit\nhold	Quitter\nmaintenir
+Vol Sql\nRF Pwr	Vol Sql\nRF Puiss
+Store	Mémoriser
+Clear\nhold	Effacer\nmaintenir
+CH %02i - empty	CA %02i - vide
+No digital modes in walkie mode	Pas de modes numériques en mode walkie
+Disk full, recording stopped	Disque plein, enregistrement arrêté
+Error write file	Erreur d'écriture du fichier
+Screen rec error	Erreur d'enregistrement de l'écran
+Saving previous recording	Enregistrement précédent en cours de sauvegarde
+Screen rec: no SD card	Enreg. écran : pas de carte SD
+Disk full	Disque plein
+Out of memory	Mémoire insuffisante
+Screen rec on	Enregistrement de l'écran activé
+Problem with create file	Impossible de créer le fichier
+RX recorder is on	Enregistreur RX activé
+RX recorder is off	Enregistreur RX désactivé
+Rec\nStop	Enreg.\nArrêt
+Play	Lecture
+Play\nStop	Lecture\nArrêt
+CW KEYBOARD - #%06x %i WPM#	CLAVIER CW - #%06x %i MPM#
+keyboard ready	clavier prêt
+no keyboard: MFK press	pas de clavier : appuyer MFK
+Set CW mode to transmit	Passez en CW pour émettre
+type, Enter sends	tapez, Entrée envoie
+Enter: send - Esc: stop - arrows or MFK: speed - MFK press: send or type	Entrée : envoyer - Esc : arrêter - flèches ou MFK : vitesse - appuyer MFK : envoyer ou taper
+Call [sent [rcvd]]: 	Indicatif [env. [reçu]] : 
+Importing QSO: %zu/%zu	Import des QSO : %zu/%zu
+Imported %u QSOs from %i	%u QSO importés sur %i
+Add	Ajouter
+Drag	Glisser
+Drop	Déposer
+Channel name	Nom du canal
+CHANNEL %d	CANAL %d
+CHANNELS	CANAUX
+Answer	Réponse
+Report	Report
+Unsupported callsign (too long)	Indicatif non pris en charge (trop long)
+Callsign is long, QTH will be omitted	L'indicatif est long, le QTH sera omis
+QTH Grid	Locator QTH
+Incorrect QTH Grid	Locator QTH incorrect
+Restart	Recommencer
+Exit	Quitter
+73, GAME OVER\n#%06x Score %d - MFK to call CQ again#	73, FIN DE PARTIE\n#%06x Score %d - MFK pour relancer CQ#
+WATERFALL SNAKE\n#%06x Turn the knob to steer - MFK to start#	SERPENT DANS LA CASCADE\n#%06x Tournez le bouton pour diriger - MFK pour commencer#
+TX stopped: SWR %.1f	TX arrêtée : ROS %.1f
+connection closed	connexion fermée
+no answer	pas de réponse
+Run	Lancer
+Scale:\nLinear	Échelle :\nLinéaire
+Scale:\nLog	Échelle :\nLog
+Span	Largeur
+RTTY TX busy	RTTY TX occupée
+Nobody heard you: Test beacon (CW)	Personne ne vous a entendu : Tester balise (CW)
+Heard by	Entendu par
+MFK: choose - press: tune	MFK : choisir - appuyer : accorder
+Freq in MHz	Fréq. en MHz
+Incorrect freq	Fréquence incorrecte
+Wait sync	Attente de synchro
+Time is synchronized with NTP	L'heure est synchronisée par NTP
+press the keyboard's pairing key	appuyez sur la touche d'appairage du clavier
+keyboard not found	clavier introuvable
+searching...	recherche...
+not found - is it in pairing mode?	introuvable - est-il en mode appairage ?
+pairing...	appairage...
+pairing failed	échec de l'appairage
+connecting...	connexion...
+paired, connect failed	appairé, connexion échouée
+disconnecting...	déconnexion...
+removing...	suppression...
+scanning 16 s...	recherche 16 s...
+type %s and Enter on the keyboard	tapez %s et Entrée sur le clavier
+type %.8s and Enter on the keyboard	tapez %.8s et Entrée sur le clavier
+type %06u and Enter on the keyboard	tapez %06u et Entrée sur le clavier
+no DNS (WiFi?)	pas de DNS (WiFi ?)
+Based on	Basé sur IU1WXY
+Log QSOs automatically	Noter les QSO automatiquement
+QSO not logged: set your callsign in Settings	QSO non noté : indiquez votre indicatif dans Réglages
+QSO logged automatically: %s %s	QSO noté automatiquement : %s %s
+73 sent: no callsign to log (Log QSO)	73 envoyé : pas d'indicatif à noter (Noter QSO)
+73 sent: no DX call to log (set it on the DX call button)	73 envoyé : pas d'indicatif DX à noter (bouton Indicatif DX)
+Notify spots on my band	Signaler les spots sur ma bande
+NEW SPOT ON YOUR BAND	NOUVEAU SPOT SUR VOTRE BANDE
+Unmark\nfreq.	Démarquer\nfréq.
+Mark\nfreq.	Marquer\nfréq.
+Scan:\nOFF	Balayage :\nOFF
+Scan:\nON	Balayage :\nON
+Tune a station from the list first (Freq.)	Accordez d'abord une station de la liste (Fréq.)
+%.1f kHz marked for scanning (%d)	%.1f kHz marquée pour le balayage (%d)
+%.1f kHz unmarked (%d)	%.1f kHz démarquée (%d)
+Scan stopped: no marked frequencies	Balayage arrêté : aucune fréquence marquée
+Scan stopped: manual tuning	Balayage arrêté : accord manuel
+Scan stopped	Balayage arrêté
+Stop the test first	Arrêtez d'abord le test
+Mark frequencies first: Freq., choose one, Mark freq.	Marquez d'abord des fréquences : Fréq., en choisir une, Marquer fréq.
+Scanning %d frequencies	Balayage de %d fréquences
+DSC activity on %.1f kHz: listening	Activité ASN sur %.1f kHz : écoute
+NAVTEX activity on %.1f kHz: listening	Activité NAVTEX sur %.1f kHz : écoute
+SCAN  %.1f kHz  %s   (Scan: stop)	BALAYAGE  %.1f kHz  %s   (Balayage : arrêter)
+RECEIVING  %.1f kHz  %s   - back to scan in %u s	RÉCEPTION  %.1f kHz  %s   - retour au balayage dans %u s
+New CX8ANM version %s: Settings > Info > Update	Nouvelle version CX8ANM %s : Réglages > Info > Mettre à jour
+Update	Mettre à jour
+Update...	Mettre à jour...
+%s available (%d MB): press again to install	%s disponible (%d Mo) : appuyez de nouveau pour installer
+%s available: press again to install	%s disponible : appuyez de nouveau pour installer
+Up to date (%s)	À jour (%s)
+No answer: is there internet?	Pas de réponse : y a-t-il internet ?
+Downloading %s: %d%%	Téléchargement %s : %d%%
+Checking the download...	Vérification du téléchargement...
+Installing: do not turn the radio off	Installation : n'éteignez pas la radio
+Installing the update: do not turn the radio off	Installation de la mise à jour : n'éteignez pas la radio
+Updated: the radio turns off	Mis à jour : la radio s'éteint
+Updated to %s: the radio turns off, press power to start it	Mis à jour en %s : la radio s'éteint, appuyez sur le bouton marche pour la rallumer
+Update failed: %s	Échec de la mise à jour : %s
+Looking for a new version...	Recherche d'une nouvelle version...
+Installing...	Installation...
+Volume: %i%%	Volume : %i%%
+Show UTC too	Afficher aussi l'UTC
+Power save	Économie d'énergie
+Power save on: CPU slows down when idle, screen dims sooner	Économie activée : le processeur ralentit au repos, l'écran baisse plus tôt
+Power save off	Économie d'énergie désactivée
+Internet\nRadio	Radio\nInternet
+Internet Radio	Radio Internet
+APP Internet radio	APP Radio Internet
+INTERNET RADIO	RADIO PAR INTERNET
+Stop	Arrêt
+Favorite	Favori
+List	Liste
+Favorites	Favoris
+Most listened worldwide	Les plus écoutées au monde
+Loading stations...	Recherche des stations...
+No favorites yet: List shows Uruguay's stations, Favorite saves one	Pas encore de favoris : Liste montre les stations du pays, Favori en garde une
+No stations	Aucune station
+Cannot run the station finder	Impossible de chercher les stations
+Choose a station and press Play (or the MFK knob)	Choisissez une station et appuyez sur Lecture (ou le bouton MFK)
+Error	Erreur
+Choose a station first	Choisissez d'abord une station
+Removed from favorites	Retirée des favoris
+Added to favorites	Ajoutée aux favoris
+Station, genre, "pais AR" or a stream address (http://...)	Station, genre, "country FR" ou une adresse de flux (http://...)
+Weather	Météo
+APP Weather	APP Météo
+INUMET weather alerts	Alertes INUMET
+WEATHER	MÉTÉO
+Now	Maintenant
+Forecast	Prévisions
+Alerts	Alertes
+YELLOW ALERT	ALERTE JAUNE
+ORANGE ALERT	ALERTE ORANGE
+RED ALERT	ALERTE ROUGE
+WEATHER NOTICE	AVIS MÉTÉO
+WEATHER WARNING	AVERTISSEMENT MÉTÉO
+from	de
+to	à
+low	faible
+moderate	modéré
+high	élevé
+very high	très élevé
+extreme	extrême
+No INUMET alerts for	Pas d'alertes INUMET pour
+(more: Alerts)	(plus : Alertes)
+Feels	Ressenti
+Min	Min
+Max	Max
+Humidity	Humidité
+Dew point	Point de rosée
+Pressure hPa	Pression hPa
+Wind	Vent
+Gusts	Rafales
+Rain 1h / 24h	Pluie 1h / 24h
+Visibility	Visibilité
+Clouds	Nuages
+Sun	Soleil
+Last 24 h	Dernières 24 h
+Tomorrow	Demain
+No forecast yet	Pas encore de prévisions
+(your department)	(votre département)
+No weather warnings in force from INUMET	Aucun avertissement INUMET en vigueur
+Getting the weather...	Récupération de la météo...
+No data: Update (needs WiFi)	Pas de données : Mettre à jour (WiFi requis)
+updating...	mise à jour...
+updated	mis à jour
+No data: is WiFi connected?	Pas de données : le WiFi est-il connecté ?
+CB\nChannels	Canaux\nCB
+APP CB channels	APP Canaux CB
+CB BAND	BANDE CB
+Knob	Bouton
+Go	Aller
+Channel	Canal
+channels	canaux
+free	libre
+Save\nchannel	Enreg.\ncanal
+Channel\nlist	Liste\ncanaux
+Main knob on CB	Bouton principal en CB
+channel by channel	canal par canal
+free tuning	accord libre
+saved: diag/%.40s	enregistré : diag/%.40s
+could not save them	impossible d'enregistrer
+saving...	enregistrement...
+Save these diagnostics?	Enregistrer ce diagnostic ?
+They are saved on the SD card, in the diag folder: nothing leaves the radio. Attach the file to a report on GitHub (condoruy/X6100-CX8ANM) if you want help. The firmware comes as it is, with no warranty.	Il est enregistré sur la carte SD, dans le dossier diag : rien ne sort de la radio. Joignez le fichier à un rapport sur GitHub (condoruy/X6100-CX8ANM) pour obtenir de l'aide. Le firmware est fourni tel quel, sans garantie.
+MFK: scroll - press: save - ESC: cancel	MFK : défiler - appuyer : enregistrer - ESC : annuler
+Save...	Enregistrer...
+Edition	Édition
+Derived from	Dérivé de
+Created in 1KO125	Créées dans 1KO125
+Reports	Rapports
+Next	Suivant
+Finish	Terminer
+Type\ncallsign	Saisir\nl'indicatif
+No license\n(listen)	Sans licence\n(écoute)
+Countries in this region	Pays de cette région
+ISO code	Code ISO
+Locator of the capital	Locator de la capitale
+The clock takes this country's time, and Internet radio its stations.	L'horloge prend l'heure de ce pays, et la radio Internet ses stations.
+License (callsign)	Licence (indicatif)
+Region	Région
+Choose the language with the MFK knob and press it	Choisissez la langue avec le bouton MFK et appuyez
+Your amateur radio callsign: it is used by FT8, JS8, the log, the cluster and the spots. Without a license you can still listen	Votre indicatif radioamateur : il sert pour FT8, JS8, le log, le cluster et les spots. Sans licence, vous pouvez quand même écouter
+The IARU region sets the band edges and the band plan shown under the spectrum	La région IARU fixe les limites des bandes et le plan de bande affiché sous le spectre
+Choose your country: it sets the clock and the Internet radio stations	Choisissez votre pays : il règle l'horloge et les stations de la radio Internet
+Welcome	Bienvenue
+none (listener)	aucun (auditeur)
+Saved	Enregistré
+IARU Region 1	Région IARU 1
+IARU Region 2	Région IARU 2
+IARU Region 3	Région IARU 3
+Europe, Africa, the Middle East, Russia and the former Soviet republics, and Mongolia	Europe, Afrique, Moyen-Orient, Russie et ex-républiques soviétiques, et Mongolie
+North, Central and South America, the Caribbean, Greenland and Hawaii	Amérique du Nord, centrale et du Sud, Caraïbes, Groenland et Hawaï
+Asia and the Pacific: China, Japan, India, Iran, Pakistan, South-East Asia, Australia, New Zealand and the Pacific islands	Asie et Pacifique : Chine, Japon, Inde, Iran, Pakistan, Asie du Sud-Est, Australie, Nouvelle-Zélande et îles du Pacifique
+Area	Secteur
+Europe, Africa, Middle East	Europe, Afrique, Moyen-Orient
+Americas	Amériques
+Asia and Pacific	Asie et Pacifique
+All areas	Toutes les zones
+HF AIR BAND	BANDE AÉRO HF
+USB. By day 8-18 MHz, at night 3-6 MHz. VHF air band (118-137 MHz): Internet radio > List	USB. Le jour 8-18 MHz, la nuit 3-6 MHz. Bande aéro VHF (118-137 MHz) : Radio Internet > Liste
+South America	Amérique du Sud
+South Atlantic	Atlantique Sud
+South America (weather)	Amérique du Sud (météo)
+Ezeiza, Argentina (weather)	Ezeiza, Argentine (météo)
+Argentina, regional (weather)	Argentine, régionales (météo)
+Caribbean	Caraïbes
+North Atlantic	Atlantique Nord
+Central East Pacific	Pacifique centre-est
+Europe	Europe
+Shannon, Ireland (weather)	Shannon, Irlande (météo)
+RAF, United Kingdom (weather)	RAF, Royaume-Uni (météo)
+Africa	Afrique
+Africa (weather)	Afrique (météo)
+Middle East	Moyen-Orient
+North Central Asia	Asie centre-nord
+East Asia	Asie de l'Est
+China (weather)	Chine (météo)
+South-East Asia	Asie du Sud-Est
+Bangkok, India, Singapore (weather)	Bangkok, Inde, Singapour (météo)
+Central West Pacific	Pacifique centre-ouest
+Tokyo, Hong Kong, Auckland (weather)	Tokyo, Hong Kong, Auckland (météo)
+North Pacific	Pacifique Nord
+South Pacific	Pacifique Sud
+Search and rescue (worldwide)	Recherche et sauvetage (mondial)
+Play /\nStop	Écouter /\nArrêter
+Air band (air traffic control)	Bande aéro (contrôle aérien)
+Choose the country and press the MFK knob	Choisissez le pays et appuyez sur le bouton MFK
+No favorites yet: List shows your country's stations, Favorite saves one	Pas encore de favoris : Liste montre les stations de votre pays, Favori en garde une
+IARU region	Région IARU
+First-start assistant	Assistant de démarrage
+Open...	Ouvrir...
+APP HF air band	APP Bande aéro HF
+HF Air\nBand	Bande\naéro HF
+HF Air Band	Bande aéro HF

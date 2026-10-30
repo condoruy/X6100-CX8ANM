@@ -9,6 +9,8 @@
 #include "dialog_settings.h"
 
 #include "dsp.h"
+#include "countries.h"
+#include "dialog_setup.h"
 #include "wifi.h"
 #include "btaudio.h"
 #include "bt_dev.h"
@@ -984,6 +986,7 @@ static action_items_t long_action_items[] = {
     { .label = " APP Internet radio ", .action = ACTION_APP_IRADIO },
     { .label = " APP Weather ", .action = ACTION_APP_METEO },
     { .label = " APP CB channels ", .action = ACTION_APP_CB },
+    { .label = " APP HF air band ", .action = ACTION_APP_AERO },
     { .label = " APP RX recorder ", .action = ACTION_APP_RECORDER },
     { .label = " APP SWR Scan ", .action = ACTION_APP_SWRSCAN },
     { .label = " APP GPS ", .action = ACTION_APP_GPS },
@@ -2409,7 +2412,7 @@ static uint8_t make_language(uint8_t row) {
     lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_CENTER, row, 1);
 
     /* Los nombres de los idiomas no se traducen: siempre se reconocen */
-    obj = dropdown_uint8(grid, &params.language, " English \n Español ", lang_update_cb);
+    obj = dropdown_uint8(grid, &params.language, " English \n Español \n Deutsch \n Français \n Italiano ", lang_update_cb);
     lang_dd = obj;
 
     lv_obj_set_size(obj, SMALL_6, ROW_H);
@@ -3965,9 +3968,36 @@ static uint8_t make_station_row(uint8_t row, const char *label, const char *val,
     return row + 1;
 }
 
+/* CX8ANM: región IARU y país (dialog_setup.c), y el asistente del primer encendido otra vez */
+static void setup_open_cb(lv_event_t *e) {
+    setup_mode_t m = (setup_mode_t)(intptr_t)lv_obj_get_user_data(lv_event_get_current_target(e));
+    lv_async_call([](void *arg) { dialog_setup_open((setup_mode_t)(intptr_t)arg); }, (void *)(intptr_t)m);
+}
+
+static uint8_t make_setup_row(uint8_t row, const char *label, const char *val, setup_mode_t m) {
+    wl_row_label(row, label);
+
+    lv_obj_t *obj = wl_button(row, val[0] ? val : "-", setup_open_cb);
+    lv_obj_set_size(obj, 150, ROW_H - 4);
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 1, 1, LV_GRID_ALIGN_CENTER, row, 1);
+    lv_obj_set_user_data(obj, (void *)(intptr_t)m);
+    lv_obj_t *l = lv_obj_get_child(obj, 0);
+    lv_label_set_long_mode(l, LV_LABEL_LONG_DOT);
+    lv_obj_set_width(l, 140);
+    lv_obj_set_style_text_align(l, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_center(l);
+    return row + 1;
+}
+
 static uint8_t make_station(uint8_t row) {
+    char region[8];
+
+    snprintf(region, sizeof(region), "%d", params.region.x);
     row = make_station_row(row, "Callsign", params.callsign.x, ST_CALLSIGN);
     row = make_station_row(row, "QTH locator", params.qth.x, ST_QTH);
+    row = make_setup_row(row, "IARU region", region, SETUP_REGION);
+    row = make_setup_row(row, "Country", country_name_cc(params.country.x), SETUP_COUNTRY);
+    row = make_setup_row(row, "First-start assistant", tr("Open..."), SETUP_ALL);
     lv_obj_add_event_cb(grid, st_delete_cb, LV_EVENT_DELETE, NULL);
     return row;
 }

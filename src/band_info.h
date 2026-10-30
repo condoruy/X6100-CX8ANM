@@ -18,6 +18,9 @@ extern "C" {
 #endif
 
 lv_obj_t * band_info_init(lv_obj_t *parent);
+
+/* CX8ANM: los límites de las bandas cambiaron (otra región IARU): se leen de nuevo */
+void band_info_reload(void);
 void band_info_update(int32_t f);
 
 #ifdef __cplusplus

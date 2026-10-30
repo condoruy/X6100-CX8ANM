@@ -5,17 +5,61 @@ Giovanni Ricciardi IU1WXY, R1CBU, R2RFE y la comunidad X6100 (ver README.md).
 
 ## Idioma
 
-- **Ajustes → Pantalla → Idioma**: English / Español. Se aplica al instante.
+- **Ajustes → Pantalla → Idioma**: English, Español, Deutsch, Français, Italiano. Se aplica al instante.
 - La interfaz, los mensajes y las pantallas de los modos (FT8, JS8, SSTV,
-  WeFax, NAVTEX, PSK, Olivia, JTTY, WSPR, CW, SOTA/POTA) están en español.
-- Las fuentes tienen á é í ó ú ü ñ ¡ ¿ (también la Sony Sketch, con sus letras).
-- La página web de la radio también está en español.
+  WeFax, NAVTEX, PSK, Olivia, JTTY, WSPR, CW, SOTA/POTA) están traducidos a los cuatro idiomas.
+- Las fuentes tienen las letras del español, alemán, francés e italiano (á à â ä ç é è ê ë í ì î ï
+  ñ ó ò ô ö ú ù û ü ¡ ¿), también la Sony Sketch, con sus letras dibujadas. En alemán se escribe
+  "ss" en lugar de "ß", como en Suiza.
+- La página web de la radio está en español.
 
 Para corregir o agregar una traducción:
 
-1. Editar `tools/i18n/es.txt` (inglés `TAB` español).
-2. `python3 tools/i18n/build.py` (genera `src/i18n_es.inc` y revisa los `%`).
+1. Editar `tools/i18n/<idioma>.txt` (`es`, `de`, `fr`, `it`: inglés `TAB` traducción).
+2. `python3 tools/i18n/build.py` (genera `src/i18n_<idioma>.inc` y revisa los `%`).
 3. Si el texto se arma con `snprintf`, `python3 tools/i18n/wrap.py src/archivo.c`.
+
+## Primer encendido: idioma, licencia, región y país
+
+La primera vez que se enciende (y una vez después de actualizar a esta versión) aparece un
+asistente de cuatro pasos. La perilla MFK elige, apretarla pasa al siguiente, ESC vuelve uno atrás:
+
+1. **Idioma**: los cinco, cada uno escrito en su idioma.
+2. **Licencia**: el indicativo con el teclado de la pantalla, o **Sin licencia (escucha)**.
+   La imagen ya no trae ningún indicativo cargado.
+3. **Región IARU** (1, 2 o 3): a la derecha dice qué zona del mundo es y la lista de todos los
+   países que están en esa región.
+4. **País**: los de la región elegida, en orden alfabético del idioma. Pone la hora del país
+   (la zona de su capital), el locator de la capital si no había uno, y el país de la radio por
+   Internet.
+
+Queda guardado y no vuelve a aparecer. Para cambiarlo: **Ajustes → General → Estación**:
+*Región IARU*, *País* o *Asistente inicial* (los cuatro pasos otra vez).
+
+## Regiones IARU
+
+- **Región 1**: Europa, África, Medio Oriente, Rusia y las ex repúblicas soviéticas, y Mongolia.
+- **Región 2**: las Américas, el Caribe, Groenlandia y Hawái.
+- **Región 3**: Asia y el Pacífico (China, Japón, India, Irán, Pakistán, Sudeste Asiático,
+  Australia, Nueva Zelanda, islas del Pacífico).
+
+La región cambia los límites de las bandas (160 m: 1,810 en la R1 y 1,800 en las otras; 80 m hasta
+3,8 / 4,0 / 3,9 MHz; 40 m hasta 7,2 / 7,3 / 7,2 MHz; 6 m hasta 52 / 54 / 54 MHz) y el plan de banda
+de colores bajo el espectro. Las alertas de INUMET solo se consultan si el país es Uruguay.
+
+## Banda aérea
+
+La banda aérea de VHF (118-137 MHz, torres y aproximación) está fuera de lo que recibe el X6100
+(0,5-30 MHz y 50-54 MHz). Hay dos formas de escuchar aviación:
+
+- **APP → (página 4) → Banda aérea HF**: las frecuencias de onda corta de las rutas aéreas
+  oceánicas (MWARA: Sudamérica, Atlántico Sur, Caribe, Atlántico Norte, Europa, África, Asia,
+  Pacífico) y los VOLMET (partes meteorológicos continuos: Ezeiza y regionales argentinos,
+  Shannon, RAF, Tokio...), más búsqueda y rescate. **Zona** cambia de zona (empieza en la de su
+  región), la perilla MFK elige y apretarla va a la frecuencia en USB. **Guardar canal** la deja
+  en memoria. De día se escucha más en 8-18 MHz y de noche en 3-6 MHz.
+- **Radio por Internet → Lista → Banda aérea**: emisoras que retransmiten el control de tránsito
+  aéreo (las del país elegido primero).
 
 ## Equipo en la PC
 
@@ -140,9 +184,12 @@ Vistas previas aproximadas: `docs/screenshots/themes_alta_gama/pro.png` y `estil
 
 **APP → (página 2) → Radio Internet.** Emisoras del directorio abierto radio-browser.info:
 
-- **Lista** pasa por: *Favoritas* → *País* (Uruguay al empezar) → *Las más escuchadas del mundo* → la última búsqueda.
-- **Buscar**: nombre de la emisora o género (rock, tango, noticias...). `pais AR` cambia el país de la lista.
-- **Reproducir** (o apretar la perilla MFK sobre la emisora), **Parar**, **Favorita** (agrega o quita).
+- **Lista** pasa por: *Favoritas* → *País* (el del asistente inicial) → *Banda aérea* → *Las más escuchadas del mundo* → la última búsqueda.
+- **País**: muestra todos los países por nombre; la perilla MFK elige y apretarla trae sus emisoras.
+  (También sirve escribir `pais AR` en **Buscar**.)
+- **Buscar**: nombre de la emisora o género (rock, tango, noticias...).
+- **Escuchar / Parar** (o apretar la perilla MFK sobre la emisora): si la elegida ya suena, se para.
+  **Favorita** agrega o quita.
 - Arriba: la emisora, el formato (MP3 128 kbps...) y el tema que está sonando, si la emisora lo manda.
 - El volumen es el de siempre. Suena por el parlante o por los auriculares Bluetooth si están conectados.
 - Al transmitir (PTT) la emisora se corta: nunca sale al aire. Al cerrar la aplicación se detiene.

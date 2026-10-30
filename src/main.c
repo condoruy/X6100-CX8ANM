@@ -23,6 +23,8 @@
 
 #include "main.h"
 #include "main_screen.h"
+#include "countries.h"
+#include "dialog_setup.h"
 #include "screen_rec.h"
 #include "mirror.h"
 #include <strings.h>
@@ -193,8 +195,8 @@ int main(void) {
     params_init();
     if (strcasecmp(params.theme_name.x, "IU1WXY") == 0)
         params_str_set(&params.theme_name, "CX8ANM");    /* el tema de fábrica cambió de nombre */
-    if (!params.qth.x[0])
-        params_str_set(&params.qth, "GF15WC");   /* Montevideo: sin GPS, Campo busca las referencias cercanas desde acá */
+    if (!params.qth.x[0] && country_find(params.country.x))
+        params_str_set(&params.qth, country_find(params.country.x)->loc);   /* sin GPS: la capital del país */
     sstv_resources_init();
     display_settings_check();
     audio_set_play_vol(params.play_gain_db_f.x);
@@ -240,7 +242,9 @@ int main(void) {
 
     lv_scr_load(main_obj);
     walkie_init(main_obj);      /* its screen instead, when on */
-    if (!walkie_on() && param_i_get(cfg_field_boot)) {
+    if (dialog_setup_first_start()) {
+        /* primer encendido: idioma, licencia, región y país antes que nada */
+    } else if (!walkie_on() && param_i_get(cfg_field_boot)) {
         main_screen_start_app(ACTION_APP_FIELD);
     }
 

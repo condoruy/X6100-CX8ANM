@@ -155,6 +155,11 @@ static void fade_ready(lv_anim_t *a) {
     fade_run = false;
 }
 
+extern "C" void band_info_reload(void) {
+    bands = BandsTable::all_bands();
+    if (obj) lv_obj_invalidate(obj);
+}
+
 extern "C" lv_obj_t *band_info_init(lv_obj_t *parent) {
     bands = BandsTable::all_bands();
     obj   = lv_obj_create(parent);
