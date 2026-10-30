@@ -1451,3 +1451,9 @@ Open...	Apri...
 APP HF air band	APP Banda aerea HF
 HF Air\nBand	Banda\naerea HF
 HF Air Band	Banda aerea HF
+Low-low (export)	Bassa-bassa (export)
+Low (export)	Bassa (export)
+Official (CEPT/FCC)	Ufficiale (CEPT/FCC)
+High (export)	Alta (export)
+High-high (export)	Alta-alta (export)
+United Kingdom 27/81 (FM)	Regno Unito 27/81 (FM)

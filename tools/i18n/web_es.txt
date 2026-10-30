@@ -1,0 +1,264 @@
+# Traducción de la interfaz web (webserver/.../views). inglés <TAB> español
+# Se aplica con: python3 tools/i18n/web_apply.py
+Download failed:	La descarga falló:
+by IU1WXY	de IU1WXY
+General	General
+Frequencies	Frecuencias
+Bands	Bandas
+Digital modes	Modos digitales
+Memories	Memorias
+Operating	Operación
+Remote	Remoto
+Field Ops	SOTA/POTA
+CW messages	Mensajes CW
+Logs	Logs
+Files	Archivos
+Gallery	Galería
+Backup	Respaldo
+System	Sistema
+Display	Pantalla
+Time	Hora
+X6100 custom firmware by IU1WXY	Firmware X6100 de IU1WXY · versión CX8ANM / Cóndor Tecnológico
+configurator	configurador
+Main Page	Página principal
+Everything the configurator can change on the radio.	Todo lo que el configurador puede cambiar en la radio.
+Bands editor	Editor de bandas
+Adds, changes and removes bands; Active binds a band to the up/down keys.	Agrega, cambia y quita bandas; Activa asigna una banda a las teclas arriba/abajo.
+Digital modes editor	Editor de modos digitales
+Adds, changes and removes the FT8/FT4 and JS8 frequencies.	Agrega, cambia y quita las frecuencias de FT8/FT4 y JS8.
+The telnet DX cluster server used by the Cluster app.	El servidor telnet de DX cluster que usa la app Cluster.
+wfview server	Servidor wfview
+Icom LAN server for wfview: turn it on and set its login.	Servidor LAN Icom para wfview: encenderlo y poner su usuario.
+Reads, edits and clears the MEM slots and the named channels.	Lee, edita y borra las memorias MEM y los canales con nombre.
+File browser	Explorador de archivos
+Downloads files from the SD card: ADIF log, screenshots, recordings.	Descarga archivos de la tarjeta SD: log ADIF, capturas, grabaciones.
+Screen and RX recordings and screenshots, with thumbnails; AVI to MP4 in the browser.	Grabaciones de pantalla y de RX y capturas, con miniaturas; AVI a MP4 en el navegador.
+Tunes the radio from the browser with spectrum, waterfall and RX audio.	Sintoniza la radio desde el navegador con espectro, cascada y audio de RX.
+Saves settings, memories, QSO log and more, and restores them after a new image.	Guarda ajustes, memorias, log de QSO y más, y los repone después de grabar una imagen nueva.
+Time editor	Editor de hora
+Shows the radio clock and sets it by hand, by NTP or by timezone.	Muestra el reloj de la radio y lo ajusta a mano, por NTP o por zona horaria.
+Tunes the radio and plays its RX audio in this browser. Receive only: there is no transmit from the web in this version.	Sintoniza la radio y reproduce su audio de RX en este navegador. Solo recepción: desde esta página no se transmite.
+Tuning	Sintonía
+Frequency, mode and band of the radio	Frecuencia, modo y banda de la radio
+Click to type a frequency	Clic para escribir una frecuencia
+Step 10 Hz	Paso 10 Hz
+Step 100 Hz	Paso 100 Hz
+Step 1 kHz	Paso 1 kHz
+Step 5 kHz	Paso 5 kHz
+Step 10 kHz	Paso 10 kHz
+or scroll on the waterfall	o la rueda sobre la cascada
+Mode	Modo
+Band	Banda
+Spectrum and waterfall	Espectro y cascada
+Scroll on the waterfall to tune	La rueda sobre la cascada sintoniza
+Audio and receiver	Audio y receptor
+RX audio in this browser, receive only	Audio de RX en este navegador, solo recepción
+🔊 Listen	🔊 Escuchar
+Browser volume	Volumen del navegador
+Filter	Filtro
+RF gain	Ganancia RF
+PTT (not in this version)	PTT (en la página Equipo)
+Audio delay ~0.5 s · 1 listener at a time	Retardo del audio ~0,5 s · un oyente a la vez
+Audio needs	El audio necesita
+(the radio's certificate is self-signed: accept it once in the browser).	(el certificado de la radio es propio: acéptelo una vez en el navegador).
+Invalid frequency	Frecuencia inválida
+Connected	Conectado
+Connection lost, retrying	Conexión perdida, reintentando
+■ Stop	■ Detener
+Listening	Escuchando
+A USB Ethernet adapter on the radio: DHCP, or a fixed address for networks that need one. The same settings as Settings &rarr; Wireless &rarr; Ethernet on the radio. WiFi is not touched.	Un adaptador Ethernet USB en la radio: DHCP, o una dirección fija para las redes que la necesitan. Los mismos ajustes que Ajustes &rarr; Inalámbrico &rarr; Ethernet en la radio. La WiFi no se toca.
+No Ethernet adapter connected.	No hay un adaptador Ethernet conectado.
+Adapter	Adaptador
+Status	Estado
+DHCP takes the address from the network	DHCP toma la dirección de la red
+Static	Fija
+IP address	Dirección IP
+For example 192.168.1.20	Por ejemplo 192.168.1.20
+Netmask	Máscara
+255.255.255.0 or /24	255.255.255.0 o /24
+Gateway	Puerta de enlace
+Optional. Leave it empty and internet stays on WiFi	Opcional. Vacía, internet sigue por WiFi
+Optional	Opcional
+Apply	Aplicar
+How the radio's screen looks: the same options as Settings &rarr; Display, applied on the radio as you change them.	Cómo se ve la pantalla de la radio: las mismas opciones que Ajustes &rarr; Pantalla, se aplican en la radio al cambiarlas.
+Read from the radio	Leído de la radio
+Time Editor	Editor de hora
+Radio clock, timezone and time synchronisation.	Reloj de la radio, zona horaria y sincronización.
+Time information	Información de hora
+This browser's clock and the radio's	El reloj de este navegador y el de la radio
+Local time	Hora local
+Loading Local Time...	Cargando la hora local...
+Server time	Hora de la radio
+Fetching Server Time...	Leyendo la hora de la radio...
+Server timezone	Zona horaria de la radio
+Fetching Server Timezone...	Leyendo la zona horaria de la radio...
+Sync Local Time to Server	Pasar la hora de esta PC a la radio
+Manually update server time	Cambiar la hora de la radio a mano
+Sets the radio clock to the date and time you type	Pone el reloj de la radio en la fecha y hora que escriba
+Input time (format: YYYY-MM-DD HH:MM:SS)	Hora (formato: AAAA-MM-DD HH:MM:SS)
+Input Time	Hora
+Manually Update Time	Cambiar la hora
+Update server time by NTP	Poner la hora de la radio por NTP
+Needs internet on the radio	Necesita internet en la radio
+Select or input NTP server	Elija o escriba un servidor NTP
+Input Custom NTP Server Address	Dirección de otro servidor NTP
+Update Time	Poner la hora
+Set server timezone	Zona horaria de la radio
+The radio's local time zone	La zona horaria local de la radio
+Select timezone or input custom timezone	Elija o escriba una zona horaria
+e.g., Asia/Shanghai	ej. America/Montevideo
+Set Timezone	Poner zona horaria
+Error fetching timezone	Error al leer la zona horaria
+Timezone updated successfully!	¡Zona horaria cambiada!
+Failed to update timezone:	No se pudo cambiar la zona horaria:
+Failed to update timezone. Please try again.	No se pudo cambiar la zona horaria. Pruebe de nuevo.
+Server Time: Unfetched	Hora de la radio: sin leer
+Update time successfully with ${ntpServer}	Hora actualizada con ${ntpServer}
+Update time failed with	No se pudo actualizar la hora con
+Time update failed. Please check the NTP server address or network connection!	No se pudo actualizar la hora. ¡Revise el servidor NTP o la conexión!
+Server time updated manually.	Hora de la radio cambiada a mano.
+Manual time update failed:	No se pudo cambiar la hora a mano:
+Manual time update failed. Please check the time format and try again.	No se pudo cambiar la hora. Revise el formato y pruebe de nuevo.
+Please select or input a timezone.	Elija o escriba una zona horaria.
+Please input custom NTP server address!	¡Escriba la dirección del servidor NTP!
+Please input a valid time.	Escriba una hora válida.
+Save the radio settings to your computer, and put them back after flashing a new image.	Guarde los ajustes de la radio en su computadora y repóngalos después de grabar una imagen nueva.
+Download backup	Descargar respaldo
+Tick the parts to save in the file	Marque las partes a guardar en el archivo
+Restore	Restaurar
+Puts a backup file back on the radio	Vuelve a poner un respaldo en la radio
+Choose a backup file. You can pick which parts to restore; the radio screen restarts (about 5 s) when settings are replaced.	Elija un archivo de respaldo. Puede elegir qué partes restaurar; la pantalla de la radio se reinicia (unos 5 s) cuando se reemplazan ajustes.
+Part	Parte
+In the file	En el archivo
+On the radio now	En la radio ahora
+Restore selected	Restaurar lo elegido
+Replace the selected parts on the radio? A copy of the current files is kept in /mnt/backup_before_restore.	¿Reemplazar las partes elegidas en la radio? Se guarda una copia de los archivos actuales en /mnt/backup_before_restore.
+Band edges and default modes shown on the radio. Active bands are reached with the band up/down buttons.	Límites de banda y modos por defecto que muestra la radio. A las bandas activas se llega con los botones de banda arriba/abajo.
+Band list	Lista de bandas
+Name, edges, default mode and the Active flag	Nombre, límites, modo por defecto y si está activa
+Add band	Agregar banda
+Name	Nombre
+Start, MHz	Inicio, MHz
+Stop, MHz	Fin, MHz
+Active	Activa
+Remove band "${data.name}"?	¿Quitar la banda "${data.name}"?
+Servers the radio can use (APP → Cluster). The one in use is marked; the radio reconnects when you change it.	Servidores que la radio puede usar (APP → Cluster). El que está en uso está marcado; la radio se reconecta al cambiarlo.
+Servers	Servidores
+Telnet servers; Use switches the radio to one	Servidores telnet; Usar pasa la radio a uno
+Host	Servidor
+Port	Puerto
+Add server	Agregar servidor
+Name, host name and telnet port	Nombre, servidor y puerto telnet
+Filters	Filtros
+Spots hidden here disappear from APP Cluster, the cluster column and the waterfall marks	Los spots ocultos acá desaparecen de APP Cluster, de la columna del cluster y de las marcas en la cascada
+Modes, bands and activity are also on the radio: Settings → Cluster.	Modos, bandas y actividad también están en la radio: Ajustes → Cluster.
+Modes	Modos
+Digital	Digital
+(none ticked = all bands)	(ninguna marcada = todas las bandas)
+Activity	Actividad
+(none ticked = all spots)	(ninguna marcada = todos los spots)
+Max age	Antigüedad máxima
+Off	No
+Skip spotters	Ignorar spotters
+e.g. K1TTT-# , *-3	ej. K1TTT-# , *-3
+Save	Guardar
+Alerts	Alertas
+Callsigns or prefixes you are looking for.	Indicativos o prefijos que está buscando.
+matches anything: VP8*, */P, 3Y0J.	vale cualquier cosa: VP8*, */P, 3Y0J.
+Popup on the radio	Aviso en la radio
+When a spot matches an alert	Cuando un spot coincide con una alerta
+Beep	Pitido
+Pattern	Patrón
+Only bands	Solo bandas
+Only mode	Solo modo
+Last seen	Visto por última vez
+e.g. VP8*	ej. VP8*
+(none = all)	(ninguna = todas)
+Any	Cualquiera
+Add	Agregar
+Saved	Guardado
+The messages of MSG &rarr; CW on the radio, sent with TX or as a beacon. Up to 64 characters each; the radio shows the changes the next time MSG &rarr; CW opens.	Los mensajes de MSG &rarr; CW de la radio, enviados con TX o como baliza. Hasta 64 caracteres cada uno; la radio muestra los cambios la próxima vez que abre MSG &rarr; CW.
+Messages	Mensajes
+Up to 64 characters each	Hasta 64 caracteres cada uno
+Message	Mensaje
+Frequencies offered by the FT8/FT4 and JS8 apps.	Frecuencias que ofrecen las apps FT8/FT4 y JS8.
+Label, dial frequency, mode and app	Etiqueta, frecuencia de dial, modo y app
+Add frequency	Agregar frecuencia
+Label	Etiqueta
+Freq, MHz	Frec, MHz
+Type	Tipo
+Remove digital mode "${data.label}"?	¿Quitar el modo digital "${data.label}"?
+POTA, SOTA, WWBOTA and HOTA portable operation: reference lists for the radio, QRZ Logbook upload, HOTA spots, activation logs.	Operación portátil POTA, SOTA, WWBOTA y HOTA: listas de referencias para la radio, subida a QRZ Logbook, spots HOTA, logs de activaciones.
+API key from your QRZ Logbook settings. Key:	Clave API de los ajustes de su QRZ Logbook. Clave:
+API key	Clave API
+Empty = remove the key	Vacía = quitar la clave
+New key (empty = remove)	Clave nueva (vacía = quitar)
+HOTA spots	Spots HOTA
+cqhota.app takes spots with your own key: cqhota.app, My account, Integration API key. Without it HOTA spots go to the DX cluster only. Key:	cqhota.app acepta spots con su propia clave: cqhota.app, My account, Integration API key. Sin ella los spots HOTA van solo al DX cluster. Clave:
+Integration key	Clave de integración
+Reference lists	Listas de referencias
+Update the lists	Actualizar las listas
+Activation logs	Logs de activaciones
+Download or delete the logs of the activations	Descargue o borre los logs de las activaciones
+File	Archivo
+Size	Tamaño
+Date	Fecha
+Delete	Borrar
+No logs yet	Todavía no hay logs
+Delete the log "${name}"? Download it first if you still need it: this cannot be undone.	¿Borrar el log "${name}"? Descárguelo antes si todavía lo necesita: no se puede deshacer.
+downloaded while the radio writes it may come out damaged (the radio's copy is not touched): open it with any SQLite3 tool to check.	descargado mientras la radio lo escribe puede salir dañado (la copia de la radio no se toca): ábralo con cualquier herramienta SQLite3 para revisarlo.
+Screen recordings (AVI), RX audio recordings, screenshots, SSTV and WeFax pictures stored on the radio. Tap files to select them, then download them as a ZIP or delete them together. Screen recordings can be converted to MP4 in this browser.	Grabaciones de pantalla (AVI), grabaciones de audio de RX, capturas, imágenes SSTV y WeFax guardadas en la radio. Toque los archivos para elegirlos y después descárguelos en un ZIP o bórrelos juntos. Las grabaciones de pantalla se pueden pasar a MP4 en este navegador.
+In-browser conversion needs a secure page. Open	La conversión en el navegador necesita una página segura. Abra
+the HTTPS version of this page	la versión HTTPS de esta página
+: the radio uses a self-signed certificate, so the browser shows a warning once. Accept it (Advanced, then Proceed) and the option appears.	: la radio usa un certificado propio, así que el navegador avisa una vez. Acéptelo (Avanzado, después Continuar) y aparece la opción.
+Drop pictures here or	Suelte imágenes acá o
+Choose files	Elija archivos
+PNG files up to 4 MB are sent as they are; JPEG and other pictures are converted to PNG in this browser. A file with the same name is kept: the new one gets -1, -2... at the end.	Los PNG de hasta 4 MB se mandan tal cual; JPEG y otras imágenes se pasan a PNG en este navegador. Si ya hay un archivo con ese nombre se conserva: al nuevo se le agrega -1, -2... al final.
+Select all	Elegir todo
+None	Ninguno
+Download ZIP	Descargar ZIP
+This folder is empty.	Esta carpeta está vacía.
+Open	Abrir
+Convert to MP4 (in browser)	Pasar a MP4 (en el navegador)
+Converted	Convertido
+Conversion failed:	La conversión falló:
+Deleted	Borrado
+Delete failed	No se pudo borrar
+ZIP download started	Descarga del ZIP iniciada
+waiting	esperando
+converting	convirtiendo
+sending	enviando
+saved as	guardado como
+failed:	falló:
+Uploaded	Subido
+Can't read the list	No se puede leer la lista
+Every QSO on the radio, day by day: the day's logs (FT8, FT4, JS8 and the phone's logger) and the POTA/SOTA activations. Edit a QSO in place, delete QSOs or whole days, export what the filter shows as ADIF or CSV.	Todos los QSO de la radio, día por día: los logs del día (FT8, FT4, JS8 y el logger del teléfono) y las activaciones POTA/SOTA. Edite un QSO en el lugar, borre QSO o días enteros, exporte lo que muestra el filtro en ADIF o CSV.
+Filter and export	Filtrar y exportar
+Export, and Delete shown, work on the QSOs the filter shows	Exportar y Borrar lo mostrado actúan sobre los QSO que muestra el filtro
+Call, name, QTH, grid, reference…	Indicativo, nombre, QTH, cuadrícula, referencia…
+All bands	Todas las bandas
+All modes	Todos los modos
+From	Desde
+To	Hasta
+Export ADIF	Exportar ADIF
+Export CSV	Exportar CSV
+Delete shown	Borrar lo mostrado
+Download the file	Descargar el archivo
+${list.length} of ${qsos.length} QSOs shown	${list.length} de ${qsos.length} QSO mostrados
+The activation running on the radio is in the list: end it first	La activación en curso en la radio está en la lista: termínela primero
+Delete ${what}? This cannot be undone: export first if you still need them.	¿Borrar ${what}? No se puede deshacer: exporte antes si todavía los necesita.
+Nothing to export	Nada para exportar
+MEM slots are the radio's MEM 1-9 buttons (hold to save, tap to load). Channels are the named list in APP → Channels; the radio picks up changes within a few seconds, unless the Channels dialog is open.	Las memorias MEM son los botones MEM 1-9 de la radio (mantener para guardar, tocar para cargar). Los canales son la lista con nombre de APP → Canales; la radio toma los cambios en unos segundos, salvo que el diálogo de Canales esté abierto.
+MEM slots	Memorias MEM
+The MEM 1-9 buttons: hold to save, tap to load	Los botones MEM 1-9: mantener para guardar, tocar para cargar
+Channels	Canales
+The named list in APP → Channels	La lista con nombre de APP → Canales
+Lets	Permite que
+on a PC control the radio over the network like an Icom IC-705 (CI-V, RX audio, waterfall). In wfview: radio IP, control port 50001, audio LPCM 1ch 16bit. The radio applies changes within a few seconds.	en una PC controle la radio por la red como un Icom IC-705 (CI-V, audio de RX, cascada). En wfview: IP de la radio, puerto de control 50001, audio LPCM 1ch 16bit. La radio aplica los cambios en unos segundos.
+Server	Servidor
+Icom LAN server and its login	Servidor LAN Icom y su usuario
+Enabled	Activado
+Listens for wfview on the network	Espera a wfview en la red
+User	Usuario
+Up to 15 characters	Hasta 15 caracteres
+Password	Contraseña

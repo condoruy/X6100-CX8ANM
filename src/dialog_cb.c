@@ -29,7 +29,7 @@
 static const x6100_mode_t modes[] = {x6100_mode_am, x6100_mode_nfm, x6100_mode_usb, x6100_mode_lsb};
 static const char *const  mode_names[] = {"AM", "FM", "USB", "LSB"};
 
-static lv_obj_t *title, *table;
+static lv_obj_t *title, *desc, *table;
 
 static void construct_cb(lv_obj_t *parent);
 static void destruct_cb(void);
@@ -71,6 +71,7 @@ static void show_title(void) {
     char a[16], b[16];
 
     if (!title) return;
+    if (desc) lv_label_set_text(desc, tr(cb_band_desc(band())));
     lv_label_set_text_fmt(title, "#%06x %s %s#  #%06x %s - %s MHz#   %s #%06x %s#   %s #%06x %s#",
                           theme_hex(TC_text_head), tr("CB BAND"), cb_band_name(band()), theme_hex(TC_text_dim),
                           cb_freq_text(cb_freq(band(), 1), a, sizeof(a)), cb_freq_text(cb_freq(band(), 40), b, sizeof(b)),
@@ -193,10 +194,15 @@ static void construct_cb(lv_obj_t *parent) {
     lv_obj_set_style_text_color(title, TC(text), 0);
     lv_obj_set_pos(title, 14, 6);
 
+    desc = lv_label_create(dialog.obj);     /* el nombre de la banda: oficial, de exportación, UK */
+    lv_obj_set_style_text_font(desc, &sony_18, 0);
+    lv_obj_set_style_text_color(desc, TC(accent), 0);
+    lv_obj_set_pos(desc, 14, 32);
+
     table = lv_table_create(dialog.obj);
     lv_obj_remove_style(table, NULL, LV_STATE_ANY | LV_PART_MAIN);
-    lv_obj_set_pos(table, 10, 36);
-    lv_obj_set_size(table, 780, DIALOG_H - 44);
+    lv_obj_set_pos(table, 10, 56);
+    lv_obj_set_size(table, 780, DIALOG_H - 64);
     lv_table_set_col_cnt(table, 3);
     lv_table_set_col_width(table, 0, 230);
     lv_table_set_col_width(table, 1, 230);
@@ -227,5 +233,5 @@ static void construct_cb(lv_obj_t *parent) {
 }
 
 static void destruct_cb(void) {
-    title = table = NULL;
+    title = desc = table = NULL;
 }

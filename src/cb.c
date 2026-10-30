@@ -32,6 +32,13 @@ const char *cb_band_name(int band) {
     return band >= 0 && band < CB_BANDS ? names[band] : "?";
 }
 
+/* Los nombres de siempre de la grilla de exportación; solo la C (y la UK en el Reino Unido) son legales casi en todos lados */
+const char *cb_band_desc(int band) {
+    static const char *const d[CB_BANDS] = {"Low-low (export)", "Low (export)", "Official (CEPT/FCC)", "High (export)",
+                                            "High-high (export)", "United Kingdom 27/81 (FM)"};
+    return band >= 0 && band < CB_BANDS ? d[band] : "";
+}
+
 const char *cb_freq_text(int32_t hz, char *buf, size_t size) {
     if (hz % 1000) snprintf(buf, size, "%d.%05d", hz / 1000000, hz % 1000000 / 10);
     else snprintf(buf, size, "%d.%03d", hz / 1000000, hz / 1000 % 1000);

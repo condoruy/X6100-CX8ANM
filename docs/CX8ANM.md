@@ -230,7 +230,10 @@ INUMET no tiene una API publicada: se usan los mismos datos públicos que alimen
 **APP → página 4 → Canales CB** (también en **V/M → página 3**).
 
 - La lista muestra los 40 canales de la banda elegida, con su frecuencia. El 9 es emergencias y el 19 rutas y viajeros.
-  **Banda** pasa por A, B, C (la oficial, 26.965–27.405 MHz), D, E y **UK** (la del Reino Unido,
+  **Banda** pasa por A (baja-baja), B (baja), C (la oficial, CEPT/FCC, 26.965–27.405 MHz), D (alta),
+  E (alta-alta) y **UK**. A, B, D y E son la grilla "de exportación" (los mismos 40 canales corridos
+  450 kHz) y no son legales en la mayoría de los países. Bajo el título se ve el nombre de la banda.
+  La **UK** es la del Reino Unido (
   "27/81": 40 canales en FM de 27,60125 a 27,99125 MHz, cada 10 kHz). Al elegir UK el modo pasa a FM.
   En la UK la perilla principal salta solo entre los canales UK ("CB UK-19").
 - Con la perilla MFK se elige el canal; al apretarla (o **Ir**) la radio va al canal en el **modo
