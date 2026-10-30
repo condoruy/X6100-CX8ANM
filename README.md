@@ -55,6 +55,10 @@ control remoto, temas…, ver [su README](docs/README_IU1WXY.md)) y además:
 
 El detalle de cada función está en **[docs/CX8ANM.md](docs/CX8ANM.md)**.
 
+> **En prueba (rama `remoto`):** *Remoto+*, la radio desde el teléfono o la PC con voz por el
+> micrófono, FT8 con subida a QRZ, CW desde el teclado y acceso desde cualquier lugar con Tailscale.
+> Ver [docs/REMOTO.md](docs/REMOTO.md).
+
 ## Instalar
 
 1. Bajar `Xiegu_X6100-CX8ANM_v<versión>.img.zip` de la

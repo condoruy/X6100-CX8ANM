@@ -1457,3 +1457,6 @@
 { "High (export)", "Hoch (Export)" },
 { "High-high (export)", "Hoch-hoch (Export)" },
 { "United Kingdom 27/81 (FM)", "Vereinigtes Königreich 27/81 (FM)" },
+{ "Web voice: no audio, TX stopped", "Web-Sprache: kein Audio, TX gestoppt" },
+{ "Web voice: 3 minutes, TX stopped", "Web-Sprache: 3 Minuten, TX gestoppt" },
+{ "Web voice: %s", "Web-Sprache: %s" },

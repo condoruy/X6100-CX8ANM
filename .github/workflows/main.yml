@@ -178,8 +178,14 @@ jobs:
         V="$(tr -d ' \n' < x6100_gui/VERSION_CX8ANM).${{ github.run_number }}"
         echo "$V" > x6100_gui/VERSION_CX8ANM
         echo "CX8ANM_VERSION=$V" >> "$GITHUB_ENV"
-        echo "IMG=Xiegu_X6100-CX8ANM_v$V" >> "$GITHUB_ENV"
-        echo "Imagen: Xiegu_X6100-CX8ANM_v$V"
+        # Las ramas de prueba (no main) no se publican: el nombre de la imagen dice cuál es
+        if [ "$GITHUB_REF" = "refs/heads/main" ] || [ "${GITHUB_REF#refs/tags/}" != "$GITHUB_REF" ]; then
+          IMG="Xiegu_X6100-CX8ANM_v$V"
+        else
+          IMG="Xiegu_X6100-CX8ANM_v$V-${GITHUB_REF_NAME//\//-}"
+        fi
+        echo "IMG=$IMG" >> "$GITHUB_ENV"
+        echo "Imagen: $IMG"
 
     # Configure
     - name: Configure

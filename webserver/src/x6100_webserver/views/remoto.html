@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1726">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Remoto+">
+<link rel="manifest" href="/remoto/manifest.json">
+<link rel="icon" href="/static/remoto-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/static/remoto-icon.svg">
+<title>X6100 Remoto+</title>
+<style>
+:root{--bg:#0e1726;--panel:#16233a;--line:#26385a;--text:#e9eef6;--dim:#9db0c8;--acc:#f2b34a;--teal:#5ec8c8;--red:#ff5050;--ok:#4cd28a}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,select,input,textarea{font:inherit;color:inherit}
+button{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;cursor:pointer}
+button.on{background:var(--acc);color:#1a1300;border-color:var(--acc);font-weight:700}
+button:disabled{opacity:.45;cursor:not-allowed}
+select,input[type=text],input[type=number],textarea{background:#0b1320;border:1px solid var(--line);border-radius:10px;padding:10px;min-height:44px;width:100%}
+label{color:var(--dim);font-size:13px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+a{color:var(--teal)}
+.app{max-width:900px;margin:0 auto;padding:10px 12px 92px}
+.top{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;padding:6px 2px 10px}
+.freq{font:700 34px/1 ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.02em;cursor:pointer}
+.sub{color:var(--dim);font-size:13px}
+.badges{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.badge{font-size:12px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--panel);border:1px solid var(--line)}
+.badge.tx{background:var(--red);border-color:var(--red);color:#fff}
+.badge.ok{color:var(--ok)}
+.badge.bad{color:var(--red)}
+.smeter{grid-column:1/-1;display:flex;align-items:center;gap:10px}
+.bar{flex:1;height:12px;background:#0b1320;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+.bar>div{height:100%;width:0;background:linear-gradient(90deg,var(--ok) 0 70%,var(--acc) 70% 85%,var(--red) 85%)}
+.scope{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#000;touch-action:none}
+.scope canvas{display:block;width:100%}
+.tabs{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:#0b1320;border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+.tabs button{border:0;background:none;border-radius:8px;min-height:52px;font-size:12px;color:var(--dim);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.tabs button.cur{color:var(--acc);background:var(--panel)}
+.tabs svg{width:22px;height:22px}
+.pane{display:none;margin-top:12px}
+.pane.cur{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}
+.card h3{margin:0 0 8px;font-size:15px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pills button{min-width:52px}
+.ptt{width:100%;min-height:150px;border-radius:24px;font-size:24px;font-weight:800;letter-spacing:.06em;background:#3a1216;border:2px solid #7a2a30;user-select:none;-webkit-user-select:none;touch-action:none}
+.ptt.live{background:var(--red);border-color:#fff;color:#fff}
+.ptt:disabled{background:var(--panel);border-color:var(--line)}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0}
+.switch input{width:52px;height:30px;accent-color:var(--red)}
+.mic{height:10px;background:#0b1320;border-radius:5px;overflow:hidden;border:1px solid var(--line)}
+.mic>div{height:100%;width:0;background:var(--teal)}
+.list{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.msg{display:grid;grid-template-columns:42px 1fr auto;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line);font:13px/1.3 ui-monospace,Menlo,Consolas,monospace;cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;border-radius:0;text-align:left;width:100%;min-height:40px}
+.msg.cq{color:var(--ok)}
+.msg.me{background:#3a2a0a;color:var(--acc);font-weight:700}
+.msg.txm{color:var(--red);cursor:default}
+.dim{color:var(--dim)}
+.status{min-height:22px;font-size:13px;color:var(--dim);margin:6px 2px}
+.status.err{color:var(--red)}
+.cwtext{min-height:90px;max-height:30vh;overflow:auto;white-space:pre-wrap;font:14px/1.4 ui-monospace,Menlo,Consolas,monospace;background:#0b1320;border:1px solid var(--line);border-radius:10px;padding:10px}
+.warn{background:#3a2a0a;border:1px solid #7a5a1a;color:#ffd68a;border-radius:10px;padding:10px;font-size:13px}
+@media (min-width:760px){.app{padding-bottom:110px}.freq{font-size:42px}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="top">
+  <div>
+    <div class="freq" id="freq" title="Tocar para escribir una frecuencia">--.---.---</div>
+    <input id="freq-in" type="text" inputmode="decimal" placeholder="14.074 (MHz)" hidden autocomplete="off">
+    <div class="sub" id="sub">Conectando…</div>
+  </div>
+  <div class="badges">
+    <span class="badge" id="b-conn">●</span>
+    <span class="badge" id="b-mode">--</span>
+    <span class="badge" id="b-tx" hidden>TX</span>
+  </div>
+  <div class="smeter"><span class="sub" id="s-txt">S0</span><div class="bar"><div id="s-bar"></div></div><span class="sub" id="pwr-txt"></span></div>
+</div>
+
+<div class="scope" id="scope"><canvas id="sp" height="90"></canvas><canvas id="wf" height="170"></canvas></div>
+<div class="status" id="status"></div>
+
+<!-- RADIO -->
+<section class="pane cur" id="p-radio">
+  <div class="card">
+    <h3>Sintonía</h3>
+    <div class="row">
+      <button id="dn">◀</button>
+      <select id="step" style="width:auto">
+        <option value="10">10 Hz</option><option value="100" selected>100 Hz</option><option value="1000">1 kHz</option>
+        <option value="5000">5 kHz</option><option value="10000">10 kHz</option>
+      </select>
+      <button id="up">▶</button>
+      <button id="listen" style="margin-left:auto">🔈 Escuchar</button>
+    </div>
+    <div style="margin-top:10px"><label for="vol">Volumen en este equipo</label><input type="range" id="vol" min="0" max="200" value="100"></div>
+  </div>
+  <div class="card">
+    <h3>Modo y banda</h3>
+    <div class="row pills" id="modes"></div>
+    <div class="row pills" id="bands" style="margin-top:8px"></div>
+  </div>
+  <div class="card">
+    <h3>Receptor</h3>
+    <div class="row pills">
+      <button data-toggle="pre">PRE</button><button data-toggle="att">ATT</button>
+      <button data-toggle="nb">NB</button><button data-toggle="nr">NR</button><button id="agc">AGC</button>
+    </div>
+    <div class="grid2" style="margin-top:10px">
+      <div><label for="filter" id="filter-l">Filtro</label><input type="range" id="filter" min="100" max="6000" step="50"></div>
+      <div><label for="rfgain" id="rfgain-l">Ganancia RF</label><input type="range" id="rfgain" min="0" max="100"></div>
+      <div><label for="pwr" id="pwr-l">Potencia TX</label><input type="range" id="pwr" min="1" max="100"></div>
+    </div>
+  </div>
+</section>
+
+<!-- VOZ -->
+<section class="pane" id="p-voz">
+  <div class="card">
+    <div class="switch"><div><b>Permitir transmitir</b><div class="sub">Se apaga cada vez que se abre la página. Vale para voz, FT8 y CW.</div></div><input type="checkbox" class="txallow" aria-label="Permitir transmitir"></div>
+  </div>
+  <div class="card">
+    <button class="ptt" id="ptt" disabled>PTT</button>
+    <div class="row" style="margin-top:10px;justify-content:space-between">
+      <label><input type="checkbox" id="latch"> Tocar para empezar y tocar para terminar</label>
+      <span class="sub" id="ptt-time"></span>
+    </div>
+    <div style="margin-top:10px"><label>Nivel del micrófono</label><div class="mic"><div id="mic-bar"></div></div></div>
+    <div style="margin-top:10px"><label for="micgain" id="micgain-l">Ganancia del micrófono</label><input type="range" id="micgain" min="10" max="400" value="100"></div>
+    <p class="sub">Voz en LSB, USB, AM o FM, desde la pantalla principal (sin una app abierta en la radio). Máximo 3 minutos por pasada; si se corta la conexión, la radio deja de transmitir sola.</p>
+    <div class="warn" id="mic-https" hidden>El micrófono solo funciona con <b>https</b>. Abra <a id="https-link" href="#">esta dirección</a> y acepte el certificado de la radio una vez.</div>
+  </div>
+</section>
+
+<!-- FT8 -->
+<section class="pane" id="p-ft8">
+  <div class="card">
+    <div class="row">
+      <button id="ft8-open">Abrir FT8 en la radio</button>
+      <button id="ft8-close">Cerrar app</button>
+      <span class="sub" id="ft8-state" style="margin-left:auto"></span>
+    </div>
+    <div class="row pills" style="margin-top:8px">
+      <button id="ft8-cq">CQ</button><button id="ft8-auto">Auto</button><button id="ft8-stop">Parar TX</button>
+    </div>
+    <p class="sub">Tocar un mensaje para contestarle. Verde: llamadas CQ. Amarillo: le hablan a usted. Necesita "Permitir transmitir" (pestaña Voz o Ajustes).</p>
+  </div>
+  <div class="list" id="ft8-list"></div>
+  <div class="card" style="margin-top:12px">
+    <h3>QSO anotados</h3>
+    <div id="ft8-qsos" class="sub">Todavía ninguno en esta sesión.</div>
+    <div class="row" style="margin-top:8px">
+      <label><input type="checkbox" id="qrz-auto"> Subir cada QSO a QRZ</label>
+      <button id="qrz-day" style="margin-left:auto">Subir el día a QRZ</button>
+    </div>
+    <p class="sub" id="qrz-nokey" hidden>Falta la clave de QRZ Logbook: se carga en la página <a href="/field">SOTA/POTA</a> de la web de la radio.</p>
+  </div>
+</section>
+
+<!-- CW -->
+<section class="pane" id="p-cw">
+  <div class="card">
+    <div class="row"><b>CW desde el teclado</b><span class="sub" id="cw-state" style="margin-left:auto"></span></div>
+    <div style="margin-top:8px"><label for="wpm" id="wpm-l">Velocidad</label><input type="range" id="wpm" min="5" max="45"></div>
+    <textarea id="cw-in" rows="2" placeholder="Escriba y apriete Enviar (Enter)"></textarea>
+    <div class="row" style="margin-top:8px"><button id="cw-send" class="on">Enviar</button><button id="cw-stop">Parar</button><button id="cw-mode">Pasar a CW</button></div>
+    <div class="row pills" id="macros" style="margin-top:8px"></div>
+    <p class="sub">Mantener apretado un mensaje guardado para cambiarlo. {MI} es su indicativo.</p>
+  </div>
+  <div class="card"><h3>Decodificado</h3><div class="cwtext" id="cw-rx"></div></div>
+</section>
+
+<!-- AJUSTES -->
+<section class="pane" id="p-aj">
+  <div class="card">
+    <div class="switch"><div><b>Permitir transmitir</b><div class="sub">Apagado al abrir. Sin esto, la página solo escucha.</div></div><input type="checkbox" class="txallow" aria-label="Permitir transmitir"></div>
+  </div>
+  <div class="card">
+    <h3>Instalar como app</h3>
+    <p class="sub">En el teléfono: menú del navegador → <b>Agregar a la pantalla de inicio</b>. En la PC (Chrome/Edge): ícono de instalar en la barra de direcciones. Abre directo, sin barra del navegador.</p>
+  </div>
+  <div class="card">
+    <h3>Desde cualquier lugar</h3>
+    <p class="sub">Con Tailscale en el teléfono y en una Raspberry Pi o PC de su casa, esta misma página anda fuera de casa como si estuviera en la WiFi. Guía: <a href="https://github.com/condoruy/X6100-CX8ANM/blob/remoto/docs/REMOTO.md" target="_blank" rel="noopener">docs/REMOTO.md</a></p>
+  </div>
+  <div class="card">
+    <h3>Seguridad</h3>
+    <p class="sub">La radio deja de transmitir sola si no le llega audio por casi un segundo, a los 3 minutos, si se abre una app o si se cambia a CW. Cualquiera que abra esta página en su red puede usar la radio: compártala solo con quien corresponda.</p>
+  </div>
+</section>
+
+</div>
+
+<nav class="tabs" aria-label="Secciones">
+  <button class="cur" data-tab="radio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 12l4-3"/></svg>Radio</button>
+  <button data-tab="voz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Voz</button>
+  <button data-tab="ft8"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12h3l2-6 4 12 2-6h7"/></svg>FT8</button>
+  <button data-tab="cw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 12h1M11 12h6"/></svg>CW</button>
+  <button data-tab="aj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>Ajustes</button>
+</nav>
+
+<script>
+(function() {
+"use strict";
+const $ = (s) => document.querySelector(s), $$ = (s) => Array.from(document.querySelectorAll(s));
+const QRZ_KEY = {{'true' if qrz_key else 'false'}};
+const MODES = ["LSB", "USB", "CW", "USB-D", "AM", "NFM"];
+const BANDS = [160, 80, 60, 40, 30, 20, 17, 15, 12, 10, 6];
+const RX_RATE = 12000, TX_RATE = 16000;
+
+let st = null, lastState = 0, txAllowed = false;
+const hold = {};
+
+/* ---------- utilidades ---------- */
+let statusTimer = null;
+function status(text, err) {
+  const el = $("#status");
+  el.textContent = text || "";
+  el.classList.toggle("err", !!err);
+  clearTimeout(statusTimer);
+  if (text) statusTimer = setTimeout(() => { el.textContent = ""; }, err ? 6000 : 3000);
+}
+async function api(path, body) {
+  const r = await fetch(path, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body || {})});
+  let j = {};
+  try { j = await r.json(); } catch (e) {}
+  if (!r.ok) throw new Error(j.msg || ("Error " + r.status));
+  return j;
+}
+function send(cmd, val, text) {
+  const b = {cmd: cmd};
+  if (val !== undefined) b.val = val;
+  if (text !== undefined) b.text = text;
+  return api("/link/v2/cmd", b).catch((e) => { status(e.message, true); throw e; });
+}
+function throttle(fn, ms) {
+  let t = null, last = 0, args;
+  return function() { args = arguments; if (t) return; t = setTimeout(() => { t = null; last = Date.now(); fn.apply(null, args); }, Math.max(0, last + ms - Date.now())); };
+}
+const fmtFreq = (f) => Math.floor(f / 1e6) + "." + String(Math.floor(f / 1e3) % 1000).padStart(3, "0") + "." + String(f % 1000).padStart(3, "0");
+const sText = (db) => db <= -73 ? "S" + Math.max(0, Math.min(9, Math.round((db + 127) / 6))) : "S9+" + Math.round(db + 73);
+function needTx() {
+  if (txAllowed) return true;
+  status("Active \"Permitir transmitir\" primero", true);
+  return false;
+}
+
+/* ---------- pestañas ---------- */
+$$(".tabs button").forEach((b) => b.addEventListener("click", () => {
+  $$(".tabs button").forEach((x) => x.classList.toggle("cur", x === b));
+  $$(".pane").forEach((p) => p.classList.toggle("cur", p.id === "p-" + b.dataset.tab));
+  try { localStorage.setItem("remoto-tab", b.dataset.tab); } catch (e) {}
+}));
+try { const t = localStorage.getItem("remoto-tab"); if (t) $(`.tabs [data-tab="${t}"]`).click(); } catch (e) {}
+
+/* ---------- permitir transmitir ---------- */
+$$(".txallow").forEach((c) => c.addEventListener("change", () => setTxAllowed(c.checked)));
+function setTxAllowed(on) {
+  txAllowed = on;
+  $$(".txallow").forEach((c) => { c.checked = on; });
+  $("#ptt").disabled = !on;
+  if (on) micStart().catch((e) => { status(e.message, true); setTxAllowed(false); });
+  else { pttUp(); micStop(); }
+}
+
+/* ---------- sintonía y receptor ---------- */
+const step = () => parseInt($("#step").value);
+let tuneTarget = null, tuneUntil = 0;
+const sendFreq = throttle((f) => send("freq", f), 100);
+function tuneTo(f) {
+  f = Math.round(f / step()) * step();
+  tuneTarget = f; tuneUntil = Date.now() + 1000;
+  $("#freq").textContent = fmtFreq(f);
+  sendFreq(f);
+}
+$("#dn").onclick = () => send("tune", -step());
+$("#up").onclick = () => send("tune", step());
+MODES.forEach((m) => { const b = document.createElement("button"); b.textContent = m; b.dataset.mode = m; b.onclick = () => send("mode", m); $("#modes").appendChild(b); });
+BANDS.forEach((n) => { const b = document.createElement("button"); b.textContent = n; b.dataset.band = n; b.onclick = () => send("band", n); $("#bands").appendChild(b); });
+$$("[data-toggle]").forEach((b) => b.onclick = () => { if (st) send(b.dataset.toggle, st[b.dataset.toggle] ? 0 : 1); });
+$("#agc").onclick = () => send("agc");
+const slider = (id, cmd, label, fmt) => {
+  const s = throttle((v) => send(cmd, v), 150);
+  $(id).addEventListener("input", function() { hold[cmd] = Date.now() + 1500; $(label).textContent = fmt(this.value); s(parseInt(this.value)); });
+};
+const fFilter = (v) => "Filtro " + (v >= 1000 ? (v / 1000).toFixed(1) + " kHz" : v + " Hz");
+const fRf = (v) => "Ganancia RF " + v;
+const fPwr = (v) => "Potencia TX " + (v / 10).toFixed(1) + " W";
+slider("#filter", "filter", "#filter-l", fFilter);
+slider("#rfgain", "rfgain", "#rfgain-l", fRf);
+slider("#pwr", "pwr", "#pwr-l", fPwr);
+
+$("#freq").onclick = () => {
+  $("#freq").hidden = true;
+  const i = $("#freq-in");
+  i.hidden = false; i.value = st ? (st.freq / 1e6).toFixed(6).replace(/0+$/, "").replace(/\.$/, "") : ""; i.focus(); i.select();
+};
+const closeFreq = () => { $("#freq-in").hidden = true; $("#freq").hidden = false; };
+$("#freq-in").addEventListener("keydown", function(e) {
+  if (e.key === "Escape") return closeFreq();
+  if (e.key !== "Enter") return;
+  const v = parseFloat(this.value.replace(",", "."));
+  closeFreq();
+  if (!isFinite(v) || v <= 0) return status("Frecuencia inválida", true);
+  send("freq", Math.round(v < 100 ? v * 1e6 : v < 100000 ? v * 1e3 : v));
+});
+$("#freq-in").addEventListener("blur", closeFreq);
+
+/* ---------- estado ---------- */
+function render(s) {
+  st = s; lastState = Date.now();
+  if (Date.now() > tuneUntil || s.freq === tuneTarget) { tuneTarget = null; $("#freq").textContent = fmtFreq(s.freq); }
+  $("#sub").textContent = "VFO-" + s.vfo + (s.band ? " · " + s.band : "") + (s.app ? " · app " + s.app : "");
+  $("#b-mode").textContent = s.mode;
+  $("#b-tx").hidden = !s.tx;
+  $("#s-bar").style.width = Math.max(0, Math.min(100, (s.db + 127) * 100 / 114)) + "%";
+  $("#s-txt").textContent = s.tx ? "TX" : sText(s.db);
+  $("#pwr-txt").textContent = s.tx && s.fwd ? (s.fwd / 10).toFixed(1) + " W · ROE " + (s.swr / 10).toFixed(1) : "";
+  $$("#modes [data-mode]").forEach((b) => b.classList.toggle("on", b.dataset.mode === s.mode));
+  const band = (s.band.match(/^(\d+)m\b/) || [])[1];
+  $$("#bands [data-band]").forEach((b) => b.classList.toggle("on", b.dataset.band === band));
+  $$("[data-toggle]").forEach((b) => b.classList.toggle("on", !!s[b.dataset.toggle]));
+  $("#agc").textContent = "AGC " + s.agc;
+  if (!(Date.now() < hold.filter)) { $("#filter").value = s.filter; $("#filter-l").textContent = fFilter(s.filter); }
+  if (!(Date.now() < hold.rfgain)) { $("#rfgain").value = s.rfgain; $("#rfgain-l").textContent = fRf(s.rfgain); }
+  if (!(Date.now() < hold.pwr)) { $("#pwr").value = s.pwr; $("#pwr-l").textContent = fPwr(s.pwr); }
+  renderFt8(s); renderCw(s);
+}
+setInterval(() => {
+  const ok = Date.now() - lastState < 3000;
+  const b = $("#b-conn");
+  b.className = "badge " + (ok ? "ok" : "bad");
+  b.textContent = ok ? "● en línea" : "● sin conexión";
+}, 1000);
+
+/* ---------- espectro y cascada ---------- */
+const sp = $("#sp"), wf = $("#wf"), spCtx = sp.getContext("2d"), wfCtx = wf.getContext("2d");
+let scope = null, wfImg, wfPx;
+const PALETTE = (() => {
+  const stops = [[0, 0, 0, 0], [50, 0, 0, 127], [112, 177, 0, 0], [190, 229, 228, 0], [255, 255, 255, 255]], p = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let k = 0; while (stops[k + 1][0] < i) k++;
+    const a = stops[k], b = stops[k + 1], t = (i - a[0]) / (b[0] - a[0]);
+    const c = [1, 2, 3].map((j) => Math.round(a[j] + (b[j] - a[j]) * t));
+    p[i] = (0xff000000 | c[2] << 16 | c[1] << 8 | c[0]) >>> 0;
+  }
+  return p;
+})();
+const BLACK = 0xff000000;
+function resize() {
+  const w = Math.max(100, Math.round(sp.clientWidth));
+  if (sp.width === w) return;
+  sp.width = wf.width = w;
+  wfImg = wfCtx.createImageData(w, wf.height);
+  wfPx = new Uint32Array(wfImg.data.buffer).fill(BLACK);
+}
+window.addEventListener("resize", resize); resize();
+function maxBin(bins, x, W) {
+  const n = bins.length; let v = 0;
+  for (let i = Math.floor(x * n / W); i < Math.max(Math.floor((x + 1) * n / W), Math.floor(x * n / W) + 1); i++) v = Math.max(v, bins[i]);
+  return v;
+}
+function drawSpectrum() {
+  const W = sp.width, H = sp.height;
+  spCtx.fillStyle = "#000"; spCtx.fillRect(0, 0, W, H);
+  if (!scope) return;
+  spCtx.strokeStyle = "#9fe"; spCtx.beginPath();
+  for (let x = 0; x < W; x++) { const y = H - 2 - maxBin(scope.bins, x, W) * (H - 6) / 255; x ? spCtx.lineTo(x + .5, y) : spCtx.moveTo(x + .5, y); }
+  spCtx.stroke();
+  if (st) {
+    const x = Math.round((st.freq - scope.c + scope.w / 2) * W / scope.w) + .5;
+    spCtx.strokeStyle = "#ff5050"; spCtx.beginPath(); spCtx.moveTo(x, 0); spCtx.lineTo(x, H); spCtx.stroke();
+  }
+}
+function addLine(m) {
+  const raw = atob(m.d), bins = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) bins[i] = raw.charCodeAt(i);
+  const W = wf.width, H = wf.height;
+  if (scope && scope.w === m.w && scope.c !== m.c) {
+    const dx = Math.round((scope.c - m.c) * W / m.w);
+    if (Math.abs(dx) >= W) wfPx.fill(BLACK);
+    else for (let y = 0; y < H; y++) {
+      const r = y * W;
+      if (dx > 0) { wfPx.copyWithin(r + dx, r, r + W - dx); wfPx.fill(BLACK, r, r + dx); }
+      else { wfPx.copyWithin(r, r - dx, r + W); wfPx.fill(BLACK, r + W + dx, r + W); }
+    }
+  } else if (scope && scope.w !== m.w) wfPx.fill(BLACK);
+  scope = {c: m.c, w: m.w, bins: bins};
+  wfPx.copyWithin(W, 0, W * (H - 1));
+  for (let x = 0; x < W; x++) wfPx[x] = PALETTE[maxBin(bins, x, W)];
+  wfCtx.putImageData(wfImg, 0, 0);
+  drawSpectrum();
+}
+let drag = null;
+[sp, wf].forEach((cv) => {
+  cv.addEventListener("pointerdown", (e) => { if (!st || !scope) return; drag = {x: e.clientX, f: st.freq, moved: false}; cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener("pointermove", (e) => { if (!drag) return; const dx = e.clientX - drag.x; if (Math.abs(dx) > 6) drag.moved = true; if (drag.moved) tuneTo(drag.f - dx * scope.w / cv.clientWidth); });
+  cv.addEventListener("pointerup", (e) => {
+    if (drag && !drag.moved) { const r = cv.getBoundingClientRect(); tuneTo(scope.c - scope.w / 2 + (e.clientX - r.left) * scope.w / r.width); }
+    drag = null;
+  });
+  cv.addEventListener("pointercancel", () => { drag = null; });
+  cv.addEventListener("wheel", (e) => { if (!st) return; e.preventDefault(); tuneTo((tuneTarget !== null ? tuneTarget : st.freq) + (e.deltaY < 0 ? step() : -step())); }, {passive: false});
+});
+
+/* ---------- eventos de la radio ---------- */
+function connect() {
+  const es = new EventSource("/link/v2/events");
+  es.onmessage = (e) => {
+    const m = JSON.parse(e.data);
+    if (m.t === "state") render(m);
+    else if (m.t === "spec") addLine(m);
+    else if (m.t === "ft8_rx") ft8Rx(m);
+    else if (m.t === "ft8_tx") ft8Tx(m);
+    else if (m.t === "ft8_qso") ft8Qso(m);
+    else if (m.t === "cw_text") cwRx(m.text);
+    else if (m.t === "err") status(m.err, true);
+  };
+  es.addEventListener("fail", (e) => status(e.data, true));
+}
+connect();
+
+/* ---------- audio de recepción ---------- */
+const JITTER = `
+class Jitter {
+  constructor(outRate) { this.buf = new Float32Array(${RX_RATE} * 4); this.r = 0; this.n = 0; this.pos = 0; this.playing = false; this.step = ${RX_RATE} / outRate; }
+  push(s) {
+    const len = this.buf.length;
+    for (let i = 0; i < s.length && this.n < len; i++, this.n++) this.buf[(this.r + this.n) % len] = s[i];
+    if (this.n > ${RX_RATE}) { const drop = this.n - ${RX_RATE} * 0.4; this.r = (this.r + drop) % len; this.n -= drop; }
+  }
+  pull(out) {
+    const len = this.buf.length;
+    if (!this.playing && this.n < ${RX_RATE} * 0.4) return out.fill(0);
+    this.playing = true;
+    for (let i = 0; i < out.length; i++) {
+      if (this.n < 2) { this.playing = false; return out.fill(0, i); }
+      const a = this.buf[this.r], b = this.buf[(this.r + 1) % len];
+      out[i] = a + (b - a) * this.pos;
+      this.pos += this.step;
+      while (this.pos >= 1) { this.pos -= 1; this.r = (this.r + 1) % len; this.n--; }
+    }
+  }
+}`;
+const RX_WORKLET = JITTER + `
+class RemoteRx extends AudioWorkletProcessor {
+  constructor() { super(); this.j = new Jitter(sampleRate); this.port.onmessage = (e) => this.j.push(e.data); }
+  process(inputs, outputs) { this.j.pull(outputs[0][0]); return true; }
+}
+registerProcessor("remote-rx", RemoteRx);`;
+let rx = null;
+function rxStop() {
+  if (!rx) return;
+  rx.abort.abort(); rx.ctx.close(); rx = null;
+  $("#listen").textContent = "🔈 Escuchar"; $("#listen").classList.remove("on");
+}
+async function rxStart() {
+  const a = rx = {abort: new AbortController(), ctx: new AudioContext()};
+  $("#listen").textContent = "■ Silenciar"; $("#listen").classList.add("on");
+  a.gain = a.ctx.createGain(); a.gain.gain.value = $("#vol").value / 100; a.gain.connect(a.ctx.destination);
+  await a.ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([RX_WORKLET], {type: "application/javascript"})));
+  const node = new AudioWorkletNode(a.ctx, "remote-rx", {numberOfInputs: 0, outputChannelCount: [1]});
+  node.connect(a.gain);
+  const r = await fetch("/link/v2/audio", {signal: a.abort.signal, cache: "no-store"});
+  if (!r.ok) throw new Error(r.status === 409 ? "Ya hay otra página escuchando (una a la vez)" : "La radio no manda audio");
+  const reader = r.body.getReader();
+  let odd = null;
+  while (true) {
+    const res = await reader.read();
+    if (res.done) break;
+    let b = res.value;
+    if (odd !== null) { const t = new Uint8Array(b.length + 1); t[0] = odd; t.set(b, 1); b = t; }
+    const n = b.length >> 1;
+    odd = b.length & 1 ? b[b.length - 1] : null;
+    const dv = new DataView(b.buffer, b.byteOffset, n * 2), f = new Float32Array(n);
+    for (let i = 0; i < n; i++) f[i] = dv.getInt16(i * 2, true) / 32768;
+    node.port.postMessage(f, [f.buffer]);
+  }
+  throw new Error("La radio cortó el audio");
+}
+$("#listen").onclick = () => {
+  if (rx) return rxStop();
+  rxStart().catch((e) => { if (e.name === "AbortError") return; rxStop(); status(e.message, true); });
+};
+$("#vol").addEventListener("input", function() { if (rx) rx.gain.gain.value = this.value / 100; });
+
+/* ---------- voz: micrófono -> radio ---------- */
+const TX_WORKLET = `
+class MicTx extends AudioWorkletProcessor {
+  constructor() { super(); this.step = sampleRate / ${TX_RATE}; this.pos = 0; this.gain = 1; this.port.onmessage = (e) => { this.gain = e.data; }; this.buf = new Int16Array(800); this.n = 0; this.peak = 0; }
+  process(inputs) {
+    const ch = inputs[0] && inputs[0][0];
+    if (!ch) return true;
+    for (; this.pos < ch.length; this.pos += this.step) {
+      let v = ch[Math.floor(this.pos)] * this.gain;
+      v = v > 1 ? 1 : v < -1 ? -1 : v;
+      const a = Math.abs(v); if (a > this.peak) this.peak = a;
+      this.buf[this.n++] = v * 32767;
+      if (this.n === this.buf.length) { this.port.postMessage({pcm: this.buf.buffer, peak: this.peak}, [this.buf.buffer]); this.buf = new Int16Array(800); this.n = 0; this.peak = 0; }
+    }
+    this.pos -= ch.length;
+    return true;
+  }
+}
+registerProcessor("mic-tx", MicTx);`;
+let mic = null, voice = null;
+async function micStart() {
+  if (mic) return;
+  if (!window.isSecureContext || !navigator.mediaDevices) {
+    $("#mic-https").hidden = false;
+    throw new Error("El micrófono necesita https");
+  }
+  const stream = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1}});
+  const ctx = new AudioContext();
+  await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([TX_WORKLET], {type: "application/javascript"})));
+  const node = new AudioWorkletNode(ctx, "mic-tx", {numberOfOutputs: 0});
+  ctx.createMediaStreamSource(stream).connect(node);
+  node.port.postMessage($("#micgain").value / 100);
+  node.port.onmessage = (e) => {
+    $("#mic-bar").style.width = Math.min(100, e.data.peak * 100) + "%";
+    if (voice && voice.session) { voice.queue.push(new Uint8Array(e.data.pcm)); flushVoice(); }
+  };
+  mic = {stream: stream, ctx: ctx, node: node};
+}
+function micStop() {
+  if (!mic) return;
+  mic.stream.getTracks().forEach((t) => t.stop());
+  mic.ctx.close();
+  mic = null;
+  $("#mic-bar").style.width = "0";
+}
+$("#micgain").addEventListener("input", function() {
+  $("#micgain-l").textContent = "Ganancia del micrófono " + this.value + " %";
+  if (mic) mic.node.port.postMessage(this.value / 100);
+});
+/* 200 ms por pedido, uno detrás del otro */
+async function flushVoice() {
+  const v = voice;
+  if (!v || v.busy || !v.session) return;
+  const bytes = v.queue.reduce((n, b) => n + b.length, 0);
+  if (bytes < TX_RATE * 2 * 0.2 && !v.ending) return;
+  v.busy = true;
+  const all = new Uint8Array(bytes);
+  let o = 0; v.queue.forEach((b) => { all.set(b, o); o += b.length; }); v.queue = [];
+  try {
+    if (bytes) {
+      const r = await fetch("/link/v2/voice/data?s=" + v.session, {method: "POST", body: all, headers: {"Content-Type": "application/octet-stream"}});
+      if (!r.ok) { let j = {}; try { j = await r.json(); } catch (e) {} throw new Error(j.msg || "La radio cortó la transmisión"); }
+    }
+  } catch (e) {
+    status(e.message, true);
+    voiceEnd(true);
+  } finally {
+    v.busy = false;
+  }
+  if (voice === v && v.ending) return voiceStopNow(v);
+  if (voice === v) flushVoice();
+}
+async function voiceStopNow(v) {
+  if (v.stopped) return;
+  v.stopped = true;
+  try { await api("/link/v2/voice/stop?s=" + v.session); } catch (e) {}
+  if (voice === v) voice = null;
+}
+function voiceEnd(failed) {
+  const v = voice;
+  if (!v) return;
+  clearInterval(v.timer);
+  $("#ptt").classList.remove("live"); $("#ptt").textContent = "PTT"; $("#ptt-time").textContent = "";
+  if (failed || !v.session) { voice = null; if (v.session) voiceStopNow(v); return; }
+  v.ending = true;
+  if (!v.busy) flushVoice();
+}
+async function pttDown() {
+  if (voice || !needTx() || !mic) return;
+  const v = voice = {queue: [], session: null, busy: false, ending: false, t0: Date.now()};
+  $("#ptt").classList.add("live"); $("#ptt").textContent = "Conectando…";
+  try {
+    const r = await api("/link/v2/voice/start");
+    if (voice !== v) { api("/link/v2/voice/stop?s=" + r.session).catch(() => {}); return; }
+    v.session = r.session;
+    $("#ptt").textContent = "AL AIRE";
+    v.timer = setInterval(() => {
+      const s = Math.floor((Date.now() - v.t0) / 1000);
+      $("#ptt-time").textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0") + " / 3:00";
+      if (s >= 180) pttUp();
+    }, 500);
+  } catch (e) {
+    status(e.message, true);
+    voice = null;
+    $("#ptt").classList.remove("live"); $("#ptt").textContent = "PTT";
+  }
+}
+function pttUp() { if (voice) voiceEnd(false); }
+const ptt = $("#ptt");
+ptt.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  if ($("#latch").checked) return voice ? pttUp() : pttDown();
+  ptt.setPointerCapture(e.pointerId); pttDown();
+});
+ptt.addEventListener("pointerup", () => { if (!$("#latch").checked) pttUp(); });
+ptt.addEventListener("pointercancel", () => pttUp());
+ptt.addEventListener("contextmenu", (e) => e.preventDefault());
+document.addEventListener("visibilitychange", () => { if (document.hidden) pttUp(); });
+window.addEventListener("pagehide", () => pttUp());
+if (!window.isSecureContext) {
+  $("#mic-https").hidden = false;
+  const u = "https://" + location.hostname + "/remoto";
+  $("#https-link").href = u; $("#https-link").textContent = u;
+}
+
+/* ---------- FT8 ---------- */
+const ft8 = {list: [], qsos: []};
+$("#ft8-open").onclick = () => send("app", undefined, "FT8");
+$("#ft8-close").onclick = () => send("app", undefined, "off");
+$("#ft8-cq").onclick = () => { if (st && st.ax && st.ax.cq) send("ft8_cq", 0); else if (needTx()) send("ft8_cq", 1); };
+$("#ft8-auto").onclick = () => send("ft8_auto", st && st.ax && st.ax.auto ? 0 : 1);
+$("#ft8-stop").onclick = () => send("ft8_stop");
+function renderFt8(s) {
+  const on = /^FT/.test(s.app || "");
+  const ax = on ? s.ax || {} : {};
+  $("#ft8-open").disabled = on;
+  $("#ft8-close").disabled = !s.app;
+  ["#ft8-cq", "#ft8-auto", "#ft8-stop"].forEach((id) => { $(id).disabled = !on; });
+  $("#ft8-cq").classList.toggle("on", !!ax.cq);
+  $("#ft8-auto").classList.toggle("on", !!ax.auto);
+  $("#ft8-state").textContent = on ? (ax.txing ? "transmitiendo" : ax.txen ? "TX lista" : "escuchando") + (ax.txfreq ? " · TX " + ax.txfreq + " Hz" : "") : "FT8 cerrado";
+}
+function ft8Add(row) {
+  const list = $("#ft8-list");
+  list.insertBefore(row, list.firstChild);
+  while (list.children.length > 120) list.removeChild(list.lastChild);
+}
+function ft8Rx(m) {
+  const b = document.createElement("button");
+  b.className = "msg" + (m.to_me ? " me" : m.type === "CQ" ? " cq" : "");
+  const d = new Date();
+  b.innerHTML = "<span></span><span></span><span class='dim'></span>";
+  b.children[0].textContent = (m.snr > 0 ? "+" : "") + m.snr;
+  b.children[1].textContent = m.text;
+  b.children[2].textContent = String(d.getUTCHours()).padStart(2, "0") + String(d.getUTCMinutes()).padStart(2, "0") + String(d.getUTCSeconds()).padStart(2, "0");
+  b.onclick = () => { if (needTx()) send("ft8_reply", m.id).then(() => status("Contestando a " + (m.call || m.text))); };
+  ft8Add(b);
+}
+function ft8Tx(m) {
+  const r = document.createElement("div");
+  r.className = "msg txm";
+  r.innerHTML = "<span>TX</span><span></span><span></span>";
+  r.children[1].textContent = m.text;
+  ft8Add(r);
+}
+function ft8Qso(m) {
+  ft8.qsos.unshift(m.call + "  " + (m.grid || "") + "  env " + m.sent + " / rec " + m.rcvd);
+  $("#ft8-qsos").textContent = ft8.qsos.join("\n");
+  $("#ft8-qsos").style.whiteSpace = "pre-line";
+  status("QSO anotado: " + m.call);
+  if ($("#qrz-auto").checked) setTimeout(() => qrzUpload("last"), 1500);   // que la radio termine de escribir el log
+}
+async function qrzUpload(what) {
+  try {
+    const r = await api("/link/v2/qrz", {what: what});
+    status("QRZ: " + r.sent + " subidos" + (r.dup ? ", " + r.dup + " ya estaban" : ""));
+  } catch (e) { status(e.message, true); }
+}
+$("#qrz-day").onclick = () => qrzUpload("today");
+if (!QRZ_KEY) { $("#qrz-nokey").hidden = false; $("#qrz-auto").disabled = true; $("#qrz-day").disabled = true; }
+try { $("#qrz-auto").checked = localStorage.getItem("remoto-qrz") === "1"; } catch (e) {}
+$("#qrz-auto").addEventListener("change", function() { try { localStorage.setItem("remoto-qrz", this.checked ? "1" : "0"); } catch (e) {} });
+
+/* ---------- CW ---------- */
+const MACROS_DEF = [["CQ", "CQ CQ DE {MI} {MI} K"], ["QRZ?", "QRZ? DE {MI} K"], ["599", "UR 599 599 TU"], ["73", "TU 73 DE {MI} SK"], ["TU", "TU"]];
+let macros;
+try { macros = JSON.parse(localStorage.getItem("remoto-macros")) || MACROS_DEF; } catch (e) { macros = MACROS_DEF; }
+const myCall = () => "{{call}}" || "MI";
+function cwSend(text) {
+  text = text.replace(/\{MI\}/g, myCall()).toUpperCase().trim();
+  if (!text || !needTx()) return;
+  if (!st || st.mode.indexOf("CW") !== 0) return status("Pase la radio a CW primero", true);
+  send("cw_send", undefined, text).then(() => status("CW: " + text));
+}
+function drawMacros() {
+  const box = $("#macros");
+  box.innerHTML = "";
+  macros.forEach((m, i) => {
+    const b = document.createElement("button");
+    b.textContent = m[0];
+    let t = null, long = false;
+    b.addEventListener("pointerdown", () => { long = false; t = setTimeout(() => {
+      long = true;
+      const txt = prompt("Texto de " + m[0] + " ({MI} = su indicativo)", m[1]);
+      if (txt !== null) { macros[i] = [m[0], txt]; try { localStorage.setItem("remoto-macros", JSON.stringify(macros)); } catch (e) {} }
+    }, 700); });
+    b.addEventListener("pointerup", () => { clearTimeout(t); if (!long) cwSend(m[1]); });
+    b.addEventListener("pointerleave", () => clearTimeout(t));
+    box.appendChild(b);
+  });
+}
+drawMacros();
+$("#cw-send").onclick = () => { cwSend($("#cw-in").value); $("#cw-in").value = ""; };
+$("#cw-in").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#cw-send").click(); } });
+$("#cw-stop").onclick = () => send("cw_stop");
+$("#cw-mode").onclick = () => send("mode", "CW");
+const sendWpm = throttle((v) => send("cw_wpm", v), 200);
+$("#wpm").addEventListener("input", function() { hold.wpm = Date.now() + 1500; $("#wpm-l").textContent = "Velocidad " + this.value + " ppm"; sendWpm(parseInt(this.value)); });
+function renderCw(s) {
+  const cw = !s.app && s.ax ? s.ax : null;
+  $("#cw-mode").hidden = s.mode.indexOf("CW") === 0;
+  if (cw && cw.wpm && !(Date.now() < hold.wpm)) { $("#wpm").value = cw.wpm; $("#wpm-l").textContent = "Velocidad " + cw.wpm + " ppm"; }
+  $("#cw-state").textContent = s.mode.indexOf("CW") !== 0 ? "la radio no está en CW" : s.app ? "cierre la app " + s.app : cw && cw.busy ? "enviando…" : cw && cw.rx_wpm ? "recibe ~" + cw.rx_wpm + " ppm" : "lista";
+}
+function cwRx(t) {
+  const el = $("#cw-rx");
+  el.textContent = (el.textContent + t).slice(-2000);
+  el.scrollTop = el.scrollHeight;
+}
+})();
+</script>
+</body>
+</html>

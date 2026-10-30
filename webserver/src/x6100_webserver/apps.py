@@ -44,7 +44,7 @@ def page_scheme():
             or "text/html" not in bottle.request.headers.get("Accept", "")):
         return
     secure = str(env.get("SERVER_PORT")) == str(settings.HTTPS_PORT)
-    remote = bottle.request.path == "/remote"
+    remote = bottle.request.path in ("/remote", "/remoto")   # Remoto+: también el micrófono
     if secure == remote:
         return
     host = bottle.request.get_header("Host", "").split(":")[0] or env.get("SERVER_NAME", "")
@@ -862,6 +862,145 @@ def remote_audio():
                 remote_audio_busy = False
 
     return pcm()
+
+
+# Remoto+ (CX8ANM): la radio desde el teléfono o la PC, con voz por el micrófono del navegador,
+# FT8, CW y subida a QRZ. Usa el protocolo de arriba (LINK) y, para la voz, el socket de la
+# interfaz REMOTE_VOICE_SOCK (src/remote_voice.c): el navegador manda trozos de PCM s16le
+# 16 kHz por POST; si dejan de llegar, la interfaz corta la transmisión sola.
+
+REMOTE_VOICE_SOCK = "/tmp/x6100_voice.sock"
+VOICE_IDLE_S = 1.0          # sin trozos por más de esto: se cierra (la interfaz corta a los 0,8 s)
+VOICE_CHUNK_MAX = 64000     # 2 s de audio por pedido, como mucho
+VOICE_REASONS = {
+    "the radio is already transmitting": "La radio ya está transmitiendo",
+    "close the app open on the radio first": "Primero cierre la app abierta en la radio (la voz va desde la pantalla principal)",
+    "voice needs LSB, USB, AM or FM": "La voz necesita LSB, USB, AM o FM",
+}
+voice_lock = threading.Lock()
+voice_session = None        # {"id", "sock", "last"}
+
+
+def voice_close(sess):
+    try:
+        sess["sock"].close()
+    except OSError:
+        pass
+
+
+def voice_reaper():
+    global voice_session
+    while True:
+        time.sleep(0.25)
+        with voice_lock:
+            if voice_session and time.monotonic() - voice_session["last"] > VOICE_IDLE_S:
+                voice_close(voice_session)
+                voice_session = None
+
+
+threading.Thread(target=voice_reaper, daemon=True).start()
+
+
+@app.route('/remoto')
+def remoto():
+    return bottle.template('remoto', qrz_key=key_set("qrz.conf"), call=read_callsign())
+
+
+@app.route('/remoto/manifest.json')
+def remoto_manifest():
+    bottle.response.content_type = "application/manifest+json"
+    return json.dumps({
+        "name": "X6100 Remoto+", "short_name": "Remoto+", "lang": "es", "start_url": "/remoto",
+        "scope": "/", "display": "standalone", "background_color": "#0e1726", "theme_color": "#0e1726",
+        "icons": [{"src": "/static/remoto-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}],
+    })
+
+
+@app.post(LINK + '/voice/start')
+def voice_start():
+    global voice_session
+    with voice_lock:
+        if voice_session:
+            return api_error(409, "Ya hay alguien transmitiendo desde la web")
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        sock.settimeout(2)
+        try:
+            sock.connect(REMOTE_VOICE_SOCK)
+            reply = sock.makefile("rb").readline().decode(errors="replace").strip()
+        except OSError:
+            sock.close()
+            return api_error(503, "La radio no acepta voz (¿firmware sin Remoto+?)")
+        if reply != "OK":
+            sock.close()
+            why = reply[4:] if reply.startswith("ERR ") else reply
+            return api_error(409, VOICE_REASONS.get(why, why or "La radio no aceptó"))
+        sock.settimeout(1)
+        voice_session = {"id": os.urandom(8).hex(), "sock": sock, "last": time.monotonic()}
+        return {"status": "OK", "session": voice_session["id"], "rate": 16000}
+
+
+@app.post(LINK + '/voice/data')
+def voice_data():
+    global voice_session
+    sid = bottle.request.query.get("s", "")
+    body = bottle.request.body.read(VOICE_CHUNK_MAX + 1)
+    if len(body) > VOICE_CHUNK_MAX or len(body) % 2:
+        return api_error(400, "Trozo de audio inválido")
+    with voice_lock:
+        if not voice_session or voice_session["id"] != sid:
+            return api_error(410, "La transmisión terminó")
+        try:
+            voice_session["sock"].sendall(body)
+        except OSError:
+            voice_close(voice_session)
+            voice_session = None
+            return api_error(410, "La radio cortó la transmisión")
+        voice_session["last"] = time.monotonic()
+    return {"status": "OK"}
+
+
+@app.post(LINK + '/voice/stop')
+def voice_stop():
+    global voice_session
+    sid = bottle.request.query.get("s", "")
+    with voice_lock:
+        if voice_session and voice_session["id"] == sid:
+            try:
+                voice_session["sock"].shutdown(socket.SHUT_WR)   # la radio termina lo que tiene y suelta
+            except OSError:
+                pass
+            voice_close(voice_session)
+            voice_session = None
+    return {"status": "OK"}
+
+
+@app.post(LINK + '/qrz')
+def remoto_qrz():
+    """{"what": "last"} el último QSO del log del día, {"what": "today"} todo el día, a QRZ Logbook"""
+    what = (bottle.request.json or {}).get("what", "last")
+    if not key_set("qrz.conf"):
+        return api_error(409, "Falta la clave de QRZ Logbook: página SOTA/POTA de la web")
+    day = datetime.now(timezone.utc).strftime("%Y%m%d") + ".adi"
+    recs = log_records(day)
+    if not recs:
+        return api_error(404, "Todavía no hay QSO en el log de hoy")
+    if what == "last":
+        recs = recs[-1:]
+    with tempfile.NamedTemporaryFile("w", suffix=".adi", delete=False) as f:
+        f.write("<eoh>\n" + "".join(r.strip() + " <eor>\n" for r in recs))
+        tmp = f.name
+    env = dict(os.environ, X6100_FIELD_DIR=settings.FIELD_DIR, X6100_CALL=read_callsign())
+    try:
+        r = subprocess.run([settings.FIELD_CMD, "qrz-upload", tmp], capture_output=True, text=True, timeout=120, env=env)
+        line = (r.stdout.strip().splitlines() or ["error sin respuesta"])[-1]
+    except (OSError, subprocess.SubprocessError) as e:
+        line = f"error {e}"
+    finally:
+        os.unlink(tmp)
+    m = re.fullmatch(r"ok (\d+) (\d+)", line)
+    if not m:
+        return api_error(502, "QRZ: " + (line[6:] if line.startswith("error ") else line).strip())
+    return {"status": "OK", "sent": int(m.group(1)), "dup": int(m.group(2))}
 
 
 # Equipo: la radio duplicada en la PC (CX8ANM / Cóndor Tecnológico).

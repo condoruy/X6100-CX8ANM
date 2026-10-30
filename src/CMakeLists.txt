@@ -20,6 +20,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     dialog_cb.c
     cb.c
     countries.c
+    remote_voice.c
     dialog_setup.c
     dialog_aero.c
     aero.c

@@ -25,6 +25,7 @@
 #include "main_screen.h"
 #include "countries.h"
 #include "dialog_setup.h"
+#include "remote_voice.h"
 #include "screen_rec.h"
 #include "mirror.h"
 #include <strings.h>
@@ -227,6 +228,7 @@ int main(void) {
     cat_init();
     wfview_server_init();
     remote_server_init();
+    remote_voice_init();     /* voz desde el navegador (página Remoto+) */
     gps_init();
     if (!qso_log_init()) {
         LV_LOG_ERROR("Can't init QSO log");
