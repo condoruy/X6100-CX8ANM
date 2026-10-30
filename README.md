@@ -47,7 +47,7 @@ control remoto, temas…, ver [su README](docs/README_IU1WXY.md)) y además:
 - **Temas** estilo equipos de alta gama y de transceptores conocidos, con variantes *Deck*.
 - **Radio por Internet**, por país, con emisoras que se agregan a mano desde la radio o desde el navegador.
 - **Estación meteorológica** en pantalla y **alertas de INUMET**.
-- **Banda Ciudadana (CB) por canales** (bandas A a E), con modo predeterminado y la perilla
+- **Banda Ciudadana (CB) por canales** (bandas A a E y la UK 27/81), con modo predeterminado y la perilla
   saltando de canal en canal.
 - **Guardar cualquier frecuencia en memoria** desde el panel.
 - Punto de acceso WiFi propio, aviso de actividad del cluster en tu banda, lista de sitios de

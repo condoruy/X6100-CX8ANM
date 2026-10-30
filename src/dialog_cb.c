@@ -1,7 +1,7 @@
 /*
  *  SPDX-License-Identifier: LGPL-2.1-or-later
  *
- *  CX8ANM: Banda Ciudadana. Los 40 canales de la banda elegida (A a E); la perilla MFK elige
+ *  CX8ANM: Banda Ciudadana. Los 40 canales de la banda elegida (A a E, y UK: la del Reino Unido, en FM); la perilla MFK elige
  *  uno y al apretarla (o con Ir) la radio va al canal en el modo predeterminado (AM, FM, USB o
  *  LSB), que después se cambia como siempre. "Perilla" decide si en la CB la perilla principal
  *  salta de canal en canal o sintoniza libre. "Guardar" deja la frecuencia actual en la lista de
@@ -68,11 +68,13 @@ static int mode_ix(void) {
 }
 
 static void show_title(void) {
+    char a[16], b[16];
+
     if (!title) return;
-    lv_label_set_text_fmt(title, "#%06x %s %c#  #%06x %d.%03d - %d.%03d MHz#   %s #%06x %s#   %s #%06x %s#",
-                          theme_hex(TC_text_head), tr("CB BAND"), cb_band_letter(band()), theme_hex(TC_text_dim),
-                          cb_freq(band(), 1) / 1000000, cb_freq(band(), 1) / 1000 % 1000,
-                          cb_freq(band(), 40) / 1000000, cb_freq(band(), 40) / 1000 % 1000, tr("Mode"),
+    lv_label_set_text_fmt(title, "#%06x %s %s#  #%06x %s - %s MHz#   %s #%06x %s#   %s #%06x %s#",
+                          theme_hex(TC_text_head), tr("CB BAND"), cb_band_name(band()), theme_hex(TC_text_dim),
+                          cb_freq_text(cb_freq(band(), 1), a, sizeof(a)), cb_freq_text(cb_freq(band(), 40), b, sizeof(b)),
+                          tr("Mode"),
                           theme_hex(TC_accent), mode_names[mode_ix()], tr("Knob"), theme_hex(TC_accent),
                           params.cb_knob.x ? tr("channels") : tr("free"));
 }
@@ -86,8 +88,9 @@ static void fill_table(void) {
     for (int c = 1; c <= CB_CHANNELS; c++) {
         int32_t hz = cb_freq(band(), c);
         bool    on = cur_band == band() && cur_ch == c;
+        char    f[16];
         lv_table_set_cell_value_fmt(table, c - 1, 0, "%s%s %d", on ? LV_SYMBOL_RIGHT " " : "", tr("Channel"), c);
-        lv_table_set_cell_value_fmt(table, c - 1, 1, "%d.%03d MHz", hz / 1000000, hz / 1000 % 1000);
+        lv_table_set_cell_value_fmt(table, c - 1, 1, "%s MHz", cb_freq_text(hz, f, sizeof(f)));
         lv_table_set_cell_value(table, c - 1, 2, cb_channel_note(c));
     }
 }
@@ -111,20 +114,21 @@ static void select_row(int ch) {
 /* ---------- acciones ---------- */
 
 static void tune(int ch) {
-    char    name[24];
+    char    name[24], f[16];
     int32_t hz = cb_freq(band(), ch);
 
     if (!hz || radio_get_state() != RADIO_RX) return;
     main_screen_set_freq(hz);
     cparam_i_set(cfg_cur_mode, modes[mode_ix()]);
-    msg_update_text_fmt("%s  %d.%03d MHz  %s", cb_name(hz, name, sizeof(name)) ?: "CB", hz / 1000000,
-                        hz / 1000 % 1000, mode_names[mode_ix()]);
+    msg_update_text_fmt("%s  %s MHz  %s", cb_name(hz, name, sizeof(name)) ?: "CB", cb_freq_text(hz, f, sizeof(f)),
+                        mode_names[mode_ix()]);
     fill_table();
 }
 
 static void band_cb(button_data_t *b) {
     (void)b;
     params_uint8_set(&params.cb_band, (band() + 1) % CB_BANDS);
+    if (band() == CB_BAND_UK) params_uint8_set(&params.cb_mode, 1);    /* la UK es en FM */
     show_title();
     fill_table();
     select_row(19 <= CB_CHANNELS ? 19 : 1);
