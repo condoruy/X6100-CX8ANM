@@ -32,7 +32,8 @@ Pegá la dirección del audio que da el sitio de la emisora (por ejemplo, el enl
   <tbody></tbody>
 </table>
 </div>
-<div class="actions"><span class="status" id="atc-status"></span></div>
+<div class="actions"><button id="atc-import"><svg class="i"><use href="#i-plus"/></svg>Importar archivo</button> <a id="atc-export" href="/api/iradio-atc/export" download>Exportar</a> <input type="file" id="atc-file" accept=".txt,.tsv,.csv,text/plain" hidden> <span class="status" id="atc-status"></span></div>
+<p class="sub" style="margin: 6px 0 0">Archivo de texto: una emisora por línea, <b>nombre, dirección, formato, kbps y país</b> separados por tabulador o por punto y coma. Las que ya están no se repiten.</p>
 </div>
 </section>
 
@@ -105,5 +106,27 @@ Object.values(lists).forEach(function(L) {
     row.find("input.name").focus();
   });
   $.get(L.api, {}, function(d) { render(L, d); });
+});
+
+$("#atc-import").on("click", function() { $("#atc-file").val("").trigger("click"); });
+$("#atc-file").on("change", function() {
+  const f = this.files && this.files[0];
+  if (!f) return;
+  const rd = new FileReader();
+  rd.onload = function() {
+    $.ajax({
+      url: "/api/iradio-atc/import", type: "POST", data: JSON.stringify({text: rd.result}),
+      contentType: "application/json; charset=utf-8", dataType: "json",
+      success: function(r) {
+        render(lists.atc, r);
+        let t = r.added + " agregadas";
+        if (r.skipped) t += ", " + r.skipped + " ya estaban";
+        if (r.bad && r.bad.length) t += ", líneas con error: " + r.bad.join(", ");
+        showStatus(lists.atc, t, r.bad && r.bad.length > 0 && !r.added);
+      },
+      error: function(xhr) { showStatus(lists.atc, xhr.responseJSON ? xhr.responseJSON.msg : "No se pudo importar", true); }
+    });
+  };
+  rd.readAsText(f, "utf-8");
 });
 </script>

@@ -1532,6 +1532,61 @@ def add_iradio(kind):
     return get_iradio(kind)
 
 
+@app.post('/api/<kind:re:iradio|iradio-atc>/import')
+def import_iradio(kind):
+    """Varias emisoras de un archivo de texto: una por línea, nombre <TAB> dirección <TAB> formato <TAB> kbps <TAB> país
+    (también separadas por ; o |). Se agregan las que no están; las líneas que no sirven se informan."""
+    k = "atc" if kind.endswith("atc") else "fav"
+    data = bottle.request.json if isinstance(bottle.request.json, dict) else {}
+    text = str(data.get("text") or "")[:200000]
+    items = read_iradio(k)
+    have = {x["url"] for x in items}
+    added, skipped, bad = 0, 0, []
+    clean = lambda v, n: " ".join(str(v or "").split())[:n]
+    for n, line in enumerate(text.splitlines(), 1):
+        line = line.strip().lstrip("\ufeff")
+        if not line or line.startswith("#"):
+            continue
+        sep = "\t" if "\t" in line else (";" if ";" in line else ("|" if "|" in line else None))
+        p = [x.strip() for x in (line.split(sep) if sep else [line])]
+        if p and p[0].lower() in ("nombre", "name"):
+            continue                     # encabezado
+        if len(p) == 1 and p[0].lower().startswith(("http://", "https://")):
+            p = [p[0].rsplit("/", 1)[-1] or p[0], p[0]]
+        p += [""] * (5 - len(p))
+        s = {"name": clean(p[0], 60), "url": clean(p[1], 250).replace(" ", "%20"), "codec": clean(p[2], 8).upper(),
+             "kbps": clean(p[3], 6), "cc": clean(p[4], 2).upper()}
+        if not s["name"] or not s["url"].lower().startswith(("http://", "https://")) or (s["kbps"] and not s["kbps"].isdigit()):
+            bad.append(n)
+            continue
+        if s["url"] in have:
+            skipped += 1
+            continue
+        if len(items) >= IRADIO_FAV_MAX:
+            bad.append(n)
+            continue
+        items.append(s)
+        have.add(s["url"])
+        added += 1
+    try:
+        if added:
+            write_iradio(items, k)
+    except OSError as ex:
+        return api_error(500, f"No se pudo guardar: {ex}")
+    r = get_iradio(kind)
+    r.update({"added": added, "skipped": skipped, "bad": bad[:20]})
+    return r
+
+
+@app.get('/api/<kind:re:iradio|iradio-atc>/export')
+def export_iradio(kind):
+    k = "atc" if kind.endswith("atc") else "fav"
+    lines = ["\t".join([s["name"], s["url"], s["codec"], s["kbps"], s["cc"]]) for s in read_iradio(k)]
+    bottle.response.content_type = "text/plain; charset=utf-8"
+    bottle.response.set_header("Content-Disposition", 'attachment; filename="%s"' % ("banda-aerea.txt" if k == "atc" else "favoritas.txt"))
+    return "\n".join(lines) + ("\n" if lines else "")
+
+
 @app.put('/api/<kind:re:iradio|iradio-atc>/<i:int>')
 def set_iradio(kind, i):
     k = "atc" if kind.endswith("atc") else "fav"
