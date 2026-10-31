@@ -58,6 +58,7 @@ extern "C" {
     #include "dialog_wefax.h"
     #include "dialog_wspr.h"
     #include "gps.h"
+    #include "station.h"
     #include "main.h"
     #include "main_screen.h"
     #include "meter.h"
@@ -462,6 +463,7 @@ static void apply_cmd(void *arg) {
             break;
         case CMD_LOCATION:
             gps_phone_set(c->lat, c->lon);
+            station_qth_from_position(c->lat, c->lon);
             break;
         case CMD_QSO_LOG:
             dialog_field_qso_log(c->text);

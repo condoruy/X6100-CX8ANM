@@ -1456,14 +1456,17 @@ def delete_cw_message(dbcon, id):
 IRADIO_FAV_MAX = 150
 
 
-def iradio_file():
-    return os.path.join(settings.FILEBROWSER_PATH or "/mnt", "iradio", "favorites.tsv")
+IRADIO_FILES = {"fav": "favorites.tsv", "atc": "atc.tsv"}   # atc: emisoras de banda aérea que carga cada uno
 
 
-def read_iradio():
+def iradio_file(kind="fav"):
+    return os.path.join(settings.FILEBROWSER_PATH or "/mnt", "iradio", IRADIO_FILES[kind])
+
+
+def read_iradio(kind="fav"):
     out = []
     try:
-        with open(iradio_file(), encoding="utf-8", errors="replace") as f:
+        with open(iradio_file(kind), encoding="utf-8", errors="replace") as f:
             for line in f:
                 p = line.rstrip("\r\n").split("\t")
                 if len(p) >= 2 and p[0] and p[1].startswith(("http://", "https://")):
@@ -1474,8 +1477,8 @@ def read_iradio():
     return out
 
 
-def write_iradio(items):
-    path = iradio_file()
+def write_iradio(items, kind="fav"):
+    path = iradio_file(kind)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
@@ -1504,55 +1507,59 @@ def iradio_page():
     return bottle.template('iradio')
 
 
-@app.get('/api/iradio')
-def get_iradio():
-    return {"stations": read_iradio(), "max": IRADIO_FAV_MAX}
+@app.get('/api/<kind:re:iradio|iradio-atc>')
+def get_iradio(kind):
+    k = "atc" if kind.endswith("atc") else "fav"
+    return {"stations": read_iradio(k), "max": IRADIO_FAV_MAX}
 
 
-@app.post('/api/iradio')
-def add_iradio():
+@app.post('/api/<kind:re:iradio|iradio-atc>')
+def add_iradio(kind):
+    k = "atc" if kind.endswith("atc") else "fav"
     try:
         s = iradio_entry()
-        items = read_iradio()
+        items = read_iradio(k)
         if any(x["url"] == s["url"] for x in items):
-            raise ValueError("Esa dirección ya está en las favoritas")
+            raise ValueError("Esa dirección ya está en la lista")
         if len(items) >= IRADIO_FAV_MAX:
-            raise ValueError("Ya hay %d favoritas: quite alguna" % IRADIO_FAV_MAX)
+            raise ValueError("Ya hay %d emisoras: quite alguna" % IRADIO_FAV_MAX)
         items.append(s)
-        write_iradio(items)
+        write_iradio(items, k)
     except ValueError as ex:
         return api_error(400, str(ex))
     except OSError as ex:
         return api_error(500, f"No se pudo guardar: {ex}")
-    return get_iradio()
+    return get_iradio(kind)
 
 
-@app.put('/api/iradio/<i:int>')
-def set_iradio(i):
+@app.put('/api/<kind:re:iradio|iradio-atc>/<i:int>')
+def set_iradio(kind, i):
+    k = "atc" if kind.endswith("atc") else "fav"
     try:
         s = iradio_entry()
-        items = read_iradio()
+        items = read_iradio(k)
         if not 0 <= i < len(items):
             raise ValueError("Esa emisora ya no está (recargue la página)")
         items[i] = s
-        write_iradio(items)
+        write_iradio(items, k)
     except ValueError as ex:
         return api_error(400, str(ex))
     except OSError as ex:
         return api_error(500, f"No se pudo guardar: {ex}")
-    return get_iradio()
+    return get_iradio(kind)
 
 
-@app.delete('/api/iradio/<i:int>')
-def delete_iradio(i):
+@app.delete('/api/<kind:re:iradio|iradio-atc>/<i:int>')
+def delete_iradio(kind, i):
+    k = "atc" if kind.endswith("atc") else "fav"
     try:
-        items = read_iradio()
+        items = read_iradio(k)
         if 0 <= i < len(items):
             del items[i]
-            write_iradio(items)
+            write_iradio(items, k)
     except OSError as ex:
         return api_error(500, f"No se pudo guardar: {ex}")
-    return get_iradio()
+    return get_iradio(kind)
 
 
 def read_channels():

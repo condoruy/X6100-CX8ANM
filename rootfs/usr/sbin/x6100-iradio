@@ -163,7 +163,7 @@ def cmd_air(args):
             rows += api("/json/stations/search", dict(COMMON, tag=tag, limit="80"))
         except Fail:
             errors += 1
-            if errors == len(AIR_TAGS):
+            if errors == len(AIR_TAGS) and not own_atc():
                 raise
     for word in ("ATC", "Tower", "Approach"):
         try:
@@ -172,7 +172,25 @@ def cmd_air(args):
             pass
     rows = [s for s in rows if is_atc(s)]
     rows.sort(key=lambda s: (clean(s.get("countrycode")).upper() != cc, -(s.get("clickcount") or 0)))
-    print_list(rows)
+    print_list(own_atc() + rows)
+
+
+ATC_FILE = "/mnt/iradio/atc.tsv"
+
+
+def own_atc():
+    """Las emisoras de banda aérea que cargó el usuario (página Radio por Internet de la web de la radio)."""
+    out = []
+    try:
+        with open(ATC_FILE, encoding="utf-8", errors="replace") as f:
+            for line in f:
+                p = line.rstrip("\r\n").split("\t")
+                if len(p) >= 2 and p[0] and p[1].startswith(("http://", "https://")):
+                    p += [""] * (5 - len(p))
+                    out.append({"name": "★ " + p[0], "url": p[1], "codec": p[2], "bitrate": p[3], "countrycode": p[4]})
+    except OSError:
+        pass
+    return out
 
 
 def cmd_search(args):

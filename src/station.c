@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 static bool check_ftx_msg_encoding(const char *text) {
     ftx_message_rc_t rc;
@@ -104,6 +105,17 @@ bool station_qth_save(const char *qth) {
     }
     params_str_set(&params.qth, qth);
     return true;
+}
+
+/* Phone position (Remoto+ or X6100 Link): the saved QTH follows it, so the locator stays up to date
+ * also after the phone disconnects. Called from the GUI thread. */
+void station_qth_from_position(double lat, double lon) {
+    char grid[9];
+
+    qth_pos_to_str(lat, lon, grid);
+    grid[6] = '\0';
+    if (strncasecmp(params.qth.x, grid, 6) != 0)
+        params_str_set(&params.qth, grid);
 }
 
 const char *station_qth(void) {

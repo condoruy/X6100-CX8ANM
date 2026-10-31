@@ -184,12 +184,15 @@ a{color:var(--teal)}
     <div class="switch"><div><b>Permitir transmitir</b><div class="sub">Apagado al abrir. Sin esto, la página solo escucha.</div></div><input type="checkbox" class="txallow" aria-label="Permitir transmitir"></div>
   </div>
   <div class="card">
+    <div class="switch"><div><b>Usar el GPS del teléfono</b><div class="sub" id="gps-state">El locator de la radio se actualiza solo con la posición del teléfono (hace falta https y permitir la ubicación).</div></div><input type="checkbox" id="gps-on" aria-label="Usar el GPS del teléfono"></div>
+  </div>
+  <div class="card">
     <h3>Instalar como app</h3>
     <p class="sub">En el teléfono: menú del navegador → <b>Agregar a la pantalla de inicio</b>. En la PC (Chrome/Edge): ícono de instalar en la barra de direcciones. Abre directo, sin barra del navegador.</p>
   </div>
   <div class="card">
     <h3>Desde cualquier lugar</h3>
-    <p class="sub">Con Tailscale en el teléfono y en una Raspberry Pi o PC de su casa, esta misma página anda fuera de casa como si estuviera en la WiFi. Guía: <a href="https://github.com/condoruy/X6100-CX8ANM/blob/remoto/docs/REMOTO.md" target="_blank" rel="noopener">docs/REMOTO.md</a></p>
+    <p class="sub">Con Tailscale en el teléfono y en una Raspberry Pi o PC de su casa, esta misma página anda fuera de casa como si estuviera en la WiFi. Guía: <a href="https://github.com/condoruy/X6100-CX8ANM/blob/main/docs/REMOTO.md" target="_blank" rel="noopener">docs/REMOTO.md</a></p>
   </div>
   <div class="card">
     <h3>Seguridad</h3>
@@ -722,6 +725,45 @@ function cwRx(t) {
   el.scrollTop = el.scrollHeight;
 }
 })();
+
+/* ---------- GPS del teléfono → locator de la radio ---------- */
+const gps = {watch: null, last: null, sent: 0};
+function grid6(lat, lon) {
+  const L = "ABCDEFGHIJKLMNOPQR", l = "abcdefghijklmnopqrstuvwx";
+  let x = lon + 180, y = lat + 90;
+  const a = L[Math.floor(x / 20)] + L[Math.floor(y / 10)];
+  x %= 20; y %= 10;
+  const b = String(Math.floor(x / 2)) + String(Math.floor(y));
+  x %= 2; y %= 1;
+  return a + b + l[Math.floor(x * 12)] + l[Math.floor(y * 24)];
+}
+function gpsState(t, err) { const e = $("#gps-state"); e.textContent = t; e.style.color = err ? "var(--bad, #e5484d)" : ""; }
+function gpsStop() {
+  if (gps.watch !== null) navigator.geolocation.clearWatch(gps.watch);
+  gps.watch = null; gps.last = null;
+}
+function gpsStart() {
+  if (!("geolocation" in navigator)) { gpsState("Este navegador no da la ubicación.", true); $("#gps-on").checked = false; return; }
+  if (!window.isSecureContext) { gpsState("Abra la página con https:// para usar la ubicación.", true); $("#gps-on").checked = false; return; }
+  gpsState("Buscando la posición…");
+  gps.watch = navigator.geolocation.watchPosition((p) => {
+    const lat = p.coords.latitude, lon = p.coords.longitude, now = Date.now();
+    const moved = !gps.last || Math.abs(lat - gps.last[0]) > 0.0005 || Math.abs(lon - gps.last[1]) > 0.0005;
+    if (moved || now - gps.sent > 60000) {
+      send("location", undefined, lat.toFixed(5) + "," + lon.toFixed(5)).then(() => {
+        gps.last = [lat, lon]; gps.sent = now;
+        gpsState("Locator " + grid6(lat, lon) + " · ±" + Math.round(p.coords.accuracy) + " m · enviado " + new Date().toLocaleTimeString());
+      }).catch(() => {});
+    }
+  }, (e) => {
+    gpsState(e.code === 1 ? "Ubicación no permitida: habilítela para esta página en el navegador." : "Sin posición todavía (" + e.message + ").", true);
+  }, {enableHighAccuracy: true, maximumAge: 30000, timeout: 60000});
+}
+$("#gps-on").addEventListener("change", (e) => {
+  try { localStorage.setItem("remoto-gps", e.target.checked ? "1" : "0"); } catch (x) {}
+  if (e.target.checked) gpsStart(); else { gpsStop(); gpsState("Apagado. El locator queda en el último valor."); }
+});
+try { if (localStorage.getItem("remoto-gps") === "1") { $("#gps-on").checked = true; gpsStart(); } } catch (x) {}
 </script>
 </body>
 </html>

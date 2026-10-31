@@ -52,12 +52,13 @@ control remoto, temas…, ver [su README](docs/README_IU1WXY.md)) y además:
 - **Guardar cualquier frecuencia en memoria** desde el panel.
 - Punto de acceso WiFi propio, aviso de actividad del cluster en tu banda, lista de sitios de
   operación de campo (SOTA, POTA, WWBOTA, HOTA), NAVTEX/DSC guardados solos, y más.
+- **Remoto+**: la radio desde el teléfono o la PC con voz por el micrófono, FT8 con subida a QRZ,
+  CW desde el teclado, el GPS del teléfono para el locator y acceso desde cualquier lugar con Tailscale.
+  Ver [docs/REMOTO.md](docs/REMOTO.md).
+- **Banda aérea propia**: cada uno carga sus emisoras de control de tránsito aéreo desde la página
+  *Radio por Internet* de la web de la radio; aparecen primero en la lista Banda aérea.
 
 El detalle de cada función está en **[docs/CX8ANM.md](docs/CX8ANM.md)**.
-
-> **En prueba (rama `remoto`):** *Remoto+*, la radio desde el teléfono o la PC con voz por el
-> micrófono, FT8 con subida a QRZ, CW desde el teclado y acceso desde cualquier lugar con Tailscale.
-> Ver [docs/REMOTO.md](docs/REMOTO.md).
 
 ## Instalar
 

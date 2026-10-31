@@ -4725,11 +4725,8 @@ static void ap_switch_cb(lv_event_t *e) {
     bool      on = lv_obj_has_state(sw, LV_STATE_CHECKED);
 
     if (ap_busy) return;
-    if (on && !params.wifi_enabled.x) {
-        lv_obj_clear_state(sw, LV_STATE_CHECKED);
-        msg_update_text_fmt("Turn on WiFi/BT power first");
-        return;
-    }
+    if (on && !params.wifi_enabled.x)
+        wifi_power_on();    /* the script waits for the WiFi chip to come up */
     ap_busy = true;
     lv_label_set_text(ap.note, on ? "starting" : "stopping");
     sh_run(ap_cmd(on ? "on" : "off").c_str(), ap_set_done, (void *)(intptr_t)ap_gen);

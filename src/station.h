@@ -26,6 +26,7 @@ bool station_qth_save(const char *qth);
 /* The locator to operate with: the 6 characters from a current GPS fix,
  * else the saved QTH (params.qth.x itself, never overwritten by the GPS). */
 const char *station_qth(void);
+void station_qth_from_position(double lat, double lon);
 
 #ifdef __cplusplus
 }

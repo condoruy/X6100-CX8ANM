@@ -1,7 +1,5 @@
 # Remoto+ — la radio desde el teléfono o la PC
 
-> Versión de prueba (rama `remoto`). La versión publicada del firmware no cambia hasta que se
-> decida pasarla.
 
 **Remoto+** es una página web que sirve la propia radio y que se instala en el teléfono o la PC
 como si fuera una app, gratis y sin tienda. Tiene cinco partes:
@@ -55,6 +53,17 @@ la PC con Chrome o Edge, el ícono de instalar en la barra de direcciones.
 
 La radio tiene que estar en **CW** (botón *Pasar a CW*) y en la pantalla principal. Velocidad,
 texto libre y mensajes guardados; se mantienen apretados para cambiarlos.
+
+## GPS del teléfono → locator
+
+En *Ajustes*, **Usar el GPS del teléfono** manda la posición del teléfono a la radio mientras la
+página está abierta, y el locator (QTH) de la radio se actualiza solo: sirve para FT8, el log y
+las apps que usan el locator. El último valor queda guardado al cerrar la página.
+
+- Funciona igual con la radio conectada a la WiFi del celular (punto de acceso del teléfono), a la
+  WiFi de casa o al punto de acceso de la radio.
+- El navegador pide permiso de ubicación la primera vez y necesita la página en **https**.
+- Manda la posición cuando el teléfono se mueve unos 50 m, y como mínimo una vez por minuto.
 
 ## Desde cualquier lugar (fuera de casa)
 

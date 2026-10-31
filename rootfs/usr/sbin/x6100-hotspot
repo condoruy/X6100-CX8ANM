@@ -47,6 +47,21 @@ wifi_dev() {
     nmcli -t -f DEVICE,TYPE device 2>/dev/null | sed -n 's/:wifi$//p' | head -n1
 }
 
+# Recién encendido el chip WiFi, la placa tarda unos segundos en aparecer
+wait_wifi_dev() {
+    i=0
+    while [ $i -lt 25 ]; do
+        dev=$(wifi_dev)
+        if [ -n "$dev" ] && ! nmcli -t -f DEVICE,STATE device 2>/dev/null | grep -q "^$dev:unavailable"; then
+            echo "$dev"
+            return 0
+        fi
+        sleep 1
+        i=$((i + 1))
+    done
+    wifi_dev
+}
+
 is_on() {
     nmcli -t -f NAME connection show --active 2>/dev/null | grep -qx "$CON"
 }
@@ -85,18 +100,30 @@ dhcp_stop() {
 case "$1" in
   on)
     load_conf
-    dev=$(wifi_dev)
+    nmcli radio wifi on >/dev/null 2>&1
+    dev=$(wait_wifi_dev)
     if [ -z "$dev" ]; then
-        echo "no hay WiFi: encienda WiFi/BT" >&2
+        echo "no aparece la placa WiFi: encienda WiFi/BT"
         exit 1
     fi
+    # Sin la red de casa al alcance, NetworkManager sigue intentando conectarse a ella:
+    # se corta ese intento para que no le gane al punto de acceso
+    nmcli device disconnect "$dev" >/dev/null 2>&1
     nmcli connection delete "$CON" >/dev/null 2>&1
-    nmcli connection add type wifi ifname "$dev" con-name "$CON" autoconnect no ssid "$SSID" \
+    out=$(nmcli connection add type wifi ifname "$dev" con-name "$CON" autoconnect no ssid "$SSID" \
         802-11-wireless.mode ap 802-11-wireless.band bg 802-11-wireless.channel 6 \
         wifi-sec.key-mgmt wpa-psk wifi-sec.psk "$PASS" \
         wifi-sec.proto rsn wifi-sec.pairwise ccmp wifi-sec.group ccmp \
-        ipv4.method manual ipv4.addresses $IP/24 ipv6.method disabled >/dev/null || exit 1
-    nmcli connection up "$CON" >/dev/null || exit 1
+        ipv4.method manual ipv4.addresses $IP/24 ipv6.method disabled 2>&1) || { echo "$out" | tail -n1; exit 1; }
+    tries=0
+    until out=$(nmcli -w 30 connection up "$CON" 2>&1); do
+        tries=$((tries + 1))
+        if [ $tries -ge 3 ]; then
+            echo "$out" | tail -n1 | sed 's/^Error: //'
+            exit 1
+        fi
+        sleep 3
+    done
     dhcp_start "$dev"
     echo "on $SSID $PASS $IP"
     ;;
