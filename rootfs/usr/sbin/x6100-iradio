@@ -139,18 +139,38 @@ def cmd_top(args):
 
 # Banda aérea: emisoras que retransmiten el control de tránsito aéreo (torres, aproximación),
 # las del país primero. El X6100 no recibe la banda aérea de VHF (118-137 MHz) por radio.
-AIR_TAGS = ["atc", "air traffic control", "aviation", "airband", "air band", "liveatc"]
+AIR_TAGS = ["atc", "air traffic control", "liveatc", "airband", "air band", "tower", "atis"]
+# Solo se aceptan emisoras que en el nombre, las etiquetas o la dirección dicen que son control de tránsito
+# aéreo; "aviation" y parecidas traen muchas radios musicales y se descartan.
+AIR_YES = re.compile(r"(\batc\b|liveatc|air ?traffic|\bairband\b|\bair band\b|\btower\b|\btwr\b|\bapproach\b|"
+                     r"\bapp\b|\bground\b|\bgnd\b|\batis\b|\bdeparture\b|\bcenter\b|\bcentre\b|\btorre\b|"
+                     r"aproximaci|tr[aá]nsito a[eé]reo|tr[aá]fico a[eé]reo|\b[kcslef][a-z]{3}[_ ](twr|app|gnd|del|ctr|atis)\b)", re.I)
+AIR_NO = re.compile(r"\b(music|musica|música|pop|rock|hits?|jazz|dance|chill|lounge|news|noticias|talk|christian|"
+                    r"gospel|country|oldies|classic|fm \d|radio fm)\b", re.I)
+
+
+def is_atc(s):
+    text = " ".join([clean(s.get("name")), clean(s.get("tags")), s.get("url_resolved") or s.get("url") or ""])
+    return bool(AIR_YES.search(text)) and not AIR_NO.search(clean(s.get("name")) + " " + clean(s.get("tags")))
 
 
 def cmd_air(args):
     cc = (args[0] if args else "").upper()[:2]
     rows = []
+    errors = 0
     for tag in AIR_TAGS:
         try:
             rows += api("/json/stations/search", dict(COMMON, tag=tag, limit="80"))
         except Fail:
-            if not rows and tag == AIR_TAGS[-1]:
+            errors += 1
+            if errors == len(AIR_TAGS):
                 raise
+    for word in ("ATC", "Tower", "Approach"):
+        try:
+            rows += api("/json/stations/search", dict(COMMON, name=word, limit="60"))
+        except Fail:
+            pass
+    rows = [s for s in rows if is_atc(s)]
     rows.sort(key=lambda s: (clean(s.get("countrycode")).upper() != cc, -(s.get("clickcount") or 0)))
     print_list(rows)
 
