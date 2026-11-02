@@ -143,6 +143,10 @@ se vuelve a grabar la imagen con balenaEtcher como siempre.
 - Ajustes > Info > Modo ahorro: el procesador baja la velocidad en reposo (schedutil en vez de
   performance) y la pantalla se atenúa a los 15 s como mucho. Apagado por defecto. Para medir:
   /mnt/battery_log.csv (vbat, batcap, cpu_mhz cada 30 s).
+- La pantalla tampoco se atenúa sola: el brillo en reposo viene igual al normal (Ajustes > Pantalla >
+  Tiempo, Brillo, para volver a usarlo). Al actualizar a esta versión se apagan las dos cosas una vez.
+- Colores de la cascada: Ajustes > Pantalla > CASCADA > Colores (los del tema, clásico, Gauss, gris,
+  fuego, hielo, arco iris, verde, violeta o ámbar), o en la web de la radio, página Pantalla.
 - Ajustes > Info > Banda base: muestra "(OK)" si es la última oficial conocida de Xiegu (V1.1.8,
   15/09/2024) o "- Xiegu 1.1.8" si hay una más nueva. Se actualiza con el procedimiento oficial
   de Xiegu (fuente de 13,8 V). La versión conocida está en src/power_save.c (BASEBAND_LATEST).

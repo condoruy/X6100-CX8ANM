@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+/* Una vez por radio: ahorro de energía apagado (Modo ahorro y atenuación de pantalla) */
+void power_save_migrate(void);
 /* Aplica params.power_save: el procesador baja la velocidad cuando no hay trabajo
  * (governor "schedutil"/"ondemand" en vez de "performance") */
 void power_save_apply(void);

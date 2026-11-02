@@ -1460,3 +1460,14 @@ United Kingdom 27/81 (FM)	Royaume-Uni 27/81 (FM)
 Web voice: no audio, TX stopped	Voix web : pas d'audio, TX arrêtée
 Web voice: 3 minutes, TX stopped	Voix web : 3 minutes, TX arrêtée
 Web voice: %s	Voix web : %s
+# Colores de la cascada
+Colors	Couleurs
+Classic	Classique
+Gauss	Gauss
+Grey	Gris
+Fire	Feu
+Ice	Glace
+Rainbow	Arc-en-ciel
+Green	Vert
+Purple	Violet
+Amber	Ambre
