@@ -51,6 +51,7 @@
 #include "dialog_wefax.h"
 #include "dialog_navtex.h"
 #include "dialog_iradio.h"
+#include "dialog_zello.h"
 #include "dialog_meteo.h"
 #include "dialog_cb.h"
 #include "dialog_aero.h"
@@ -627,6 +628,7 @@ static const char *app_name(press_action_t a) {
         case ACTION_APP_OLIVIA:     return "Olivia";
         case ACTION_APP_JTTY:       return "JTTY";
         case ACTION_APP_IRADIO:     return "Internet Radio";
+        case ACTION_APP_ZELLO:      return "Zello";
         case ACTION_APP_METEO:      return "Weather";
         case ACTION_APP_CB:         return "CB";
         case ACTION_APP_AERO:       return "HF Air Band";
@@ -789,6 +791,10 @@ void main_screen_start_app(press_action_t app_action) {
             dialog_construct(dialog_iradio, obj);
             break;
 
+        case ACTION_APP_ZELLO:
+            dialog_construct(dialog_zello, obj);
+            break;
+
         case ACTION_APP_METEO:
             dialog_construct(dialog_meteo, obj);
             break;
@@ -910,6 +916,7 @@ void main_screen_action(press_action_t action) {
         case ACTION_APP_METEO:
         case ACTION_APP_CB:
         case ACTION_APP_AERO:
+        case ACTION_APP_ZELLO:
             main_screen_start_app(action);
             break;
 
@@ -1263,6 +1270,9 @@ static void main_screen_keypad_cb(lv_event_t * e) {
             break;
 
         case KEYPAD_PTT:
+            /* Con Zello abierto, el PTT del costado habla por Zello y no sale al aire */
+            if (keypad->state == KEYPAD_PRESS && dialog_zello_ptt(true)) break;
+            if ((keypad->state == KEYPAD_RELEASE || keypad->state == KEYPAD_LONG_RELEASE) && dialog_zello_ptt(false)) break;
             switch (keypad->state) {
                 case KEYPAD_PRESS:
                     dialog_msg_voice_ptt_pressed();

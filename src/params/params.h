@@ -75,6 +75,7 @@ typedef enum {
     ACTION_APP_METEO,   /* 125, CX8ANM: estación meteorológica e INUMET */
     ACTION_APP_CB,      /* 126, CX8ANM: canales de la Banda Ciudadana */
     ACTION_APP_AERO,    /* 127, CX8ANM: banda aérea de HF */
+    ACTION_APP_ZELLO,   /* 128, CX8ANM: Zello */
 } press_action_t;
 
 typedef enum {

@@ -55,6 +55,8 @@ control remoto, temas…, ver [su README](docs/README_IU1WXY.md)) y además:
 - **Remoto+**: la radio desde el teléfono o la PC con voz por el micrófono, FT8 con subida a QRZ,
   CW desde el teclado, el GPS del teléfono para el locator y acceso desde cualquier lugar con Tailscale.
   Ver [docs/REMOTO.md](docs/REMOTO.md).
+- **Zello**: escuchar y hablar en canales de Zello desde la radio (PTT del costado y micrófono de mano),
+  con las propias llaves de desarrollador de cada uno.
 - **Banda aérea propia**: cada uno carga sus emisoras de control de tránsito aéreo desde la página
   *Radio por Internet* de la web de la radio; aparecen primero en la lista Banda aérea.
 

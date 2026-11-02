@@ -984,6 +984,7 @@ static action_items_t long_action_items[] = {
     { .label = " APP Field Ops ", .action = ACTION_APP_FIELD },
     { .label = " APP Bands ", .action = ACTION_APP_BANDS },
     { .label = " APP Internet radio ", .action = ACTION_APP_IRADIO },
+    { .label = " APP Zello ", .action = ACTION_APP_ZELLO },
     { .label = " APP Weather ", .action = ACTION_APP_METEO },
     { .label = " APP CB channels ", .action = ACTION_APP_CB },
     { .label = " APP HF air band ", .action = ACTION_APP_AERO },

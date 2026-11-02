@@ -1,0 +1,79 @@
+% rebase('base.html', title='Zello')
+<h2><svg class="i"><use href="#i-speaker"/></svg>Zello</h2>
+<p class="sub">Canales de Zello en la radio: APP &rarr; Zello. Se escucha por el parlante (o los auriculares Bluetooth) y se habla
+con el PTT del costado de la radio o el botón Hablar, por el <b>micrófono de mano sin apretar su PTT</b>. Lo que se dice va a Zello, no sale al aire.</p>
+
+<section class="dp-card">
+<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-lock"/></svg></span><div><h3>Cuenta de Zello</h3><p>La misma de la app del celular</p></div></div>
+<div class="dp-row">
+    <div class="dp-lbl"><label for="z-user"><b>Usuario</b></label></div>
+    <div class="dp-ctl"><input id="z-user" autocomplete="off" maxlength="64" placeholder="su usuario de Zello"></div>
+  </div>
+<div class="dp-row">
+    <div class="dp-lbl"><label for="z-pass"><b>Clave</b></label></div>
+    <div class="dp-ctl"><input id="z-pass" type="password" autocomplete="new-password" maxlength="128" placeholder=""></div>
+  </div>
+</section>
+
+<section class="dp-card">
+<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-key"/></svg></span><div><h3>Llaves de desarrollador</h3><p id="key-state"></p></div></div>
+<div class="dp-body">
+<p class="sub" style="margin-top: 0">Zello pide que cada uno use sus propias llaves (son gratis):</p>
+<ol class="sub">
+<li>Entrar a <a href="https://developers.zello.com/" target="_blank" rel="noopener">developers.zello.com</a> con el usuario y la clave de Zello.</li>
+<li>Completar el perfil de desarrollador y guardar.</li>
+<li><b>Keys</b> &rarr; <b>Add Key</b>. Copiar el <b>Issuer</b> y la <b>Private Key</b> completa (con las líneas BEGIN y END) y pegarlos acá.</li>
+</ol>
+</div>
+<div class="dp-row">
+    <div class="dp-lbl"><label for="z-iss"><b>Issuer</b></label></div>
+    <div class="dp-ctl"><input id="z-iss" autocomplete="off" maxlength="300" placeholder="WWx6Ym…"></div>
+  </div>
+<div class="dp-row">
+    <div class="dp-lbl"><label for="z-key"><b>Private Key</b></label></div>
+    <div class="dp-ctl"><textarea id="z-key" rows="5" placeholder="-----BEGIN PRIVATE KEY-----&#10;…&#10;-----END PRIVATE KEY-----" style="font-family: monospace; width: 100%"></textarea></div>
+  </div>
+<div class="dp-body" style="border-top:1px solid #1a283c">
+<p class="sub" style="margin: 0">La radio firma su propio permiso de conexión con esta llave, así que <b>la hora de la radio tiene que estar bien</b> (con internet se pone sola).</p>
+</div>
+</section>
+
+<section class="dp-card">
+<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-speaker"/></svg></span><div><h3>Canales</h3><p>Hasta 20, uno por línea, escritos igual que en Zello</p></div></div>
+<div class="dp-body">
+<textarea id="z-chans" rows="5" placeholder="Radioaficionados Uruguay&#10;Otro canal" style="width: 100%"></textarea>
+<div class="actions"><button id="z-save" class="primary">Guardar</button> <button id="z-test">Probar conexión</button> <span class="status" id="z-status"></span></div>
+</div>
+</section>
+
+<script>
+function zStatus(text, error) {
+  const el = $("#z-status");
+  el.toggleClass("error", !!error);
+  el.html('<span class="dot"></span>').append(document.createTextNode(text));
+}
+function zRender(d) {
+  $("#z-user").val(d.user);
+  $("#z-pass").val("").attr("placeholder", d.pass_set ? "guardada (dejar vacío para no cambiarla)" : "");
+  $("#z-iss").val(d.issuer);
+  $("#z-key").val("").attr("placeholder", d.key_set ? "Private Key guardada (pegar otra para cambiarla)" : "-----BEGIN PRIVATE KEY-----\n…\n-----END PRIVATE KEY-----");
+  $("#key-state").text(d.key_set ? "Private Key cargada" : "Falta la Private Key");
+  $("#z-chans").val(d.channels.join("\n"));
+}
+$("#z-save").on("click", function() {
+  const d = {user: $("#z-user").val().trim(), issuer: $("#z-iss").val().trim(),
+             channels: $("#z-chans").val().split("\n").map(function(x) { return x.trim(); }).filter(Boolean)};
+  if ($("#z-pass").val()) d.password = $("#z-pass").val();
+  if ($("#z-key").val().trim()) d.private_key = $("#z-key").val();
+  $.ajax({url: "/api/zello", type: "POST", data: JSON.stringify(d), contentType: "application/json; charset=utf-8", dataType: "json",
+    success: function(r) { zRender(r); zStatus("Guardado. En la radio: APP → Zello → Recargar canales"); },
+    error: function(xhr) { zStatus(xhr.responseJSON ? xhr.responseJSON.msg : "No se pudo guardar", true); }});
+});
+$("#z-test").on("click", function() {
+  zStatus("Probando… (hasta 30 s)");
+  $.ajax({url: "/api/zello/test", type: "POST", dataType: "json",
+    success: function(r) { zStatus(r.ok ? "Conectado: " + r.msg : r.msg, !r.ok); },
+    error: function() { zStatus("No se pudo probar", true); }});
+});
+$.get("/api/zello", {}, zRender);
+</script>

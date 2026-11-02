@@ -16,6 +16,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     dialog_wefax.c
     dialog_navtex.c
     dialog_iradio.c
+    dialog_zello.c
     dialog_meteo.c
     dialog_cb.c
     cb.c

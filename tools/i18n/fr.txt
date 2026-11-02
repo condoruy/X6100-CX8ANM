@@ -1460,3 +1460,18 @@ United Kingdom 27/81 (FM)	Royaume-Uni 27/81 (FM)
 Web voice: no audio, TX stopped	Voix web : pas d'audio, TX arrêtée
 Web voice: 3 minutes, TX stopped	Voix web : 3 minutes, TX arrêtée
 Web voice: %s	Voix web : %s
+# Zello
+Connect /	Connecter /
+Talk	Parler
+Reload	Recharger
+no user	pas d'utilisateur
+online	en ligne
+Zello channels	Canaux Zello
+APP Zello	APP Zello
+Add your Zello channels on the radio's web page (Zello page)	Ajoutez vos canaux Zello sur la page web de la radio (page Zello)
+Connect to a Zello channel first	Connectez-vous d'abord à un canal Zello
+Zello is not ready to talk yet	Zello n'est pas encore prêt pour parler
+No channels: add them on the radio's web page (Zello page)	Aucun canal : ajoutez-les sur la page web de la radio (page Zello)
+Disconnected: choose a channel and press the MFK or Connect	Déconnecté : choisissez un canal et appuyez sur le MFK ou Connecter
+Talking: speak into the hand mic	En émission : parlez dans le micro à main
+Side PTT or Talk: speak into the hand mic (without its PTT)	PTT latéral ou Parler : parlez dans le micro à main (sans son PTT)

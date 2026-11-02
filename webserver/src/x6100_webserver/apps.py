@@ -1617,6 +1617,107 @@ def delete_iradio(kind, i):
     return get_iradio(kind)
 
 
+# ---------- Zello (x6100-zello, src/dialog_zello.c) ----------
+# /mnt/zello.conf: USER, PASS, ISSUER, CHANNEL, CHANNELS (separados por |); /mnt/zello.key: la Private Key (PEM).
+# La clave y la llave nunca se devuelven a la página: solo si están cargadas.
+
+def zello_paths():
+    root = settings.FILEBROWSER_PATH or "/mnt"
+    return os.path.join(root, "zello.conf"), os.path.join(root, "zello.key")
+
+
+def read_zello():
+    conf, _ = zello_paths()
+    c = {"USER": "", "PASS": "", "ISSUER": "", "CHANNEL": "", "CHANNELS": ""}
+    try:
+        with open(conf, encoding="utf-8") as f:
+            for line in f:
+                line = line.rstrip("\r\n")
+                if "=" in line and not line.startswith("#"):
+                    k, v = line.split("=", 1)
+                    v = v.strip()
+                    if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
+                        v = v[1:-1]
+                    c[k.strip().upper()] = v
+    except OSError:
+        pass
+    return c
+
+
+def zello_public():
+    c = read_zello()
+    _, key = zello_paths()
+    return {"user": c["USER"], "pass_set": bool(c["PASS"]), "issuer": c["ISSUER"], "key_set": os.path.isfile(key),
+            "channels": [x for x in c["CHANNELS"].split("|") if x], "channel": c["CHANNEL"]}
+
+
+@app.route('/zello')
+def zello_page():
+    return bottle.template('zello')
+
+
+@app.get('/api/zello')
+def get_zello():
+    return zello_public()
+
+
+@app.post('/api/zello')
+def set_zello():
+    data = bottle.request.json if isinstance(bottle.request.json, dict) else {}
+    c = read_zello()
+    one = lambda v, n: " ".join(str(v or "").replace("\n", " ").replace("|", " ").replace('"', "").split())[:n]
+    try:
+        if "user" in data:
+            c["USER"] = one(data.get("user"), 64)
+        if data.get("password"):
+            c["PASS"] = str(data["password"]).replace("\n", "").replace('"', "")[:128]
+        if "issuer" in data:
+            c["ISSUER"] = one(data.get("issuer"), 300).replace(" ", "")
+        if "channels" in data:
+            chans = []
+            for x in data.get("channels") or []:
+                x = one(x, 60)
+                if x and x not in chans:
+                    chans.append(x)
+            if len(chans) > 20:
+                raise ValueError("Hasta 20 canales")
+            c["CHANNELS"] = "|".join(chans)
+            if c["CHANNEL"] not in chans:
+                c["CHANNEL"] = chans[0] if chans else ""
+        conf, key = zello_paths()
+        if data.get("private_key"):
+            pem = str(data["private_key"]).strip().replace("\r\n", "\n")
+            if "-----BEGIN" not in pem or "PRIVATE KEY-----" not in pem:
+                raise ValueError("La Private Key tiene que incluir las líneas BEGIN y END")
+            tmp = key + ".tmp"
+            with open(tmp, "w") as f:
+                f.write(pem + "\n")
+            os.chmod(tmp, 0o600)
+            os.replace(tmp, key)
+        tmp = conf + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            for k in ("USER", "PASS", "ISSUER", "CHANNEL", "CHANNELS"):
+                f.write('%s="%s"\n' % (k, c[k]))
+        os.chmod(tmp, 0o600)
+        os.replace(tmp, conf)
+        os.sync()
+    except ValueError as ex:
+        return api_error(400, str(ex))
+    except OSError as ex:
+        return api_error(500, f"No se pudo guardar: {ex}")
+    return zello_public()
+
+
+@app.post('/api/zello/test')
+def test_zello():
+    try:
+        r = subprocess.run(["/usr/sbin/x6100-zello", "test"], capture_output=True, text=True, timeout=40)
+        out = (r.stdout.strip().splitlines() or ["error sin respuesta"])[-1]
+    except (OSError, subprocess.SubprocessError) as ex:
+        out = "error " + str(ex)
+    return {"ok": out.startswith("ok"), "msg": out[3:] if out.startswith("ok") else out[6:] if out.startswith("error") else out}
+
+
 def read_channels():
     """Valid channels from channels.json; invalid ones are skipped like the GUI does."""
     try:

@@ -1,0 +1,518 @@
+#!/usr/bin/env python3
+# CX8ANM: Zello en el X6100 (Zello Channel API, Zello "Friends and Family").
+#
+#   x6100-zello run [canal]
+#        se conecta y se queda en el canal: el audio que llega sale por la salida estándar como PCM
+#        s16 mono 16 kHz (la GUI lo pasa al parlante); el estado en STATUS, cuatro líneas:
+#          estado ("connecting", "online", "error <motivo>")
+#          canal<TAB>usuarios en línea
+#          quién habla ahora (vacío si nadie)
+#          "tx" mientras se transmite
+#        Para hablar, la GUI se conecta a TX_SOCK y manda PCM s16 mono 16 kHz; al cerrar, termina el mensaje.
+#   x6100-zello test     prueba usuario, clave y llaves; imprime "ok <canal>" o "error <motivo>"
+#   x6100-zello token    imprime un token de prueba (para revisar las llaves)
+#
+# Cada usuario usa sus propias llaves de desarrollador (developers.zello.com): Issuer y Private Key,
+# cargadas desde la web de la radio en /mnt/zello.conf y /mnt/zello.key. La radio firma el token ella misma.
+import base64
+import ctypes
+import ctypes.util
+import json
+import os
+import random
+import socket
+import ssl
+import struct
+import subprocess
+import sys
+import threading
+import time
+
+CONF = "/mnt/zello.conf"
+KEY = "/mnt/zello.key"
+STATUS = "/tmp/x6100-zello.status"
+TX_SOCK = "/tmp/x6100-zello.sock"
+HOST = "zello.io"
+PATH = "/ws"
+RATE = 16000
+FRAME_MS = 20
+FRAME = RATE * FRAME_MS // 1000            # 320 muestras
+TX_MAX_S = 120                              # un mensaje no dura más que esto
+UA = "X6100-CX8ANM"
+
+
+class Fail(Exception):
+    pass
+
+
+# ---------- configuración ----------
+def read_conf():
+    c = {"USER": "", "PASS": "", "ISSUER": "", "CHANNEL": "", "CHANNELS": ""}
+    try:
+        with open(CONF, encoding="utf-8") as f:
+            for line in f:
+                line = line.rstrip("\r\n")
+                if "=" in line and not line.startswith("#"):
+                    k, v = line.split("=", 1)
+                    v = v.strip()
+                    if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
+                        v = v[1:-1]
+                    c[k.strip().upper()] = v
+    except OSError:
+        pass
+    return c
+
+
+# ---------- token JWT (RS256, firmado con openssl) ----------
+def b64url(b):
+    return base64.urlsafe_b64encode(b).rstrip(b"=").decode()
+
+
+def make_token(issuer, key_path=KEY):
+    if not issuer:
+        raise Fail("falta el Issuer de Zello (web de la radio, página Zello)")
+    if not os.path.isfile(key_path):
+        raise Fail("falta la Private Key de Zello (web de la radio, página Zello)")
+    head = b64url(json.dumps({"alg": "RS256", "typ": "JWT"}, separators=(",", ":")).encode())
+    body = b64url(json.dumps({"iss": issuer, "exp": int(time.time()) + 60}, separators=(",", ":")).encode())
+    data = (head + "." + body).encode()
+    try:
+        r = subprocess.run(["openssl", "dgst", "-sha256", "-sign", key_path, "-binary"], input=data,
+                           capture_output=True, timeout=30)
+    except (OSError, subprocess.SubprocessError) as e:
+        raise Fail("no se pudo firmar el token (%s)" % e)
+    if r.returncode != 0 or not r.stdout:
+        raise Fail("la Private Key no sirve: péguela completa, con BEGIN y END")
+    return data.decode() + "." + b64url(r.stdout)
+
+
+# ---------- WebSocket (RFC 6455), solo lo necesario ----------
+class WS:
+    def __init__(self, host, path, port=443, timeout=15, tls=True):
+        raw = socket.create_connection((host, port), timeout=timeout)
+        if tls:
+            ctx = ssl.create_default_context()
+            for ca in ("/etc/ssl/certs/ca-certificates.crt", "/etc/ssl/cert.pem"):
+                if os.path.exists(ca):
+                    ctx.load_verify_locations(ca)
+                    break
+            self.s = ctx.wrap_socket(raw, server_hostname=host)
+        else:
+            self.s = raw
+        self.s.settimeout(None)
+        key = base64.b64encode(os.urandom(16)).decode()
+        req = ("GET %s HTTP/1.1\r\nHost: %s\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n"
+               "Sec-WebSocket-Key: %s\r\nSec-WebSocket-Version: 13\r\nUser-Agent: %s\r\n\r\n") % (path, host, key, UA)
+        self.s.sendall(req.encode())
+        head = b""
+        while b"\r\n\r\n" not in head:
+            c = self.s.recv(1024)
+            if not c:
+                raise Fail("el servidor de Zello cerró la conexión")
+            head += c
+            if len(head) > 16384:
+                raise Fail("respuesta rara del servidor de Zello")
+        head, self.buf = head.split(b"\r\n\r\n", 1)
+        line = head.split(b"\r\n", 1)[0].decode("latin-1")
+        if " 101 " not in line + " ":
+            raise Fail("el servidor de Zello no aceptó la conexión (%s)" % line.strip())
+        self.lock = threading.Lock()
+        self.closed = False
+
+    def _read(self, n):
+        while len(self.buf) < n:
+            c = self.s.recv(65536)
+            if not c:
+                raise ConnectionError("conexión cerrada")
+            self.buf += c
+        out, self.buf = self.buf[:n], self.buf[n:]
+        return out
+
+    def send(self, payload, opcode):
+        if isinstance(payload, str):
+            payload = payload.encode()
+        n = len(payload)
+        hdr = bytes([0x80 | opcode])
+        if n < 126:
+            hdr += bytes([0x80 | n])
+        elif n < 65536:
+            hdr += bytes([0x80 | 126]) + struct.pack(">H", n)
+        else:
+            hdr += bytes([0x80 | 127]) + struct.pack(">Q", n)
+        mask = os.urandom(4)
+        body = bytes(b ^ mask[i & 3] for i, b in enumerate(payload))
+        with self.lock:
+            self.s.sendall(hdr + mask + body)
+
+    def send_json(self, obj):
+        self.send(json.dumps(obj, separators=(",", ":")), 0x1)
+
+    def recv(self):
+        """(opcode, payload) de un mensaje completo; 0x1 texto, 0x2 binario"""
+        parts, op0 = [], None
+        while True:
+            b0, b1 = self._read(2)
+            fin, op = b0 & 0x80, b0 & 0x0F
+            n = b1 & 0x7F
+            if n == 126:
+                n = struct.unpack(">H", self._read(2))[0]
+            elif n == 127:
+                n = struct.unpack(">Q", self._read(8))[0]
+            mask = self._read(4) if b1 & 0x80 else None
+            data = self._read(n)
+            if mask:
+                data = bytes(b ^ mask[i & 3] for i, b in enumerate(data))
+            if op == 0x9:                      # ping
+                self.send(data, 0xA)
+                continue
+            if op == 0xA:
+                continue
+            if op == 0x8:
+                raise ConnectionError("Zello cerró la conexión")
+            if op != 0:
+                op0 = op
+            parts.append(data)
+            if fin:
+                return op0, b"".join(parts)
+
+    def close(self):
+        if self.closed:
+            return
+        self.closed = True
+        try:
+            self.send(b"", 0x8)
+        except OSError:
+            pass
+        try:
+            self.s.close()
+        except OSError:
+            pass
+
+
+# ---------- Opus (libopus del sistema) ----------
+class Opus:
+    def __init__(self):
+        name = ctypes.util.find_library("opus") or "libopus.so.0"
+        try:
+            self.lib = ctypes.CDLL(name)
+        except OSError:
+            raise Fail("falta libopus en el firmware")
+        L = self.lib
+        L.opus_decoder_create.restype = ctypes.c_void_p
+        L.opus_decoder_create.argtypes = [ctypes.c_int32, ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
+        L.opus_decode.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int32, ctypes.POINTER(ctypes.c_int16),
+                                  ctypes.c_int, ctypes.c_int]
+        L.opus_decoder_destroy.argtypes = [ctypes.c_void_p]
+        L.opus_encoder_create.restype = ctypes.c_void_p
+        L.opus_encoder_create.argtypes = [ctypes.c_int32, ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
+        L.opus_encode.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_int16), ctypes.c_int, ctypes.c_char_p,
+                                  ctypes.c_int32]
+        L.opus_encoder_destroy.argtypes = [ctypes.c_void_p]
+        self.pcm = (ctypes.c_int16 * 5760)()
+
+    def decoder(self):
+        err = ctypes.c_int()
+        d = self.lib.opus_decoder_create(RATE, 1, ctypes.byref(err))
+        if not d or err.value != 0:
+            raise Fail("Opus: no se pudo crear el decodificador")
+        return d
+
+    def decode(self, d, data):
+        n = self.lib.opus_decode(d, data, len(data), self.pcm, 5760, 0)
+        return bytes(memoryview(self.pcm).cast("B")[:n * 2]) if n > 0 else b""
+
+    def encoder(self):
+        err = ctypes.c_int()
+        e = self.lib.opus_encoder_create(RATE, 1, 2048, ctypes.byref(err))   # OPUS_APPLICATION_VOIP
+        if not e or err.value != 0:
+            raise Fail("Opus: no se pudo crear el codificador")
+        return e
+
+    def encode(self, e, pcm_bytes):
+        buf = (ctypes.c_int16 * FRAME).from_buffer_copy(pcm_bytes)
+        out = ctypes.create_string_buffer(1500)
+        n = self.lib.opus_encode(e, buf, FRAME, out, 1500)
+        return out.raw[:n] if n > 0 else b""
+
+
+# ---------- estado para la GUI ----------
+class Status:
+    def __init__(self):
+        self.state, self.channel, self.users, self.talker, self.tx = "connecting", "", "", "", False
+        self.lock = threading.Lock()
+
+    def set(self, **kw):
+        with self.lock:
+            for k, v in kw.items():
+                setattr(self, k, v)
+            txt = "%s\n%s\t%s\n%s\n%s\n" % (self.state, self.channel, self.users, self.talker, "tx" if self.tx else "")
+        try:
+            tmp = STATUS + ".tmp"
+            with open(tmp, "w") as f:
+                f.write(txt)
+            os.replace(tmp, STATUS)
+        except OSError:
+            pass
+
+
+ERRORS = {
+    "not authorized": "usuario o clave de Zello incorrectos",
+    "not enough params": "faltan datos: usuario, clave o llaves de Zello",
+    "channel is not ready": "el canal todavía no está listo",
+    "channels limit exceeded": "demasiados canales",
+    "invalid token": "token rechazado: revise el Issuer y la Private Key, y la hora de la radio",
+    "token expired": "token vencido: revise la hora de la radio",
+}
+
+
+def reason(e):
+    e = str(e)
+    return ERRORS.get(e, e)
+
+
+# ---------- la sesión ----------
+class Session:
+    def __init__(self, conf, channel, out, status, opus):
+        self.conf, self.channel, self.out, self.st, self.opus = conf, channel, out, status, opus
+        self.ws = None
+        self.seq = 0
+        self.waiting = {}            # seq -> [event, respuesta]
+        self.rx = {}                 # stream_id -> decodificador
+        self.refresh = None
+        self.tx_on = False
+        self.alive = True
+
+    def call(self, obj, timeout=10):
+        self.seq += 1
+        obj["seq"] = self.seq
+        ev = [threading.Event(), None]
+        self.waiting[self.seq] = ev
+        self.ws.send_json(obj)
+        if not ev[0].wait(timeout):
+            self.waiting.pop(obj["seq"], None)
+            raise Fail("Zello no contestó")
+        return ev[1]
+
+    def connect(self):
+        self.st.set(state="connecting", channel=self.channel, users="", talker="")
+        test = os.environ.get("X6100_ZELLO_TEST")     # "host:port" sin TLS, solo para pruebas
+        if test:
+            h, p = test.rsplit(":", 1)
+            self.ws = WS(h, PATH, int(p), tls=False)
+        else:
+            self.ws = WS(HOST, PATH)
+        threading.Thread(target=self.reader, daemon=True).start()
+        msg = {"command": "logon", "channels": [self.channel], "platform_type": "X6100", "platform_name": UA,
+               "version": os.environ.get("X6100_FW", "")}
+        if self.refresh:
+            msg["refresh_token"] = self.refresh
+        else:
+            msg["auth_token"] = make_token(self.conf["ISSUER"])
+        if self.conf["USER"]:
+            msg["username"] = self.conf["USER"]
+            msg["password"] = self.conf["PASS"]
+        r = self.call(msg)
+        if not r or not r.get("success"):
+            self.refresh = None
+            raise Fail(reason((r or {}).get("error", "no se pudo entrar")))
+        self.refresh = r.get("refresh_token") or self.refresh
+
+    def reader(self):
+        ws = self.ws
+        try:
+            while self.alive:
+                op, data = ws.recv()
+                if op == 0x1:
+                    self.on_json(json.loads(data.decode("utf-8", "replace")))
+                elif op == 0x2 and len(data) > 9 and data[0] == 1 and not self.tx_on:
+                    sid = struct.unpack(">I", data[1:5])[0]
+                    d = self.rx.get(sid)
+                    if d:
+                        pcm = self.opus.decode(d, data[9:])
+                        if pcm:
+                            try:
+                                self.out.write(pcm)
+                                self.out.flush()
+                            except BrokenPipeError:
+                                self.alive = False
+                                break
+        except (OSError, ConnectionError, ValueError, struct.error) as e:
+            if self.alive and self.ws is ws:
+                self.st.set(state="error " + reason(e))
+        finally:
+            for w in list(self.waiting.values()):
+                w[0].set()
+            ws.close()
+
+    def on_json(self, m):
+        if "seq" in m and m["seq"] in self.waiting:
+            w = self.waiting.pop(m["seq"])
+            w[1] = m
+            w[0].set()
+            return
+        cmd = m.get("command")
+        if cmd == "on_channel_status":
+            st = m.get("status", "")
+            users = m.get("users_online")
+            self.st.set(state="online" if st == "online" else "error canal " + st,
+                        channel=m.get("channel", self.channel), users="" if users is None else str(users))
+        elif cmd == "on_stream_start":
+            if not self.opus:
+                return
+            d = self.opus.decoder()
+            self.rx[m.get("stream_id")] = d
+            self.st.set(talker=m.get("from", "?"))
+        elif cmd == "on_stream_stop":
+            d = self.rx.pop(m.get("stream_id"), None)
+            if d:
+                self.opus.lib.opus_decoder_destroy(d)
+            if not self.rx:
+                self.st.set(talker="")
+        elif cmd == "on_error":
+            self.st.set(state="error " + reason(m.get("error", "error de Zello")))
+
+    # --- transmitir: lo que la GUI manda por el socket ---
+    def transmit(self, conn):
+        hdr = base64.b64encode(struct.pack("<HBB", RATE, 1, FRAME_MS)).decode()
+        r = self.call({"command": "start_stream", "channel": self.channel, "type": "audio", "codec": "opus",
+                       "codec_header": hdr, "packet_duration": FRAME_MS})
+        if not r or not r.get("success"):
+            self.st.set(state="error " + reason((r or {}).get("error", "no se pudo hablar")))
+            return
+        sid = r["stream_id"]
+        enc = self.opus.encoder()
+        self.tx_on = True
+        self.st.set(tx=True, talker="")
+        pending = b""
+        t0 = time.time()
+        try:
+            conn.settimeout(1.0)
+            while self.alive and time.time() - t0 < TX_MAX_S:
+                try:
+                    c = conn.recv(4096)
+                except socket.timeout:
+                    break                         # la GUI dejó de mandar: se corta
+                if not c:
+                    break
+                pending += c
+                while len(pending) >= FRAME * 2:
+                    pkt = self.opus.encode(enc, pending[:FRAME * 2])
+                    pending = pending[FRAME * 2:]
+                    if pkt:
+                        self.ws.send(struct.pack(">BII", 1, sid, 0) + pkt, 0x2)
+        finally:
+            self.opus.lib.opus_encoder_destroy(enc)
+            self.tx_on = False
+            self.st.set(tx=False)
+            try:
+                self.ws.send_json({"command": "stop_stream", "stream_id": sid, "channel": self.channel, "seq": 0})
+            except OSError:
+                pass
+
+    def close(self):
+        self.alive = False
+        if self.ws:
+            self.ws.close()
+
+
+def tx_server(get_session):
+    try:
+        os.unlink(TX_SOCK)
+    except OSError:
+        pass
+    srv = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    srv.bind(TX_SOCK)
+    os.chmod(TX_SOCK, 0o600)
+    srv.listen(1)
+    while True:
+        conn, _ = srv.accept()
+        s = get_session()
+        try:
+            if s and s.st.state == "online" and not s.tx_on:
+                s.transmit(conn)
+        except (OSError, Fail) as e:
+            if s:
+                s.st.set(state="error " + reason(e))
+        finally:
+            conn.close()
+
+
+def cmd_run(args):
+    conf = read_conf()
+    channel = (args[0] if args else conf["CHANNEL"]) or (conf["CHANNELS"].split("|")[0] if conf["CHANNELS"] else "")
+    st = Status()
+    if not channel:
+        st.set(state="error elija un canal en la web de la radio (página Zello)")
+        return 1
+    opus = Opus()
+    out = sys.stdout.buffer
+    cur = {"s": None}
+    threading.Thread(target=tx_server, args=(lambda: cur["s"],), daemon=True).start()
+    wait = 2
+    refresh = None
+    while True:
+        s = Session(conf, channel, out, st, opus)
+        s.refresh = refresh
+        cur["s"] = s
+        try:
+            s.connect()
+            wait = 2
+            while s.alive and not s.ws.closed:
+                time.sleep(0.5)
+            if not s.alive:
+                return 0                      # la GUI cerró la salida
+        except (OSError, Fail, ConnectionError) as e:
+            st.set(state="error " + reason(e))
+            if isinstance(e, Fail) and "incorrectos" in str(e):
+                return 1
+        refresh = s.refresh
+        s.close()
+        time.sleep(wait)
+        wait = min(wait * 2, 60)
+
+
+def cmd_test(args):
+    conf = read_conf()
+    channel = (args[0] if args else conf["CHANNEL"]) or (conf["CHANNELS"].split("|")[0] if conf["CHANNELS"] else "")
+    if not channel:
+        print("error falta el canal")
+        return 1
+    st = Status()
+    try:
+        s = Session(conf, channel, open(os.devnull, "wb"), st, None)
+        s.connect()
+        time.sleep(2)
+        s.close()
+        if st.state.startswith("error"):
+            print(st.state)
+            return 1
+        print("ok %s%s" % (channel, (" · %s en línea" % st.users) if st.users else ""))
+        return 0
+    except (OSError, Fail, ConnectionError) as e:
+        print("error " + reason(e))
+        return 1
+
+
+def main(argv):
+    cmd = argv[1] if len(argv) > 1 else ""
+    try:
+        if cmd == "run":
+            return cmd_run(argv[2:])
+        if cmd == "test":
+            return cmd_test(argv[2:])
+        if cmd == "token":
+            print(make_token(read_conf()["ISSUER"]))
+            return 0
+    except Fail as e:
+        print("error " + str(e))
+        try:
+            Status().set(state="error " + str(e))
+        except Exception:
+            pass
+        return 1
+    print("uso: x6100-zello run [canal] | test [canal] | token", file=sys.stderr)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

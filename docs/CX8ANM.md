@@ -200,6 +200,25 @@ Vistas previas aproximadas: `docs/screenshots/themes_alta_gama/pro.png` y `estil
 - Las favoritas quedan en `/mnt/iradio/favorites.tsv` (nombre, dirección, formato, kbps, país; una por
   línea, separadas por tabulador).
 
+## Zello
+
+*APP → Zello* (página 4 de APP). Los canales de Zello en la radio: se escucha por el parlante o por los
+auriculares Bluetooth, y se habla con el **PTT del costado** de la radio (mientras se mantiene) o con el
+botón **Hablar**, por el **micrófono de mano sin apretar su PTT**. Con la app abierta, el PTT del costado
+no sale al aire. Si se aprieta el PTT del micrófono de mano, la radio transmite por RF como siempre y
+Zello deja de hablar.
+
+Se configura en la web de la radio, página **Zello**:
+
+1. Usuario y clave de Zello (la misma cuenta de la app del celular).
+2. Llaves de desarrollador, gratis: entrar a [developers.zello.com](https://developers.zello.com/) con esa cuenta,
+   completar el perfil, *Keys → Add Key*, y pegar el **Issuer** y la **Private Key** completa.
+3. Los canales, uno por línea, escritos igual que en Zello. **Probar conexión** avisa si algo falla.
+
+La radio firma su permiso de conexión con esa llave, así que necesita la hora bien puesta (con internet se
+pone sola). En la radio: elegir el canal con la perilla y apretar la MFK (o *Conectar*); *Recargar canales*
+después de cambiarlos en la web.
+
 ## Estación meteorológica y alertas de INUMET
 
 **APP → (página 3) → Meteo.** Necesita WiFi. Se actualiza al abrir y cada 10 minutos (o con **Actualizar**).
