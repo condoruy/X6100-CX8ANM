@@ -32,7 +32,7 @@
 
 params_t params = {
     .brightness_normal      = 5,
-    .brightness_idle        = 4,
+    .brightness_idle        = 5,    /* CX8ANM: como el normal, la pantalla no se atenúa sola */
     .brightness_timeout     = 30,
     .brightness_buttons     = BUTTONS_TEMPORARILY,
 

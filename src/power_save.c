@@ -17,6 +17,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #define POWER_SAVE_DIM_S    15
 #define CPU_MAX             4
@@ -34,6 +35,20 @@ static bool write_governor(int cpu, const char *gov) {
     bool ok = fputs(gov, f) >= 0;
     ok = (fclose(f) == 0) && ok;
     return ok;
+}
+
+/* CX8ANM: el ahorro de energía viene apagado. Una sola vez, al actualizar, se apaga el Modo ahorro
+ * y la pantalla deja de atenuarse (brillo en reposo = brillo normal); después cada uno lo cambia a gusto. */
+#define ENERGY_RESET_MARK "/mnt/.cx8anm-energy-off"
+
+void power_save_migrate(void) {
+    if (access(ENERGY_RESET_MARK, F_OK) == 0) return;
+    params_bool_set(&params.power_save, false);
+    params_lock();
+    params.brightness_idle = params.brightness_normal;
+    params_unlock(&params.dirty.brightness_idle);
+    FILE *f = fopen(ENERGY_RESET_MARK, "w");
+    if (f) fclose(f);
 }
 
 void power_save_apply(void) {

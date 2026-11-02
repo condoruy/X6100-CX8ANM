@@ -1475,3 +1475,14 @@ No channels: add them on the radio's web page (Zello page)	Aucun canal : ajoutez
 Disconnected: choose a channel and press the MFK or Connect	Déconnecté : choisissez un canal et appuyez sur le MFK ou Connecter
 Talking: speak into the hand mic	En émission : parlez dans le micro à main
 Side PTT or Talk: speak into the hand mic (without its PTT)	PTT latéral ou Parler : parlez dans le micro à main (sans son PTT)
+# Colores de la cascada
+Colors	Couleurs
+Classic	Classique
+Gauss	Gauss
+Grey	Gris
+Fire	Feu
+Ice	Glace
+Rainbow	Arc-en-ciel
+Green	Vert
+Purple	Violet
+Amber	Ambre

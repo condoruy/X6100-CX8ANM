@@ -134,8 +134,8 @@ class SettingsManager {
     Parameter<int32_t> p_walkie_mic{"walkie_mic", x6100_mic_builtin, 0, 2,
         StorageType::GLOBAL, pending_writes_, &global_params_};
     // S-meter drawn as a needle on a dial instead of the bars
-    // Waterfall colours: 0 the theme's, then classic, gauss, grey, fire, ice, rainbow (theme.c)
-    Parameter<int32_t> p_wf_palette{"wf_palette", 0, 0, 6,
+    // Waterfall colours: 0 the theme's, then classic, gauss, grey, fire, ice, rainbow, green, purple, amber (waterfall.c)
+    Parameter<int32_t> p_wf_palette{"wf_palette", 0, 0, 9,
         StorageType::GLOBAL, pending_writes_, &global_params_};
     // Spectrum trace and fill: 0xRRGGBB, -1 the theme's (the fill: as the trace)
     Parameter<int32_t> p_spectrum_line_color{"spectrum_line_color", -1, -1, 0xffffff,

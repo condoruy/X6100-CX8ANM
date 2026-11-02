@@ -110,6 +110,9 @@ static void on_palette_change(Subject *subj, void *user_data) {
     static const uint32_t fire[]    = {0x000000, 0x400000, 0xa00000, 0xff4000, 0xffa000, 0xffff60, 0xffffff};
     static const uint32_t ice[]     = {0x000000, 0x001040, 0x0040a0, 0x0090ff, 0x40e0ff, 0xffffff};
     static const uint32_t rainbow[] = {0x000000, 0x0000a0, 0x0080ff, 0x00e0a0, 0x80ff00, 0xffe000, 0xff4000, 0xff0000};
+    static const uint32_t green[]   = {0x000000, 0x002a00, 0x007a10, 0x20c030, 0x90ff80, 0xffffff};   /* fósforo */
+    static const uint32_t purple[]  = {0x000000, 0x200040, 0x6010a0, 0xc040c0, 0xff80a0, 0xffffe0};
+    static const uint32_t amber[]   = {0x000000, 0x301800, 0x804000, 0xd08000, 0xffc040, 0xffffd0};
     static uint32_t       preset[256];
 
     switch (param_i_get(cfg_wf_palette)) {
@@ -119,6 +122,9 @@ static void on_palette_change(Subject *subj, void *user_data) {
         case 4: theme_ramp_palette(fire, 7, 0, preset); break;
         case 5: theme_ramp_palette(ice, 6, 0, preset); break;
         case 6: theme_ramp_palette(rainbow, 8, 0, preset); break;
+        case 7: theme_ramp_palette(green, 6, 0, preset); break;
+        case 8: theme_ramp_palette(purple, 6, 0, preset); break;
+        case 9: theme_ramp_palette(amber, 6, 0, preset); break;
         default: wf_palette = theme_waterfall(); return;
     }
     wf_palette = preset;

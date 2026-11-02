@@ -223,6 +223,7 @@ int main(void) {
     wifi_power_setup();
     btaudio_init();
     bt_dev_init();
+    power_save_migrate();
     power_save_apply();
     backlight_init();
     cat_init();

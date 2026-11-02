@@ -1724,6 +1724,31 @@ static void wf_mode_update_cb(lv_event_t *e) {
     cfg_sm.p_wf_mode.set(lv_dropdown_get_selected(lv_event_get_target(e)));
 }
 
+/* Waterfall colours: the theme's or a preset (waterfall.c), applied at once */
+static void wf_palette_update_cb(lv_event_t *e) {
+    cfg_sm.p_wf_palette.set(lv_dropdown_get_selected(lv_event_get_target(e)));
+}
+
+static uint8_t make_waterfall_palette(uint8_t row) {
+    lv_obj_t *obj;
+
+    obj = lv_label_create(grid);
+    lv_label_set_text(obj, "Colors");
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_CENTER, row, 1);
+
+    obj = lv_dropdown_create(grid);
+    dialog_item(&dialog, obj);
+    styles_dropdown_list(lv_dropdown_get_list(obj));
+    lv_dropdown_set_options(obj, " Theme \n Classic \n Gauss \n Grey \n Fire \n Ice \n Rainbow \n Green \n Purple \n Amber ");
+    lv_dropdown_set_symbol(obj, NULL);
+    lv_dropdown_set_selected(obj, cfg_sm.p_wf_palette.get());
+    lv_obj_add_event_cb(obj, wf_palette_update_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_set_size(obj, SMALL_3, ROW_H);
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 1, 3, LV_GRID_ALIGN_CENTER, row, 1);
+
+    return row + 1;
+}
+
 /* Centered: the VFO stays in the middle. Fixed: the span stays put, the VFO line moves */
 static uint8_t make_waterfall_mode(uint8_t row) {
     lv_obj_t *obj;
@@ -4587,6 +4612,7 @@ static void make_display_page() {
 
     row = card_begin("WATERFALL");
     row = make_waterfall_mode(row);
+    row = make_waterfall_palette(row);
     row = make_auto_offset(row);
     row = make_spectrum_min_max(row);
     row = make_waterfall_line_zoom(row);

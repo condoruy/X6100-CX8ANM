@@ -24,6 +24,23 @@ collect() {
 			bluetoothctl info "$mac" 2>&1
 			echo
 		done
+		echo "== Bluetooth headphone audio (PulseAudio)"
+		export PULSE_SERVER="${PULSE_SERVER:-unix:/var/run/pulse/native}"
+		pactl info 2>&1 | grep -E "Server (Name|Version)|Default (Sink|Source)|Connection failure"
+		echo "-- sinks"; pactl list short sinks 2>&1
+		echo "-- sources"; pactl list short sources 2>&1
+		echo "-- modules (bluetooth, loopback)"; pactl list short modules 2>&1 | grep -E "bluetooth|bluez|loopback"
+		echo "-- cards"
+		pactl list cards 2>&1 | grep -E "^Card|Name:|Driver:|Active Profile:|^\s+(a2dp|headset|handsfree|off)[a-z_]*:"
+		echo "-- btaudio"
+		cat /mnt/btaudio.conf 2>&1
+		echo "hp state: $(cat /tmp/btaudio-hp 2>/dev/null || echo none)"
+		pid=$(cat /tmp/btaudio-monitor.pid 2>/dev/null)
+		if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then echo "monitor: running ($pid)"; else echo "monitor: NOT running"; fi
+		/usr/sbin/btaudio-ctl status 2>&1
+		ps 2>/dev/null | grep -E "pulseaudio|bluetoothd|btaudio" | grep -v grep
+		grep -i -E "pulse|bluez|a2dp|bluetooth" /var/log/messages 2>/dev/null | tail -n 40
+		echo
 		echo "== Last pairing"
 		sed 's/\x1b\[[0-9;]*[a-zA-Z]//g; s/\r//g' /tmp/bt_pair.log 2>/dev/null | grep -v "^\s*$" | tail -n 80
 		echo
