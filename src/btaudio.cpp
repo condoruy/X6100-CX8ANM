@@ -15,6 +15,8 @@
 extern "C" {
 #include "scheduler.h"
 #include "radio.h"
+#include "walkie.h"
+#include <aether_radio/x6100_control/control.h>
 #include "lvgl/lvgl.h"
 #include <stdio.h>
 #include <string.h>
@@ -115,8 +117,28 @@ static void monitor_timer_cb(lv_timer_t *t) {
     btaudio_run("start", NULL, NULL);
 }
 
+/* With the headphones on, TX uses the radio's built-in mic (the headphones' own mic, HFP, is not
+ * usable on this radio); the Walkie screen keeps its own choice */
+static bool mic_forced = false;
+
+static void mic_follow(bool hp) {
+    if (walkie_on()) {
+        mic_forced = false;
+        return;
+    }
+    if (hp && radio_get_mic() != x6100_mic_builtin) {
+        radio_set_mic_override(x6100_mic_builtin);
+        mic_forced = true;
+    } else if (!hp && mic_forced) {
+        radio_set_mic_override(-1);
+        mic_forced = false;
+    }
+}
+
 static void mute_timer_cb(lv_timer_t *t) {
     bool hp = access(HP_STATE, F_OK) == 0;
+
+    mic_follow(hp);
 
     if (hp && saved_vol < 0) {
         /* connected: VOL becomes the headphone volume, speaker AF is forced to 0 by radio.c */
