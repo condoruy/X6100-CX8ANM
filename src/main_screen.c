@@ -1594,9 +1594,20 @@ static void freq_shift(int16_t diff, uint16_t dt) {
     /* CX8ANM: en la CB, con el modo canales, la perilla salta de canal en canal */
     if (params.cb_knob.x && cb_in_range(old)) {
         char name[24];
+        int ob = -1, nb = -1;
         freq = cb_step(old, diff > 0 ? 1 : -1);
         if (freq != old) {
+            cb_channel_of(old, &ob, NULL);
+            cb_channel_of(freq, &nb, NULL);
             cparam_i_set(cfg_fg_freq, freq);
+            if (nb != ob && nb >= 0) {
+                params_uint8_set(&params.cb_band, nb);
+                /* la UK es solo en FM: al entrar pasa a FM, como al elegirla en la app de CB */
+                if (nb == CB_BAND_UK && radio_get_state() == RADIO_RX) {
+                    params_uint8_set(&params.cb_mode, 1);
+                    cparam_i_set(cfg_cur_mode, x6100_mode_nfm);
+                }
+            }
             if (cb_name(freq, name, sizeof(name))) channel_overlay_show(name);
         }
         return;

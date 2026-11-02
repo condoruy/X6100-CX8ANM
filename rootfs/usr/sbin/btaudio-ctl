@@ -10,6 +10,7 @@
 #   btaudio-ctl volume N                 headphone volume, 0..100 %
 #   btaudio-ctl mute on|off              GUI: AF volume to 0 while headphones are connected
 #   btaudio-ctl boot                     from btcat-setup: monitor + autoconnect
+#   btaudio-ctl start                    GUI: monitor running, routing up to date
 #   btaudio-ctl monitor                  keeps the cards on A2DP and the loopback up
 #
 # Only A2DP is used: HFP/HSP (SCO) gives no audio on this radio and drops
@@ -137,12 +138,19 @@ monitor() {
 	done
 }
 
-boot() {
+# The monitor is what sends the RX audio to the headphones and silences the speaker: without it the
+# headphones connect (they beep) but stay silent. Started at boot by btcat-setup, and also by the GUI
+# ("start", every few seconds): it must run even with the Bluetooth CAT bridge turned off.
+ensure_monitor() {
 	pid=$(cat $PIDFILE 2>/dev/null)
 	if [ -z "$pid" ] || ! kill -0 "$pid" 2>/dev/null; then
 		monitor </dev/null >/dev/null 2>&1 &
 		echo $! > $PIDFILE
 	fi
+}
+
+boot() {
+	ensure_monitor
 	for _ in 1 2 3; do
 		for m in $BTAUDIO_AUTOCONNECT; do
 			bluetoothctl info "$m" 2>/dev/null | grep -q "Connected: yes" || bluetoothctl connect "$m" >/dev/null 2>&1
@@ -152,7 +160,8 @@ boot() {
 }
 
 case "$1" in
-	status)      status;;
+	status)      ensure_monitor; status;;
+	start)       ensure_monitor;;
 	save)        save_pairings;;
 	autoconnect) autoconnect "$2" "$3";;
 	rx)          set_kv BTAUDIO_RX "$(yn "$2")"; apply_rx;;
@@ -160,5 +169,5 @@ case "$1" in
 	mute)        set_kv BTAUDIO_MUTE "$(yn "$2")";;
 	boot)        boot;;
 	monitor)     monitor;;
-	*) echo "Usage: $0 {status|save|autoconnect MAC on|off|rx on|off|volume N|mute on|off|boot|monitor}"; exit 1;;
+	*) echo "Usage: $0 {status|start|save|autoconnect MAC on|off|rx on|off|volume N|mute on|off|boot|monitor}"; exit 1;;
 esac

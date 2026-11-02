@@ -110,6 +110,11 @@ static void vol_changed_cb(Subject *subj, void *user) {
     }
 }
 
+/* Keeps btaudio-ctl's monitor running (it routes the RX audio to the headphones) */
+static void monitor_timer_cb(lv_timer_t *t) {
+    btaudio_run("start", NULL, NULL);
+}
+
 static void mute_timer_cb(lv_timer_t *t) {
     bool hp = access(HP_STATE, F_OK) == 0;
 
@@ -150,6 +155,8 @@ void btaudio_init(void) {
     hp_on = saved_vol >= 0;
     subject_subscribe((Subject *)&cfg_sm.p_volume, vol_changed_cb, NULL);
     lv_timer_create(mute_timer_cb, 1000, NULL);
+    lv_timer_t *mt = lv_timer_create(monitor_timer_cb, 20000, NULL);
+    lv_timer_ready(mt);
 }
 
 bool btaudio_mute_get(void) {

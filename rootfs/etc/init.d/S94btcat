@@ -10,7 +10,11 @@ BTCAT_ENABLE=yes
 [ -r /mnt/btcat.conf ] && . /mnt/btcat.conf
 
 start() {
-	[ "$BTCAT_ENABLE" = "yes" ] || return 0
+	if [ "$BTCAT_ENABLE" != "yes" ]; then
+		# Without the CAT bridge the headphones still need their audio monitor and autoconnect
+		( sleep 8; /usr/sbin/btaudio-ctl boot >/dev/null 2>&1 & )
+		return 0
+	fi
 	printf 'Starting btcat: '
 	modprobe rfcomm 2>/dev/null
 	start-stop-daemon -S -b -q -m -p "$PIDFILE" -x /bin/sh -- -c "exec /usr/sbin/btcat 2>>/tmp/btcat.log"

@@ -83,9 +83,10 @@ int32_t cb_step(int32_t hz, int steps) {
             }
         return best ? best : hz;
     }
-    /* dentro de la misma banda: de A40 a B1, ... ; la UK sola (no se mezcla con las demás) */
-    int first = band == CB_BAND_UK ? CB_BAND_UK * CB_CHANNELS : 0;
-    int last  = band == CB_BAND_UK ? CB_BANDS * CB_CHANNELS - 1 : CB_BAND_UK * CB_CHANNELS - 1;
+    /* de A40 a B1, ... y después de la última de la E sigue la UK (UK1..UK40), como el selector de
+     * bandas de un equipo de CB; al bajar desde UK1 vuelve a la E */
+    int first = 0;
+    int last  = CB_BANDS * CB_CHANNELS - 1;
     int idx   = band * CB_CHANNELS + (ch - 1);
     int dir   = steps > 0 ? 1 : -1;
 
