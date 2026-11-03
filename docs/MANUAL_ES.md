@@ -179,10 +179,24 @@ con el notch (DNF) de la banda base, que se pone solo cada vez que hace falta.
 Desde ahí, cada vez que ese birdie cae dentro del filtro (en cualquier modo, también AM y FM), el notch se
 pone encima solo. Al salir del filtro, el DNF vuelve a como lo tenías.
 
+**Buscar en toda la banda (automático):**
+
+1. **Desconectá la antena** (así solo quedan los silbidos de la propia radio) y poné USB, LSB o CW dentro de
+   la banda que querés revisar.
+2. **Ajustes → Audio → BIRDIES → Toda la banda → Buscar.**
+3. La radio recorre la banda de a un filtro por vez y guarda cada tono fijo que encuentra (con la nota
+   "auto"). Al lado se ve el avance. Una banda de 300 kHz tarda unos 4 minutos.
+4. Al terminar vuelve a tu frecuencia y avisa cuántos encontró. Tocar **Buscar** otra vez, girar el dial,
+   cambiar de modo o apretar el PTT la detiene.
+
+Solo guarda tonos que están quietos todo el tiempo: la voz, los modos digitales y las portadoras que se
+corren no se guardan.
+
 | Botón | Qué hace |
 |---|---|
 | **Notch automático** | prende o apaga todo sin borrar la lista |
 | **Marcar** | mide el tono que se escucha y lo agrega (si ya estaba, guarda la medida nueva) |
+| **Buscar** | recorre toda la banda y guarda los birdies que encuentra |
 | **Quitar** | borra el birdie que está dentro del filtro |
 | **Borrar** | vacía la lista |
 

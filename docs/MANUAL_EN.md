@@ -180,10 +180,23 @@ the baseband notch (DNF), placed automatically whenever needed.
 From then on, whenever that birdie falls inside the filter (in any mode, AM and FM included), the notch is
 placed on it by itself. Once it is out of the filter, the DNF goes back to how you had it.
 
+**Searching the whole band (automatic):**
+
+1. **Disconnect the antenna** (so only the radio's own whistles remain) and set USB, LSB or CW inside the
+   band you want to check.
+2. **Settings → Audio → BIRDIES → Whole band → Search.**
+3. The radio goes through the band one filter width at a time and saves every steady tone it finds (with
+   the note "auto"). Progress is shown alongside. A 300 kHz band takes about 4 minutes.
+4. When done it returns to your frequency and says how many it found. Tapping **Search** again, turning the
+   dial, changing mode or pressing PTT stops it.
+
+It only saves tones that stay still the whole time: voice, digital modes and drifting carriers are not saved.
+
 | Button | What it does |
 |---|---|
 | **Automatic notch** | turns everything on or off without erasing the list |
 | **Mark** | measures the tone heard and adds it (if it was already there, keeps the new measurement) |
+| **Search** | goes through the whole band and saves the birdies it finds |
 | **Remove** | deletes the birdie that is inside the filter |
 | **Clear** | empties the list |
 
