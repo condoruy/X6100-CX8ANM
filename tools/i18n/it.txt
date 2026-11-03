@@ -1509,3 +1509,12 @@ Birdie marked at %.3f kHz	Birdie segnato a %.3f kHz
 Birdies: none in the filter here	Birdies: nessuno nel filtro
 Birdie at %.3f kHz removed	Birdie a %.3f kHz rimosso
 Birdie list cleared	Lista dei birdie cancellata
+Whole band	Tutta la banda
+antenna off: only the radio's own whistles	senza antenna: solo i fischi della radio
+searching %d%% - %d found	ricerca %d%% - %d trovati
+Birdie search done: %d found, %d new	Ricerca finita: %d trovati, %d nuovi
+Birdie search stopped	Ricerca dei birdie fermata
+Birdie search stopped: manual tuning	Ricerca fermata: sintonia manuale
+Birdies: search in USB, LSB or CW	Birdies: cerca in USB, LSB o CW
+Birdies: tune inside a band first	Birdies: prima sintonizza dentro una banda
+Searching the band for birdies (antenna off is best)...	Ricerca dei birdie nella banda (meglio senza antenna)...

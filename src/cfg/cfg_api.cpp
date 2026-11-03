@@ -320,3 +320,14 @@ void cfg_api_init(void (*on_db_error)(const char *)) {
     // Wire the ATU cache to the parameter sources and do the initial load.
     atu_cache_wire_subscriptions();
 }
+
+/* CX8ANM (birdies.c): límites de la banda definida que contiene freq */
+extern "C" bool cfg_band_limits(int32_t freq, int32_t *start, int32_t *stop) {
+    if (freq <= 0) return false;
+    BandInfoLoadResult r = BandsTable::get_by_freq(static_cast<uint32_t>(freq));
+    if (r.rc != SUCCESS || r.value.id < 0) return false;
+    if ((uint32_t)freq < r.value.start_freq || (uint32_t)freq > r.value.stop_freq) return false;
+    *start = (int32_t)r.value.start_freq;
+    *stop  = (int32_t)r.value.stop_freq;
+    return true;
+}

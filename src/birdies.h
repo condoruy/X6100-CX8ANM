@@ -26,6 +26,12 @@ void birdies_refresh(void);
 void birdies_mark(void);            /* mide ~1,5 s de audio y agrega el tono más fuerte del filtro */
 void birdies_remove_here(void);     /* quita el birdie que está dentro del filtro */
 void birdies_clear(void);
+
+/* Busca en toda la banda (de a un filtro por vez); otra llamada la detiene */
+void birdies_scan(void);
+bool birdies_scanning(void);
+int  birdies_scan_progress(void);   /* 0..100 */
+int  birdies_scan_found(void);
 int  birdies_count(void);
 bool birdies_active(void);          /* el notch está puesto sobre un birdie ahora */
 
