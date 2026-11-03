@@ -206,11 +206,15 @@ uint32_t theme_hex(theme_color_t c);
 #define TC(role) lv_color_hex(theme_hex(TC_##role))
 
 /* Loads the theme by name: a built-in one or /mnt/themes/<name>.json.
- * Unknown names fall back to IU1WXY. Then styles_init() (styles_load() does both). */
+ * Unknown names fall back to THEME_DEFAULT. Then styles_init() (styles_load() does both). */
+#define THEME_DEFAULT "Pro Azul"
 void theme_init(const char *name);
 
-/* Names for the Settings list: the built-in themes, then the files */
+/* Names for the Settings list: the theme files in /mnt/themes */
 int theme_list(char names[][32], int max);
+
+/* true for the internal base themes (not offered any more) */
+bool theme_is_builtin(const char *name);
 
 const uint32_t *theme_waterfall(void);
 

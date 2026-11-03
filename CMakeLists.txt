@@ -63,7 +63,6 @@ else()
         # Callsign -> country for the FT8/FT4 table (AD1C, country-files.com)
         install(FILES third-party/cty/cty.dat DESTINATION share/x6100)
         # Copied to /mnt/themes at start when missing (main.c)
-        install(DIRECTORY themes/RS DESTINATION share/x6100/themes)
         # Temas estilo equipo de alta gama (CX8ANM): themes/alta_gama.py los genera
         install(DIRECTORY themes/alta-gama/ DESTINATION share/x6100/themes)
 endif()

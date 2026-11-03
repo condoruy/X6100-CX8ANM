@@ -157,6 +157,10 @@ Temas disponibles en **Ajustes → Display → INTERFACE → Theme**, con la est
 equipos de base (colores, teclas, recuadro del modo, S-meter y paleta de la cascada), cada uno con su
 variante estándar y su variante **Deck** (disposición de alta densidad con frecuencia gigante, escalas S/SWR/ALC al costado y teclas planas):
 
+Son **los únicos temas que se ofrecen**: los de fábrica heredados de IU1WXY (CX8ANM/IU1WXY, Outdoor,
+Classic, Outdoor-Negative, VISION, Black Metal, Total Black y RS) ya no aparecen en la lista. El tema de
+fábrica es **Pro Azul**, y quien tenía uno de los heredados pasa a Pro Azul al actualizar.
+
 | Tema | Estilo |
 |---|---|
 | **Pro Azul** / **Pro Azul Deck** | negro con teclas grises en degradé, azul para lo activo, modo en recuadro, cascada azul → amarillo → rojo |

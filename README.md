@@ -2,13 +2,13 @@
 
 <p align="center"><i>Adaptación de Daniel Niño CX8ANM (Uruguay)</i></p>
 
-> **Esta es una versión derivada, no un firmware original.**
-> Está basada en el **[firmware X6100 de Giovanni Ricciardi IU1WXY](https://github.com/IU1WXY/X6100-IU1WXY)**,
-> que nació como derivado del **firmware 1KO125 de Hany El Imam (TheMurusTeam)**, que a su vez parte de
-> **[x6100_gui de Oleg Belousov R1CBU y Georgy Dyuldin R2RFE](https://github.com/gdyuldin/x6100_gui)**
+> **Edición independiente del firmware para el Xiegu X6100.**
+> Hasta la versión **0.127** se basó en el **[firmware X6100 de Giovanni Ricciardi IU1WXY](https://github.com/IU1WXY/X6100-IU1WXY)**,
+> publicado bajo licencia **LGPL-2.1**, que nació como derivado del **firmware 1KO125 de Hany El Imam (TheMurusTeam)**,
+> que a su vez parte de **[x6100_gui de Oleg Belousov R1CBU y Georgy Dyuldin R2RFE](https://github.com/gdyuldin/x6100_gui)**
 > y de **[AetherX6100Buildroot](https://github.com/gdyuldin/AetherX6100Buildroot)**.
-> Todo el mérito del diseño de base es de ellos. Esta edición agrega funciones, el idioma español
-> y ajustes para la Región 2 / Uruguay. **No es una versión oficial de IU1WXY, 1KO125 ni R1CBU/R2RFE:**
+> Desde entonces se desarrolla de forma **independiente**: no incorpora código de IU1WXY posterior a la 0.127
+> y tiene sus propias pantallas y temas. **No es una versión oficial de IU1WXY, 1KO125 ni R1CBU/R2RFE:**
 > los problemas de esta edición se reportan aquí, no a ellos.
 
 ## De dónde viene
@@ -16,8 +16,8 @@
 ```
 x6100_gui (R1CBU / R2RFE)
   └─ 1KO125 (Hany El Imam, TheMurusTeam)      ← origen de SSTV, WEFAX, DSC, NAVTEX y SITOR-B
-       └─ firmware IU1WXY (Giovanni Ricciardi)
-            └─ edición CX8ANM (Daniel Niño)   ← este repositorio
+       └─ firmware IU1WXY hasta 0.127 (LGPL)
+            └─ edición CX8ANM (Daniel Niño)   ← este repositorio, independiente desde entonces
 ```
 
 Las aplicaciones **SSTV, WEFAX, DSC, NAVTEX y SITOR-B** fueron concebidas, desarrolladas y
@@ -26,15 +26,17 @@ las hereda a través del firmware de IU1WXY, y el crédito de su creación corre
 
 <p align="center"><img src="docs/screenshots/main_screen.png" alt="Pantalla principal" width="720"></p>
 
-*English summary: this is a community edition of the IU1WXY X6100 firmware, which was forked from
-Hany El Imam's 1KO125 firmware (itself based on the R1CBU/R2RFE x6100_gui). The SSTV, WEFAX, DSC,
-NAVTEX and SITOR-B apps were originally conceived and developed in 1KO125. This edition adds Spanish, German, French and Italian interfaces, a first-start assistant (language, callsign, IARU region, country), HF air band and extra apps. All credit
-for the base firmware goes to its original authors; please report issues with this edition here,
-not upstream.*
+*English summary: an independent X6100 firmware edition. Up to version 0.127 it was based on the
+IU1WXY X6100 firmware (LGPL-2.1), which was forked from Hany El Imam's 1KO125 firmware (itself based on
+the R1CBU/R2RFE x6100_gui); since then it is developed independently, with no IU1WXY code newer than
+0.127 and its own screens and themes. The SSTV, WEFAX, DSC, NAVTEX and SITOR-B apps were originally
+conceived and developed in 1KO125. This edition adds Spanish, German, French and Italian interfaces, a
+first-start assistant (language, callsign, IARU region, country), HF air band and extra apps. Please
+report issues with this edition here, not upstream.*
 
 ## Qué agrega esta edición
 
-Todo lo del firmware de IU1WXY (modos digitales en la radio, DX Cluster en la cascada, SOTA/POTA,
+Lo heredado del firmware de IU1WXY hasta la 0.127 (modos digitales en la radio, DX Cluster en la cascada, SOTA/POTA,
 control remoto, temas…, ver [su README](docs/README_IU1WXY.md)) y además:
 
 - **Interfaz en español, alemán, francés e italiano** (además del inglés).
@@ -101,8 +103,7 @@ La radio solo se conecta a servicios externos cuando usás la función correspon
 Todo lo demás (ajustes, logs, fotos) queda en la tarjeta SD.
 
 ## Créditos
-Gracias por la aclaración, Hany. Ya lo corregí: el repositorio, las notas de cada versión y la pantalla de información de la radio ahora indican que el firmware de IU1WXY nació como derivado de 1KO125, y que SSTV, WEFAX, DSC, NAVTEX y SITOR-B fueron concebidas y desarrolladas originalmente por vos en 1KO125. Si tenés un enlace oficial de 1KO125, lo agrego en los créditos. 73 de CX8ANM
-- **Giovanni Ricciardi IU1WXY**: el firmware en el que se basa directamente esta edición (reescritura de la
+- **Giovanni Ricciardi IU1WXY**: el firmware (hasta la 0.127, LGPL-2.1) en el que se basó esta edición (reescritura de la
   interfaz y sistema de temas, X6100 Link y control remoto, Field Ops, DX Cluster, WSPR, SSTV TX,
   RTTY, WeFax TX, Bluetooth, servidor wfview y mucho más). Ver [sus créditos completos](docs/README_IU1WXY.md#credits).
 - **Hany El Imam (1KO125 / TheMurusTeam)**: el firmware **1KO125**, del que nació el de IU1WXY,

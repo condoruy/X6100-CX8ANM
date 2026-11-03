@@ -30,6 +30,7 @@
 #include "mirror.h"
 #include <strings.h>
 #include "styles.h"
+#include "theme.h"
 #include "fonts/font_select.h"
 #include "radio.h"
 #include "dsp.h"
@@ -194,8 +195,9 @@ int main(void) {
     vol->state = VOL_STATE_EDIT;
 
     params_init();
-    if (strcasecmp(params.theme_name.x, "IU1WXY") == 0)
-        params_str_set(&params.theme_name, "CX8ANM");    /* el tema de fábrica cambió de nombre */
+    /* CX8ANM: los temas heredados ya no se ofrecen; quien tenía uno pasa a Pro Azul */
+    if (!params.theme_name.x[0] || theme_is_builtin(params.theme_name.x))
+        params_str_set(&params.theme_name, THEME_DEFAULT);
     if (!params.qth.x[0] && country_find(params.country.x))
         params_str_set(&params.qth, country_find(params.country.x)->loc);   /* sin GPS: la capital del país */
     sstv_resources_init();
@@ -205,6 +207,9 @@ int main(void) {
     mfk_init();
     vol_init();
     /* Bundled themes to the SD card once; one already there is never overwritten */
+    /* los temas heredados que se copiaron en versiones anteriores */
+    if (system("rm -rf /mnt/themes/RS '/mnt/themes/Holo.json' '/mnt/themes/Material 3.json'") != 0)
+        LV_LOG_WARN("Old themes not removed");
     if (system("mkdir -p /mnt/themes; for t in /usr/share/x6100/themes/*; do "
                "[ -e \"/mnt/themes/${t##*/}\" ] || cp -r \"$t\" /mnt/themes/; done") != 0)
         LV_LOG_WARN("Bundled themes not copied to /mnt/themes");

@@ -488,11 +488,10 @@ void theme_init(const char *name) {
     }
     cached = 0;
 
-    if (b >= 0) {
-        use_builtin(b);
-    } else if (!name || !*name || !load_file(name)) {
-        if (name && *name) fprintf(stderr, "Theme %s not found, using CX8ANM\n", name);
-        use_builtin(B_IU1WXY);
+    /* CX8ANM: los temas de fábrica heredados no se ofrecen; un nombre de esos abre el de la edición */
+    if (b >= 0 || !name || !*name || !load_file(name)) {
+        if (name && *name && b < 0) fprintf(stderr, "Theme %s not found, using " THEME_DEFAULT "\n", name);
+        if (!load_file(THEME_DEFAULT)) use_builtin(B_CLASSIC);
     }
     if (theme_shape.waterfall_n >= 2) make_palette();
 }
@@ -502,15 +501,17 @@ const uint32_t *theme_waterfall(void) {
     return theme_shape.waterfall_table == 1 ? wf_palette_legacy : wf_palette_gauss;
 }
 
-/* Legacy is kept but not offered: IU1WXY, Outdoor, Classic, the files */
+/* CX8ANM: solo se ofrecen los temas diseñados para esta edición (los archivos de /mnt/themes).
+ * Los de fábrica heredados quedan solo como base interna de esos archivos. */
+bool theme_is_builtin(const char *name) {
+    return builtin_index(name) >= 0;
+}
+
 int theme_list(char names[][32], int max) {
     int            n = 0;
     DIR           *d;
     struct dirent *e;
 
-    for (int i = 0; i < B_COUNT && n < max; i++) {
-        if (i != B_LEGACY) snprintf(names[n++], 32, "%s", builtin_names[i]);
-    }
     d = opendir(THEMES_DIR);
     while (d && (e = readdir(d)) && n < max) {
         size_t len = strlen(e->d_name);
