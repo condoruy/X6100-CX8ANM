@@ -81,6 +81,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     mirror.c
     auto_log.c
     power_save.c
+    birdies.c
 )
 
 # Idiomas: todo texto que llega a LVGL pasa por tr() (i18n_hook.h)

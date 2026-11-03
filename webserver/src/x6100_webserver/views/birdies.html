@@ -1,0 +1,59 @@
+% rebase('base.html', title='Birdies')
+<h2><svg class="i"><use href="#i-filter"/></svg>Birdies</h2>
+<p class="sub">Los <b>birdies</b> son silbidos fijos que genera la propia radio en algunas frecuencias. Cuando uno de esta
+lista cae dentro del filtro de recepción, la radio le pone encima el notch (DNF) sola, sin tocar el DNF que uses vos.
+La forma más fácil de cargarlos es en la radio: sintonizá el silbido en USB, LSB o CW sin estaciones cerca y tocá
+<b>Ajustes &rarr; Audio &rarr; BIRDIES &rarr; Marcar</b>. Acá podés revisarlos, anotarlos o escribirlos a mano.</p>
+
+<section class="dp-card">
+<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-list"/></svg></span><div><h3>Lista</h3><p id="b-count"></p></div></div>
+<div class="dp-body">
+<table id="birdies" style="width: 100%">
+<thead><tr><th style="width: 11em">Frecuencia (kHz)</th><th>Nota</th><th style="width: 3em"></th></tr></thead>
+<tbody id="b-rows"></tbody>
+</table>
+<div class="actions"><button id="b-add">Agregar</button> <button id="b-save" class="primary">Guardar</button> <span class="status" id="b-status"></span></div>
+<p class="sub" style="margin-bottom: 0">Con tres decimales (14250.120 = 14 250 120 Hz). El notch es angosto (30 Hz): si un birdie
+no desaparece del todo, volvé a marcarlo en la radio y queda la medida nueva.</p>
+</div>
+</section>
+
+<script>
+function bStatus(text, error) {
+  const el = $("#b-status");
+  el.toggleClass("error", !!error);
+  el.html('<span class="dot"></span>').append(document.createTextNode(text));
+}
+function bRow(b) {
+  const tr = $("<tr>");
+  tr.append($("<td>").append($('<input class="b-khz" inputmode="decimal" style="width: 10em">').val(b.khz !== "" ? Number(b.khz).toFixed(3) : "")));
+  tr.append($("<td>").append($('<input class="b-note" maxlength="38" style="width: 100%" placeholder="opcional">').val(b.note || "")));
+  tr.append($("<td>").append($('<button title="Quitar">&times;</button>').on("click", function() { tr.remove(); bCount(); })));
+  $("#b-rows").append(tr);
+}
+function bCount() {
+  const n = $("#b-rows tr").length;
+  $("#b-count").text(n ? n + (n === 1 ? " birdie" : " birdies") : "Vacía: marcalos desde la radio o agregalos acá");
+}
+function bRender(d) {
+  $("#b-rows").empty();
+  d.birdies.forEach(bRow);
+  bCount();
+}
+$("#b-add").on("click", function() { bRow({khz: "", note: ""}); bCount(); $("#b-rows tr:last .b-khz").focus(); });
+$("#b-save").on("click", function() {
+  const list = [];
+  let bad = false;
+  $("#b-rows tr").each(function() {
+    const k = $(this).find(".b-khz").val().trim().replace(",", ".");
+    if (!k) return;
+    if (isNaN(Number(k))) { bad = true; return; }
+    list.push({khz: Number(k), note: $(this).find(".b-note").val()});
+  });
+  if (bad) { bStatus("Hay una frecuencia que no es un número", true); return; }
+  $.ajax({url: "/api/birdies", type: "POST", data: JSON.stringify({birdies: list}), contentType: "application/json; charset=utf-8", dataType: "json",
+    success: function(r) { bRender(r); bStatus("Guardado. La radio lo toma en unos segundos"); },
+    error: function(xhr) { bStatus(xhr.responseJSON ? xhr.responseJSON.msg : "No se pudo guardar", true); }});
+});
+$.get("/api/birdies", {}, bRender);
+</script>

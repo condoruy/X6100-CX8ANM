@@ -31,6 +31,7 @@
 #include <strings.h>
 #include "styles.h"
 #include "theme.h"
+#include "birdies.h"
 #include "fonts/font_select.h"
 #include "radio.h"
 #include "dsp.h"
@@ -243,6 +244,7 @@ int main(void) {
     dialog_cluster_start_client();
     update_check_start();
     meteo_alerts_init();     /* alertas de INUMET con WiFi */
+    birdies_init();          /* notch automático sobre los birdies marcados */
 
     pthread_t thread;
     pthread_create(&thread, NULL, tick_thread, NULL);

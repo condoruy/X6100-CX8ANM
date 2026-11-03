@@ -10,6 +10,7 @@
  *      INCLUDES
  *********************/
 #include "radio.h"
+#include "birdies.h"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -463,6 +464,25 @@ void radio_set_rx_dsp_off(bool off) {
     x6100_control_nb_set(!off && param_i_get(cfg_nb));
     x6100_control_dnf_set(!off && param_i_get(cfg_dnf));
     x6100_control_dnf_update_set(!off && param_i_get(cfg_dnf_auto));
+    radio_unlock();
+    if (!off) birdies_refresh();
+}
+
+/* CX8ANM (birdies.c): el notch sobre un birdie sin tocar los ajustes de DNF del operador;
+ * off vuelve a lo que el operador tiene puesto */
+void radio_set_dnf_override(bool on, uint16_t center, uint16_t width) {
+    radio_lock();
+    if (on) {
+        x6100_control_dnf_update_set(false);
+        x6100_control_dnf_center_set(center);
+        x6100_control_dnf_width_set(width);
+        x6100_control_dnf_set(true);
+    } else {
+        x6100_control_dnf_center_set(param_i_get(cfg_dnf_center));
+        x6100_control_dnf_width_set(param_i_get(cfg_dnf_width));
+        x6100_control_dnf_update_set(param_i_get(cfg_dnf_auto));
+        x6100_control_dnf_set(param_i_get(cfg_dnf));
+    }
     radio_unlock();
 }
 

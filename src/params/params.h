@@ -207,7 +207,8 @@ typedef struct {
     params_str_t         theme_name;    /* built-in theme or /mnt/themes/<name>.json */
     params_uint8_t       font;
     params_bool_t        cluster_band_notify;   /* aviso de spots nuevos en la banda del VFO (dialog_cluster.c) */
-    params_bool_t        power_save;    /* Modo ahorro (power_save.c) */
+    params_bool_t        power_save;
+    params_bool_t        birdies;       /* notch automático sobre los birdies marcados (birdies.c) */    /* Modo ahorro (power_save.c) */
     params_bool_t        meteo_alerts;  /* alertas de INUMET en pantalla (meteo_alerts.c) */
     params_bool_t        cb_knob;       /* en la CB la perilla salta de canal en canal (cb.c) */
     params_uint8_t       cb_mode;       /* modo al ir a un canal CB: 0 AM, 1 FM, 2 USB, 3 LSB */

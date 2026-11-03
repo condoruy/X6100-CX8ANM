@@ -188,6 +188,26 @@ un `.json` a `/mnt/themes/` en la tarjeta. Las variantes Deck activan `"deck": t
 (frecuencia grande con S/SWR/ALC al lado) y tipografía compacta `rcond`.
 Vistas previas aproximadas: `docs/screenshots/themes_alta_gama/pro.png` y `estilos.png`.
 
+## Birdies (silbidos propios de la radio)
+
+Los *birdies* son portadoras fijas que genera la propia radio en algunas frecuencias. Esta edición los saca
+con el notch (DNF) de la banda base, puesto solo:
+
+1. Sintonizá el silbido en **USB, LSB o CW**, sin estaciones cerca.
+2. **Ajustes → Audio → BIRDIES → Marcar**: la radio escucha 1,5 s, mide el tono con menos de 1 Hz de error
+   y guarda la frecuencia exacta del birdie.
+3. Desde ahí, cada vez que ese birdie cae dentro del filtro de recepción (en cualquier modo, también AM y FM),
+   el notch se pone encima solo. Al salir del filtro vuelve tu DNF como lo tenías.
+
+- **Notch automático** apaga o prende todo sin borrar la lista.
+- **Quitar** borra el birdie que está dentro del filtro; **Borrar** vacía la lista.
+- Si tenés el DNF prendido a mano, manda el tuyo: el automático no lo pisa.
+- La lista está en la tarjeta (`/mnt/birdies.txt`, "kHz nota" por línea) y se puede revisar y editar en la
+  página web: **Operación → Birdies**.
+
+El notch de la banda base es uno solo: si dos birdies caen dentro del filtro a la vez, se quita el más
+cercano al centro.
+
 ## Radio por Internet
 
 **APP → (página 2) → Radio Internet.** Emisoras del directorio abierto radio-browser.info:

@@ -1617,6 +1617,70 @@ def delete_iradio(kind, i):
     return get_iradio(kind)
 
 
+# ---------- Birdies (src/birdies.c) ----------
+# /mnt/birdies.txt: "frecuencia en kHz [nota]" por línea. La radio lo vuelve a leer sola cuando cambia.
+
+def birdies_path():
+    return os.path.join(settings.FILEBROWSER_PATH or "/mnt", "birdies.txt")
+
+
+def read_birdies():
+    out = []
+    try:
+        with open(birdies_path(), encoding="utf-8", errors="replace") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split(None, 1)
+                try:
+                    khz = float(parts[0].replace(",", "."))
+                except ValueError:
+                    continue
+                out.append({"khz": round(khz, 3), "note": parts[1] if len(parts) > 1 else ""})
+    except OSError:
+        pass
+    return sorted(out, key=lambda b: b["khz"])
+
+
+@app.route('/birdies')
+def birdies_page():
+    return bottle.template('birdies')
+
+
+@app.get('/api/birdies')
+def get_birdies():
+    return {"birdies": read_birdies()}
+
+
+@app.post('/api/birdies')
+def set_birdies():
+    data = bottle.request.json if isinstance(bottle.request.json, dict) else {}
+    items = []
+    for b in data.get("birdies", [])[:64]:
+        try:
+            khz = float(str(b.get("khz", "")).replace(",", "."))
+        except (TypeError, ValueError, AttributeError):
+            continue
+        if not 1 <= khz <= 1000000:
+            continue
+        note = " ".join(str(b.get("note") or "").split())[:38]
+        items.append((round(khz, 3), note))
+    items.sort()
+    path = birdies_path()
+    try:
+        with open(path + ".tmp", "w", encoding="utf-8") as f:
+            f.write("# Birdies (CX8ANM): frecuencia en kHz y una nota opcional, uno por línea\n")
+            for khz, note in items:
+                f.write("%.3f%s\n" % (khz, " " + note if note else ""))
+        os.replace(path + ".tmp", path)
+        os.sync()
+    except OSError as e:
+        bottle.response.status = 500
+        return {"msg": "No se pudo guardar: %s" % e}
+    return {"birdies": read_birdies()}
+
+
 # ---------- Zello (x6100-zello, src/dialog_zello.c) ----------
 # /mnt/zello.conf: USER, PASS, ISSUER, CHANNEL, CHANNELS (separados por |); /mnt/zello.key: la Private Key (PEM).
 # La clave y la llave nunca se devuelven a la página: solo si están cargadas.

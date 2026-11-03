@@ -21,6 +21,7 @@
 
 #include "dialog_msg_voice.h"
 #include "dialog_zello.h"
+#include "birdies.h"
 
 extern "C" {
     #include "audio.h"
@@ -637,6 +638,10 @@ void dsp_put_audio_samples(size_t nsamples, int16_t *samples) {
     static uint8_t hilb_i;
 
     screen_rec_put_audio_samples(nsamples, samples);
+
+    if (birdies_capturing()) {
+        birdies_put_audio(nsamples, samples);
+    }
 
     if (dialog_zello_capturing()) {
         dialog_zello_put_mic(nsamples, samples);

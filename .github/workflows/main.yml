@@ -182,6 +182,13 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-brdl-
 
+    # Los scripts de la radio tienen que poder ejecutarse aunque git los haya guardado sin el permiso
+    # (btaudio-ctl sin +x dejaba los auriculares Bluetooth mudos: "btaudio-ctl: Permission denied")
+    - name: Scripts executable
+      run: |
+        chmod +x x6100_gui/rootfs/usr/sbin/* x6100_gui/rootfs/etc/init.d/S* 2>/dev/null || true
+        ls -l x6100_gui/rootfs/usr/sbin/btaudio-ctl
+
     # u-boot 2023.01 solo está en ftp.denx.de: si no está en la copia guardada se prueba por https/http
     # y, si el servidor sigue caído, se compila el mismo u-boot v2023.01 desde su espejo oficial en GitHub
     - name: Prefetch u-boot

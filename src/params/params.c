@@ -124,6 +124,7 @@ params_t params = {
     .auto_log              = { .x = true, .name="auto_log"},
     .clock_utc             = { .x = true, .name="clock_utc"},
     .power_save            = { .x = false, .name="power_save"},
+    .birdies               = { .x = true, .name="birdies"},
     .meteo_alerts          = { .x = true, .name="meteo_alerts"},
     .cb_knob               = { .x = true, .name="cb_knob"},
     .cb_mode               = { .x = 0, .name="cb_mode"},
@@ -317,6 +318,7 @@ static bool params_load() {
         if (params_load_bool(&params.auto_log, name, i)) continue;
         if (params_load_bool(&params.clock_utc, name, i)) continue;
         if (params_load_bool(&params.power_save, name, i)) continue;
+        if (params_load_bool(&params.birdies, name, i)) continue;
         if (params_load_bool(&params.meteo_alerts, name, i)) continue;
         if (params_load_bool(&params.cb_knob, name, i)) continue;
         if (params_load_uint8(&params.cb_mode, name, i)) continue;
@@ -458,6 +460,7 @@ static void params_save() {
     params_save_bool(&params.auto_log);
     params_save_bool(&params.clock_utc);
     params_save_bool(&params.power_save);
+    params_save_bool(&params.birdies);
     params_save_bool(&params.meteo_alerts);
     params_save_bool(&params.cb_knob);
     params_save_uint8(&params.cb_mode);

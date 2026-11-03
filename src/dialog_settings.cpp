@@ -40,6 +40,7 @@ extern "C" {
     #include "meter.h"
     #include "main.h"
     #include "power_save.h"
+    #include "birdies.h"
     #include "msg.h"
     #include "textarea_window.h"
     #include "station.h"
@@ -1728,6 +1729,8 @@ static void wf_mode_update_cb(lv_event_t *e) {
 static void wf_palette_update_cb(lv_event_t *e) {
     cfg_sm.p_wf_palette.set(lv_dropdown_get_selected(lv_event_get_target(e)));
 }
+
+static uint8_t make_birdies(uint8_t row);
 
 static uint8_t make_waterfall_palette(uint8_t row) {
     lv_obj_t *obj;
@@ -4687,6 +4690,81 @@ static void make_audio_page() {
     row = make_param_slider(row, "Slope", &agc_slope_slider);
     card_end(row);
 
+    row = card_begin("BIRDIES");
+    row = make_birdies(row);
+    card_end(row);
+
+}
+
+/* CX8ANM: birdies (birdies.c). Se marca el tono que se escucha y desde ahí el notch se pone solo
+ * cada vez que ese birdie cae dentro del filtro. */
+static lv_obj_t *birdies_note;
+
+static void birdies_note_update(void) {
+    if (!birdies_note) return;
+    lv_label_set_text_fmt(birdies_note, tr("%d in the list"), birdies_count());
+}
+
+static void birdies_switch_cb(lv_event_t *e) {
+    birdies_refresh();
+    msg_update_text_fmt(params.birdies.x ? "Birdies: automatic notch on" : "Birdies: automatic notch off");
+}
+
+static void birdies_mark_cb(lv_event_t *e) {
+    birdies_mark();
+}
+
+static void birdies_remove_cb(lv_event_t *e) {
+    birdies_remove_here();
+    birdies_note_update();
+}
+
+static void birdies_clear_cb(lv_event_t *e) {
+    birdies_clear();
+    birdies_note_update();
+}
+
+static void birdies_note_timer_cb(lv_timer_t *t) {
+    birdies_note_update();
+}
+
+static void birdies_note_delete_cb(lv_event_t *e) {
+    lv_timer_del((lv_timer_t *)lv_event_get_user_data(e));
+    birdies_note = NULL;
+}
+
+static uint8_t make_birdies(uint8_t row) {
+    lv_obj_t *obj;
+
+    wl_row_label(row, "Automatic notch");
+    obj = lv_obj_create(grid);
+    lv_obj_set_size(obj, SMALL_3, ROW_H);
+    lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_START, 1, 3, LV_GRID_ALIGN_CENTER, row, 1);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_TRANSP, LV_PART_MAIN);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_center(obj);
+    obj = switch_bool(obj, &params.birdies);
+    lv_obj_set_width(obj, SMALL_3 - 30);
+    lv_obj_add_event_cb(obj, birdies_switch_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    birdies_note = wl_note(row);
+    lv_obj_add_event_cb(birdies_note, birdies_note_delete_cb, LV_EVENT_DELETE,
+                        lv_timer_create(birdies_note_timer_cb, 1000, NULL));
+    birdies_note_update();
+    row++;
+
+    wl_row_label(row, "Tuned on a birdie");
+    wl_button(row, tr("Mark"), birdies_mark_cb);
+    lv_label_set_text(wl_note(row), tr("measures the tone heard (USB, LSB, CW)"));
+    row++;
+
+    wl_row_label(row, "Birdie in the filter");
+    wl_button(row, tr("Remove"), birdies_remove_cb);
+    row++;
+
+    wl_row_label(row, "Whole list");
+    wl_button(row, tr("Clear"), birdies_clear_cb);
+    lv_label_set_text(wl_note(row), tr("also on the web page: Birdies"));
+    return row + 1;
 }
 
 /* Punto de acceso WiFi (x6100-hotspot): la radio arma su propia red y la PC

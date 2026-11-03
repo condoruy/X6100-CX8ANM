@@ -67,6 +67,7 @@ void radio_set_tx_filter(uint16_t low, uint16_t high);
  * applies them in every mode, DIGI included), or back to the settings.
  * Radio only, not saved. */
 void radio_set_rx_dsp_off(bool off);
+void radio_set_dnf_override(bool on, uint16_t center, uint16_t width);
 
 void radio_set_charger(bool on);
 

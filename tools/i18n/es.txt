@@ -1599,3 +1599,26 @@ Rainbow	Arco iris
 Green	Verde
 Purple	Violeta
 Amber	Ámbar
+# Birdies (birdies.c)
+BIRDIES	BIRDIES
+Automatic notch	Notch automático
+%d in the list	%d en la lista
+Tuned on a birdie	Sintonizado en un birdie
+Mark	Marcar
+measures the tone heard (USB, LSB, CW)	mide el tono que se escucha (USB, LSB, CW)
+Birdie in the filter	Birdie dentro del filtro
+Remove	Quitar
+Whole list	Toda la lista
+also on the web page: Birdies	también en la página web: Birdies
+Birdies: automatic notch on	Birdies: notch automático encendido
+Birdies: automatic notch off	Birdies: notch automático apagado
+Birdies: could not save the list	Birdies: no se pudo guardar la lista
+Birdies: mark them in USB, LSB or CW	Birdies: se marcan en USB, LSB o CW
+Listening to the birdie...	Escuchando el birdie...
+Birdies: the filter is too narrow	Birdies: el filtro es demasiado angosto
+Birdies: no steady tone heard in the filter	Birdies: no se escucha un tono fijo en el filtro
+Birdies: the list is full (%d)	Birdies: la lista está llena (%d)
+Birdie marked at %.3f kHz	Birdie marcado en %.3f kHz
+Birdies: none in the filter here	Birdies: no hay ninguno dentro del filtro
+Birdie at %.3f kHz removed	Birdie de %.3f kHz quitado
+Birdie list cleared	Lista de birdies borrada
