@@ -50,7 +50,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: true
-        repository: gdyuldin/AetherX6100Buildroot
+        repository: condoruy/AetherX6100Buildroot   # copia propia (fork)
         # Fijo en la versión probada: los cambios de arriba (p. ej. los enlaces a OpenX6100 del
         # 16/10/2026) rompían la compilación sin aviso
         ref: f84ff86391c4cfd253488f6e6a10c3927749d1f8

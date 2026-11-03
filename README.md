@@ -6,7 +6,7 @@
 > Hasta la versión **0.127** se basó en el **[firmware X6100 de Giovanni Ricciardi IU1WXY](https://github.com/IU1WXY/X6100-IU1WXY)**,
 > publicado bajo licencia **LGPL-2.1**, que nació como derivado del **firmware 1KO125 de Hany El Imam (TheMurusTeam)**,
 > que a su vez parte de **[x6100_gui de Oleg Belousov R1CBU y Georgy Dyuldin R2RFE](https://github.com/gdyuldin/x6100_gui)**
-> y de **[AetherX6100Buildroot](https://github.com/gdyuldin/AetherX6100Buildroot)**.
+> y de **[AetherX6100Buildroot](https://github.com/gdyuldin/AetherX6100Buildroot)** (esta edición compila con su propia copia: [condoruy/AetherX6100Buildroot](https://github.com/condoruy/AetherX6100Buildroot)).
 > Desde entonces se desarrolla de forma **independiente**: no incorpora código de IU1WXY posterior a la 0.127
 > y tiene sus propias pantallas y temas. **No es una versión oficial de IU1WXY, 1KO125 ni R1CBU/R2RFE:**
 > los problemas de esta edición se reportan aquí, no a ellos.
