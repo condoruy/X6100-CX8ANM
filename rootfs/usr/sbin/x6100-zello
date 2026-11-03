@@ -63,9 +63,72 @@ def read_conf():
     return c
 
 
-# ---------- token JWT (RS256, firmado con openssl) ----------
+# ---------- token JWT (RS256) ----------
+# La imagen no trae el programa openssl: la firma RSA (PKCS#1 v1.5 con SHA-256) se hace acá, en Python,
+# leyendo la Private Key PEM (PKCS#8 "BEGIN PRIVATE KEY" o PKCS#1 "BEGIN RSA PRIVATE KEY").
 def b64url(b):
     return base64.urlsafe_b64encode(b).rstrip(b"=").decode()
+
+
+def _der(buf, i):
+    """Un elemento DER desde buf[i]: (etiqueta, contenido, índice siguiente)"""
+    tag = buf[i]
+    n = buf[i + 1]
+    i += 2
+    if n & 0x80:
+        k = n & 0x7F
+        n = int.from_bytes(buf[i:i + k], "big")
+        i += k
+    return tag, buf[i:i + n], i + n
+
+
+def _der_seq(buf):
+    out, i = [], 0
+    while i < len(buf):
+        tag, val, i = _der(buf, i)
+        out.append((tag, val))
+    return out
+
+
+def load_rsa_key(path):
+    try:
+        with open(path) as f:
+            pem = f.read()
+    except OSError:
+        raise Fail("falta la Private Key de Zello (web de la radio, página Zello)")
+    lines = [l.strip() for l in pem.replace("\\n", "\n").splitlines()]
+    try:
+        a = next(i for i, l in enumerate(lines) if l.startswith("-----BEGIN"))
+        b = next(i for i, l in enumerate(lines) if l.startswith("-----END") and i > a)
+        der = base64.b64decode("".join(lines[a + 1:b]))
+        tag, body, _ = _der(der, 0)
+        items = _der_seq(body)
+        if len(items) == 3 and items[2][0] == 0x04:          # PKCS#8: version, algoritmo, clave PKCS#1
+            tag, body, _ = _der(items[2][1], 0)
+            items = _der_seq(body)
+        nums = [int.from_bytes(v, "big") for t, v in items if t == 0x02]
+        _, n, e, d, p, q, dp, dq, qi = nums[:9]
+    except (StopIteration, ValueError, IndexError, TypeError):
+        raise Fail("la Private Key no sirve: péguela completa, con BEGIN y END")
+    return n, e, d, p, q, dp, dq, qi
+
+
+_SHA256_PREFIX = bytes.fromhex("3031300d060960864801650304020105000420")
+
+
+def rsa_sign_sha256(key, data):
+    import hashlib
+    n, e, d, p, q, dp, dq, qi = key
+    k = (n.bit_length() + 7) // 8
+    t = _SHA256_PREFIX + hashlib.sha256(data).digest()
+    em = b"\x00\x01" + b"\xff" * (k - len(t) - 3) + b"\x00" + t
+    m = int.from_bytes(em, "big")
+    # CRT: unas 4 veces más rápido que pow(m, d, n) en el procesador de la radio
+    s1, s2 = pow(m, dp, p), pow(m, dq, q)
+    s = s2 + q * ((qi * (s1 - s2)) % p)
+    if pow(s, e, n) != m:
+        raise Fail("la Private Key no sirve (la firma no verifica)")
+    return s.to_bytes(k, "big")
 
 
 def make_token(issuer, key_path=KEY):
@@ -73,17 +136,11 @@ def make_token(issuer, key_path=KEY):
         raise Fail("falta el Issuer de Zello (web de la radio, página Zello)")
     if not os.path.isfile(key_path):
         raise Fail("falta la Private Key de Zello (web de la radio, página Zello)")
+    key = load_rsa_key(key_path)
     head = b64url(json.dumps({"alg": "RS256", "typ": "JWT"}, separators=(",", ":")).encode())
     body = b64url(json.dumps({"iss": issuer, "exp": int(time.time()) + 60}, separators=(",", ":")).encode())
     data = (head + "." + body).encode()
-    try:
-        r = subprocess.run(["openssl", "dgst", "-sha256", "-sign", key_path, "-binary"], input=data,
-                           capture_output=True, timeout=30)
-    except (OSError, subprocess.SubprocessError) as e:
-        raise Fail("no se pudo firmar el token (%s)" % e)
-    if r.returncode != 0 or not r.stdout:
-        raise Fail("la Private Key no sirve: péguela completa, con BEGIN y END")
-    return data.decode() + "." + b64url(r.stdout)
+    return data.decode() + "." + b64url(rsa_sign_sha256(key, data))
 
 
 # ---------- WebSocket (RFC 6455), solo lo necesario ----------
