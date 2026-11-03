@@ -32,7 +32,7 @@ the R1CBU/R2RFE x6100_gui); since then it is developed independently, with no IU
 0.127 and its own screens and themes. The SSTV, WEFAX, DSC, NAVTEX and SITOR-B apps were originally
 conceived and developed in 1KO125. This edition adds Spanish, German, French and Italian interfaces, a
 first-start assistant (language, callsign, IARU region, country), HF air band and extra apps. Please
-report issues with this edition here, not upstream.*
+report issues with this edition here, not upstream. Full user manual: [docs/MANUAL_EN.md](docs/MANUAL_EN.md).*
 
 ## Qué agrega esta edición
 
@@ -62,7 +62,9 @@ control remoto, temas…, ver [su README](docs/README_IU1WXY.md)) y además:
 - **Banda aérea propia**: cada uno carga sus emisoras de control de tránsito aéreo desde la página
   *Radio por Internet* de la web de la radio; aparecen primero en la lista Banda aérea.
 
-El detalle de cada función está en **[docs/CX8ANM.md](docs/CX8ANM.md)**.
+**Manual completo**, con qué hace cada función y cómo se usa paso a paso:
+**[en español](docs/MANUAL_ES.md)** · **[in English](docs/MANUAL_EN.md)**.
+Notas técnicas de cada cambio: [docs/CX8ANM.md](docs/CX8ANM.md).
 
 ## Instalar
 
