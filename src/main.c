@@ -34,6 +34,7 @@
 #include "birdies.h"
 #include "fonts/font_select.h"
 #include "radio.h"
+#include <aether_radio/x6100_control/low/control.h>
 #include "dsp.h"
 #include "util.h"
 #include "keyboard.h"
@@ -245,6 +246,13 @@ int main(void) {
     update_check_start();
     meteo_alerts_init();     /* alertas de INUMET con WiFi */
     birdies_init();          /* notch automático sobre los birdies marcados */
+    {   /* la versión de la banda base para x6100-diag cuando lo llama la página web */
+        FILE *bf = fopen("/tmp/x6100-baseband", "w");
+        if (bf) {
+            fprintf(bf, "%s\n", x6100_control_get_fw_version_str());
+            fclose(bf);
+        }
+    }
 
     pthread_t thread;
     pthread_create(&thread, NULL, tick_thread, NULL);

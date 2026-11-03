@@ -431,11 +431,19 @@ Detalle completo, incluido Tailscale: [REMOTO.md](REMOTO.md).
 
 ## Diagnóstico y cómo reportar un problema
 
-1. Reproducí el problema (por ejemplo, con los auriculares conectados).
-2. **Ajustes → Info → Diagnóstico → Guardar.** Se guarda un archivo en la carpeta `diag` de la tarjeta.
-3. Bajalo desde **Web → Archivos → diag**.
-4. Abrí un reporte en [github.com/condoruy/X6100-CX8ANM/issues](https://github.com/condoruy/X6100-CX8ANM/issues)
-   con el archivo adjunto, qué hiciste, qué esperabas y **el mensaje de error exacto** que aparece.
+El informe junta los errores de toda la radio: la interfaz (y su último cierre inesperado), el sistema, el
+núcleo, Zello, la Radio por Internet, las actualizaciones, el Bluetooth y los auriculares, la red, la banda base
+y los servicios que están corriendo.
+
+**Desde la página web (lo más fácil):**
+
+1. Hacé que el problema aparezca (por ejemplo, con los auriculares conectados).
+2. **Web → Sistema → Diagnóstico**: escribí qué pasó y el mensaje de error exacto, y tocá **Generar informe**.
+3. **Reportar en GitHub** abre un reporte nuevo con tu texto y el resumen de errores ya cargados, y baja el
+   archivo completo: arrastralo a la caja del reporte y enviá. (Hace falta una cuenta de GitHub, gratis.)
+
+**Desde la radio:** **Ajustes → Info → Diagnóstico → Guardar.** El archivo queda en la carpeta `diag` de la
+tarjeta (**Web → Archivos → diag**) para mandarlo como quieras.
 
 El diagnóstico no se manda a ningún lado: queda en tu tarjeta hasta que vos lo compartas.
 

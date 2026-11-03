@@ -1617,6 +1617,62 @@ def delete_iradio(kind, i):
     return get_iradio(kind)
 
 
+# ---------- Diagnóstico (rootfs/usr/sbin/x6100-diag) ----------
+# El mismo informe de Ajustes > Info > Diagnóstico, generado desde la web: queda en /mnt/diag y la
+# página permite bajarlo o abrir un reporte en GitHub con el resumen de errores. Nada sale de la radio
+# sin que el usuario lo mande.
+
+DIAG_CMD = "/usr/sbin/x6100-diag"
+
+
+def diag_dir():
+    return os.path.join(settings.FILEBROWSER_PATH or "/mnt", "diag")
+
+
+def diag_files():
+    try:
+        names = [n for n in os.listdir(diag_dir()) if n.startswith("diag-") and n.endswith(".txt")]
+    except OSError:
+        return []
+    return sorted(names, reverse=True)[:30]
+
+
+@app.route('/diagnostico')
+def diag_page():
+    return bottle.template('diagnostico')
+
+
+@app.get('/api/diag')
+def diag_list():
+    return {"files": diag_files()}
+
+
+@app.post('/api/diag')
+def diag_make():
+    try:
+        r = subprocess.run([DIAG_CMD, "report"], capture_output=True, text=True, timeout=120)
+    except (OSError, subprocess.SubprocessError) as e:
+        bottle.response.status = 500
+        return {"msg": "No se pudo generar: %s" % e}
+    name = (r.stdout or "").strip().splitlines()[-1:] or [""]
+    name = os.path.basename(name[0])
+    path = os.path.join(diag_dir(), name)
+    if r.returncode != 0 or not name or not os.path.isfile(path):
+        bottle.response.status = 500
+        return {"msg": "No se pudo generar: %s" % ((r.stderr or r.stdout or "").strip()[-300:] or "sin salida")}
+    with open(path, encoding="utf-8", errors="replace") as f:
+        text = f.read()
+    return {"file": name, "text": text, "files": diag_files()}
+
+
+@app.get('/api/diag/file/<name>')
+def diag_file(name):
+    name = os.path.basename(name)
+    if name not in diag_files():
+        bottle.abort(404, "No existe")
+    return bottle.static_file(name, root=diag_dir(), mimetype="text/plain", download=name)
+
+
 # ---------- Birdies (src/birdies.c) ----------
 # /mnt/birdies.txt: "frecuencia en kHz [nota]" por línea. La radio lo vuelve a leer sola cuando cambia.
 

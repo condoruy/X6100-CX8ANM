@@ -1,0 +1,86 @@
+% rebase('base.html', title='Diagnóstico')
+<h2><svg class="i"><use href="#i-pulse"/></svg>Diagnóstico</h2>
+<p class="sub">Junta los errores de toda la radio (interfaz, apps, Bluetooth, audio, red, actualizaciones, banda base) en un
+archivo para analizar un problema. <b>No incluye</b> nombres ni claves de redes WiFi, posiciones, el log de contactos ni las
+claves de Zello o QRZ. Nada sale de la radio hasta que vos lo mandes.</p>
+
+<section class="dp-card">
+<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-edit"/></svg></span><div><h3>1. Qué pasó</h3><p>Hacé que el problema aparezca y después generá el informe</p></div></div>
+<div class="dp-body">
+<textarea id="d-what" rows="4" style="width: 100%" placeholder="Qué estabas haciendo, qué esperabas y el mensaje de error exacto que apareció"></textarea>
+<div class="actions"><button id="d-make" class="primary">Generar informe</button> <span class="status" id="d-status"></span></div>
+</div>
+</section>
+
+<section class="dp-card" id="d-result" style="display: none">
+<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-upload"/></svg></span><div><h3>2. Enviarlo</h3><p id="d-file"></p></div></div>
+<div class="dp-body">
+<p class="sub" style="margin-top: 0"><b>Reportar en GitHub</b> abre un reporte nuevo en el repositorio de la edición con tu texto y el
+resumen de errores ya cargados (hace falta una cuenta de GitHub, es gratis). Para que llegue completo, arrastrá también el
+archivo descargado a la caja del reporte antes de enviarlo.</p>
+<div class="actions"><button id="d-gh" class="primary">Reportar en GitHub</button> <button id="d-dl">Descargar el archivo</button></div>
+<details style="margin-top: 10px"><summary>Ver el informe</summary>
+<pre id="d-text" style="white-space: pre-wrap; max-height: 420px; overflow: auto; font-size: 12px"></pre></details>
+</div>
+</section>
+
+<section class="dp-card">
+<div class="dp-head"><span class="dp-ico"><svg class="i"><use href="#i-archive"/></svg></span><div><h3>Informes anteriores</h3><p>En la carpeta diag de la tarjeta</p></div></div>
+<div class="dp-body"><ul id="d-list" class="sub" style="margin: 0"></ul></div>
+</section>
+
+<script>
+const REPO = "https://github.com/condoruy/X6100-CX8ANM/issues/new";
+function dStatus(text, error) {
+  const el = $("#d-status");
+  el.toggleClass("error", !!error);
+  el.html('<span class="dot"></span>').append(document.createTextNode(text));
+}
+function dList(files) {
+  const ul = $("#d-list").empty();
+  if (!files.length) { ul.append($("<li>").text("Ninguno todavía")); return; }
+  files.forEach(function(f) {
+    ul.append($("<li>").append($("<a>").attr("href", "/api/diag/file/" + encodeURIComponent(f)).text(f)));
+  });
+}
+/* El resumen va en la dirección del reporte: GitHub acepta unos 8000 caracteres */
+function ghUrl(what, text, file) {
+  const cut = text.indexOf("\n== Bluetooth controller");
+  let summary = cut > 0 ? text.slice(0, cut) : text;
+  const first = (what.split("\n")[0] || "Problema").slice(0, 70);
+  const make = function(s) {
+    const body = "**Qué pasó**\n\n" + (what || "(sin descripción)") + "\n\n**Resumen del diagnóstico** (" + file +
+      ")\n\n```\n" + s + "\n```\n\nArchivo completo: arrastrarlo acá antes de enviar.";
+    return REPO + "?title=" + encodeURIComponent("[Diagnóstico] " + first) + "&body=" + encodeURIComponent(body);
+  };
+  let url = make(summary);
+  while (url.length > 7500 && summary.length > 200) {
+    summary = summary.slice(0, Math.floor(summary.length * 0.8)) + "\n[...]";
+    url = make(summary);
+  }
+  return url;
+}
+let dLast = null;
+$("#d-dl").on("click", function() { if (dLast) location.href = "/api/diag/file/" + encodeURIComponent(dLast.file); });
+$("#d-gh").on("click", function() {
+  if (!dLast) return;
+  window.open(ghUrl($("#d-what").val().trim(), dLast.text, dLast.file), "_blank", "noopener");
+  location.href = "/api/diag/file/" + encodeURIComponent(dLast.file);      /* el archivo, para arrastrarlo */
+});
+$("#d-make").on("click", function() {
+  const btn = $(this).prop("disabled", true);
+  dStatus("Generando… (hasta un minuto)");
+  $.ajax({url: "/api/diag", type: "POST", dataType: "json", timeout: 150000,
+    success: function(r) {
+      dStatus("Listo: " + r.file);
+      $("#d-file").text(r.file);
+      $("#d-text").text(r.text);
+      dLast = r;
+      $("#d-result").show();
+      dList(r.files);
+    },
+    error: function(xhr) { dStatus(xhr.responseJSON ? xhr.responseJSON.msg : "No se pudo generar", true); },
+    complete: function() { btn.prop("disabled", false); }});
+});
+$.get("/api/diag", {}, function(r) { dList(r.files); });
+</script>

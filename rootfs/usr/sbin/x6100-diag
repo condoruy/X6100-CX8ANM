@@ -4,16 +4,63 @@
 #   x6100-diag collect VERSION BASEBAND   writes /tmp/x6100-diag.txt
 #   x6100-diag send                       CX8ANM: copies it to /mnt/diag/ (nothing leaves the
 #                                         radio) and prints the file name, to attach to a report
-# Bluetooth, base I2C and system state only: no WiFi networks, no positions, no logbook.
+#   x6100-diag report                     CX8ANM: collect + send in one step (web page Diagnóstico)
+# Errors of every part of the radio, Bluetooth, base I2C and system state. Never: WiFi names or
+# passwords, positions, logbook, Zello/QRZ keys (only whether they are loaded).
 
 OUT=/tmp/x6100-diag.txt
-MAX=60000
+MAX=90000
+NOISE="Adv Monitor|Path / reserved|usb 3-1: [0-9a-f]+: "
+
+# Error-looking lines of a log, without the known harmless noise
+errs() { grep -i -E "error|fail|fatal|warn|denied|can't|cannot|not found|no such|refused|timed? ?out|segfault|assert|abort|exception|traceback|oops|bug:|lost" "$@" 2>/dev/null | grep -v -E "$NOISE"; }
 
 collect() {
 	{
+		ver=$(cat /usr/share/x6100/VERSION_CX8ANM 2>/dev/null | tr -d ' \n')
+		base=${2:-$(cat /tmp/x6100-baseband 2>/dev/null)}
 		echo "X6100 diagnostics, $(date -u '+%Y-%m-%d %H:%M') UTC"
-		echo "firmware $1, baseband $2, kernel $(uname -r)"
-		echo "up $(cut -d. -f1 /proc/uptime) s, free memory $(awk '/MemAvailable/ {print $2}' /proc/meminfo) kB"
+		echo "edition CX8ANM v${ver:-?}, GUI base ${1:-?}, baseband ${base:-?}, kernel $(uname -r)"
+		echo "up $(cut -d. -f1 /proc/uptime) s, free memory $(awk '/MemAvailable/ {print $2}' /proc/meminfo) kB, load $(cut -d' ' -f1-3 /proc/loadavg)"
+		df -h / /mnt 2>/dev/null | awk 'NR > 1 {print "disk " $6 ": " $3 " used of " $2 " (" $5 ")"}'
+		echo
+		echo "== Services"
+		for p in x6100_gui pulseaudio bluetoothd NetworkManager gpsd x6100_webserver dnsmasq btcat x6100-zello x6100-iradio; do
+			if ps 2>/dev/null | grep -v grep | grep -q "$p"; then echo "$p: running"; else echo "$p: -"; fi
+		done
+		echo
+		echo "== GUI errors (this session)"
+		errs /tmp/x6100_log.txt | tail -n 150
+		echo
+		echo "== Last GUI crash/restart"
+		last=$(ls -t /mnt/app_logs/x6100_log_*.txt 2>/dev/null | head -n 1)
+		if [ -n "$last" ]; then
+			echo "$last ($(ls /mnt/app_logs/x6100_log_*.txt 2>/dev/null | wc -l) logs)"
+			tail -n 60 "$last"
+		else
+			echo "none"
+		fi
+		echo
+		echo "== System log errors"
+		errs /var/log/messages | tail -n 150
+		echo
+		echo "== Kernel errors"
+		dmesg 2>/dev/null | errs | tail -n 50
+		echo
+		echo "== Apps"
+		echo "-- zello: $(cat /tmp/x6100-zello.status 2>/dev/null | tr '\n' ' ' || echo 'not running')"
+		[ -r /mnt/zello.conf ] && echo "   config: $(grep -o -E '^(USER|PASS|ISSUER|CHANNEL|CHANNELS)=' /mnt/zello.conf | tr -d '=' | tr '\n' ' ')loaded; key file: $([ -s /mnt/zello.key ] && echo yes || echo no)"
+		echo "-- internet radio: $(cat /tmp/x6100-iradio.status 2>/dev/null | tr '\n' ' ' || echo 'not running')"
+		echo "-- update: $(cat /tmp/x6100-update.status 2>/dev/null | tr '\n' ' ')"
+		tail -n 25 /mnt/update/update.log 2>/dev/null
+		echo "-- birdies: $(grep -c -v -E '^[[:space:]]*(#|$)' /mnt/birdies.txt 2>/dev/null || echo 0) in the list"
+		echo "-- bluetooth CAT"; tail -n 15 /tmp/btcat.log /tmp/btcat-setup.log 2>/dev/null
+		echo "-- clock"; tail -n 5 /var/log/ntp.log 2>/dev/null
+		echo
+		echo "== Network (no network names)"
+		nmcli -t -f DEVICE,TYPE,STATE device 2>/dev/null
+		nmcli -t -f WIFI,STATE,CONNECTIVITY general 2>/dev/null
+		ip -4 -o addr show 2>/dev/null | awk '{print $2, $4}'
 		echo
 		echo "== Bluetooth controller"
 		bluetoothctl show 2>&1 | grep -v -e "^\s*UUID:" -e "Modalias"
@@ -39,7 +86,7 @@ collect() {
 		if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then echo "monitor: running ($pid)"; else echo "monitor: NOT running"; fi
 		/usr/sbin/btaudio-ctl status 2>&1
 		ps 2>/dev/null | grep -E "pulseaudio|bluetoothd|btaudio" | grep -v grep
-		grep -i -E "pulse|bluez|a2dp|bluetooth" /var/log/messages 2>/dev/null | tail -n 40
+		grep -i -E "pulse|bluez|a2dp|bluetooth" /var/log/messages 2>/dev/null | grep -v -E "$NOISE" | tail -n 40
 		echo
 		echo "== Last pairing"
 		sed 's/\x1b\[[0-9;]*[a-zA-Z]//g; s/\r//g' /tmp/bt_pair.log 2>/dev/null | grep -v "^\s*$" | tail -n 80
@@ -48,7 +95,7 @@ collect() {
 		grep -E "^(N|H|B: EV)" /proc/bus/input/devices 2>/dev/null
 		echo
 		echo "== Kernel messages (Bluetooth, HID, USB)"
-		dmesg 2>/dev/null | grep -i -E "bluetooth|hci|rtl|hid|input|usb" | tail -n 80
+		dmesg 2>/dev/null | grep -i -E "bluetooth|hci|rtl|hid|input|usb" | grep -v -E "$NOISE" | tail -n 60
 		echo
 		echo "== Base I2C (write errors, resends, stuck TX)"
 		cat /mnt/base_i2c.log.1 /mnt/base_i2c.log 2>/dev/null | tail -n 40
@@ -70,5 +117,6 @@ send() {
 case "$1" in
 	collect) collect "$2" "$3";;
 	send)    send;;
-	*)       echo "Usage: $0 collect VERSION BASEBAND | send"; exit 1;;
+	report)  collect "$2" "$3" >/dev/null && send;;
+	*)       echo "Usage: $0 collect VERSION BASEBAND | send | report"; exit 1;;
 esac

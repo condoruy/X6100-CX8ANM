@@ -432,11 +432,21 @@ Full details, including Tailscale (in Spanish): [REMOTO.md](REMOTO.md).
 
 ## Diagnostics and reporting a problem
 
-1. Reproduce the problem (for example, with the headphones connected).
-2. **Settings → Info → Diagnostics → Save.** A file is saved in the card's `diag` folder.
-3. Download it from **Web → Archivos → diag**.
-4. Open an issue at [github.com/condoruy/X6100-CX8ANM/issues](https://github.com/condoruy/X6100-CX8ANM/issues)
-   with the file attached, what you did, what you expected and **the exact error message** shown.
+The report gathers the errors of the whole radio: the interface (and its last unexpected restart), the
+system, the kernel, Zello, Internet radio, updates, Bluetooth and headphones, the network, the baseband and
+the services that are running.
+
+**From the web page (easiest):**
+
+1. Make the problem happen (for example, with the headphones connected).
+2. **Web → Sistema → Diagnóstico** (System → Diagnostics): write what happened and the exact error message,
+   and tap **Generar informe** (Generate report).
+3. **Reportar en GitHub** (Report on GitHub) opens a new issue with your text and the error summary already
+   filled in, and downloads the full file: drag it into the issue box and submit. (A free GitHub account is
+   needed.)
+
+**From the radio:** **Settings → Info → Diagnostics → Save.** The file goes to the card's `diag` folder
+(**Web → Archivos → diag**) to send it any way you like.
 
 Diagnostics are not sent anywhere: the file stays on your card until you share it.
 
