@@ -172,6 +172,36 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-ccache-
 
+    # Fuentes ya bajadas (u-boot, paquetes): si un servidor de origen está caído (ftp.denx.de lo
+    # estuvo el 2/11/2026), la compilación usa la copia guardada en vez de fallar
+    - name: Restore downloads
+      uses: actions/cache/restore@v4
+      with:
+        path: AetherX6100Buildroot/buildroot/dl
+        key: ${{ runner.os }}-brdl-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+        restore-keys: |
+          ${{ runner.os }}-brdl-
+
+    # u-boot 2023.01 solo está en ftp.denx.de: si no está en la copia guardada, se prueba también por FTP
+    # y por el archivo de U-Boot en GitHub (mismo tarball oficial, se controla con su sha256)
+    - name: Prefetch u-boot
+      run: |
+        D=AetherX6100Buildroot/buildroot/dl/uboot
+        F=$D/u-boot-2023.01.tar.bz2
+        mkdir -p $D
+        [ -s $F ] && { echo "u-boot en la copia guardada"; exit 0; }
+        for u in https://ftp.denx.de/pub/u-boot/u-boot-2023.01.tar.bz2 ftp://ftp.denx.de/pub/u-boot/u-boot-2023.01.tar.bz2 \
+                 https://sources.buildroot.net/uboot/u-boot-2023.01.tar.bz2 https://sources.buildroot.net/u-boot-2023.01.tar.bz2; do
+          if wget -q -t 2 -T 60 -O $F.tmp "$u"; then mv $F.tmp $F; echo "u-boot de $u"; break; fi
+        done
+        rm -f $F.tmp
+        if [ -s $F ]; then
+          H=$(find AetherX6100Buildroot -name "uboot.hash" -path "*boot/uboot/*" | head -n1)
+          [ -n "$H" ] && grep "u-boot-2023.01.tar.bz2" "$H" | awk '{print $2"  '$F'"}' | sha256sum -c - || true
+        else
+          echo "::warning::No se pudo bajar u-boot 2023.01 (servidor caído); la compilación lo vuelve a intentar"
+        fi
+
     # Versión CX8ANM: la del archivo + el número de esta ejecución (1.0.7, 1.0.8...)
     - name: CX8ANM version
       run: |
@@ -220,6 +250,13 @@ jobs:
       with:
         path: ~/.buildroot-ccache
         key: ${{ runner.os }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+
+    - name: Save downloads
+      if: always()
+      uses: actions/cache/save@v4
+      with:
+        path: AetherX6100Buildroot/buildroot/dl
+        key: ${{ runner.os }}-brdl-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
 
     # Replace U-boot
     - name: Replace u-boot
