@@ -182,15 +182,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-brdl-
 
-    # u-boot 2023.01 solo está en ftp.denx.de: si no está en la copia guardada, se prueba también por FTP
-    # y por el archivo de U-Boot en GitHub (mismo tarball oficial, se controla con su sha256)
+    # u-boot 2023.01 solo está en ftp.denx.de: si no está en la copia guardada se prueba por https/http
+    # y, si el servidor sigue caído, se compila el mismo u-boot v2023.01 desde su espejo oficial en GitHub
     - name: Prefetch u-boot
       run: |
         D=AetherX6100Buildroot/buildroot/dl/uboot
         F=$D/u-boot-2023.01.tar.bz2
         mkdir -p $D
         [ -s $F ] && { echo "u-boot en la copia guardada"; exit 0; }
-        for u in https://ftp.denx.de/pub/u-boot/u-boot-2023.01.tar.bz2 ftp://ftp.denx.de/pub/u-boot/u-boot-2023.01.tar.bz2 \
+        for u in https://ftp.denx.de/pub/u-boot/u-boot-2023.01.tar.bz2 http://ftp.denx.de/pub/u-boot/u-boot-2023.01.tar.bz2 \
                  https://sources.buildroot.net/uboot/u-boot-2023.01.tar.bz2 https://sources.buildroot.net/u-boot-2023.01.tar.bz2; do
           if wget -q -t 2 -T 60 -O $F.tmp "$u"; then mv $F.tmp $F; echo "u-boot de $u"; break; fi
         done
@@ -199,7 +199,13 @@ jobs:
           H=$(find AetherX6100Buildroot -name "uboot.hash" -path "*boot/uboot/*" | head -n1)
           [ -n "$H" ] && grep "u-boot-2023.01.tar.bz2" "$H" | awk '{print $2"  '$F'"}' | sha256sum -c - || true
         else
-          echo "::warning::No se pudo bajar u-boot 2023.01 (servidor caído); la compilación lo vuelve a intentar"
+          # ftp.denx.de caído y sin copia en buildroot: el mismo u-boot 2023.01 desde su espejo oficial en GitHub
+          echo "::warning::ftp.denx.de no responde: u-boot v2023.01 desde github.com/u-boot/u-boot"
+          C=AetherX6100Buildroot/br2_external/configs/X6100_defconfig
+          sed -i '/^BR2_TARGET_UBOOT_CUSTOM_VERSION/d' $C
+          echo 'BR2_TARGET_UBOOT_CUSTOM_TARBALL=y' >> $C
+          echo 'BR2_TARGET_UBOOT_CUSTOM_TARBALL_LOCATION="https://github.com/u-boot/u-boot/archive/refs/tags/v2023.01.tar.gz"' >> $C
+          grep '^BR2_TARGET_UBOOT_CUSTOM' $C
         fi
 
     # Versión CX8ANM: la del archivo + el número de esta ejecución (1.0.7, 1.0.8...)
