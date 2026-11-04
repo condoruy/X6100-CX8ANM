@@ -1522,3 +1522,17 @@ All ham bands	Alle Amateurbänder
 one after the other; Search again stops it	nacheinander; erneut Suchen stoppt
 searching %d%% - %d found - %d min left	Suche %d%% - %d gefunden - noch %d min
 Searching all bands for birdies, about %d min (antenna off is best)...	Suche Birdies in allen Bändern, etwa %d min (am besten ohne Antenne)...
+Flights	Flüge
+ APP Flights 	 APP Flüge 
+FLIGHTS	FLÜGE
+Range	Radius
+My position	Meine Position
+aircraft	Flugzeuge
+ground	am Boden
+heading	Kurs
+at	bei
+squawk	Squawk
+EMERGENCY	NOTFALL
+Getting the flights...	Flüge werden geladen...
+No aircraft seen in this zone right now	Gerade kein Flugzeug in diesem Gebiet
+Only aircraft picked up by a volunteer receiver nearby are shown	Nur Flugzeuge, die ein Freiwilligen-Empfänger in der Nähe empfängt

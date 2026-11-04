@@ -27,16 +27,17 @@ still works the same; for that, see the [inherited manual](MANUAL.md).
 10. [Citizens Band (CB) by channel](#citizens-band-cb-by-channel)
 11. [Air band](#air-band)
 12. [Internet radio](#internet-radio)
-13. [Zello](#zello)
-14. [Weather station and INUMET alerts](#weather-station-and-inumet-alerts)
-15. [NAVTEX and DSC](#navtex-and-dsc)
-16. [Cluster: activity alert on your band](#cluster-activity-alert-on-your-band)
-17. [Field operation (SOTA, POTA, WWBOTA, HOTA)](#field-operation-sota-pota-wwbota-hota)
-18. [The radio's web page](#the-radios-web-page)
-19. [Remoto+: the radio from your phone or PC](#remoto-the-radio-from-your-phone-or-pc)
-20. [Diagnostics and reporting a problem](#diagnostics-and-reporting-a-problem)
-21. [Privacy](#privacy)
-22. [Credits and licence](#credits-and-licence)
+13. [Flights (Flightradar-style)](#flights-flightradar-style)
+14. [Zello](#zello)
+15. [Weather station and INUMET alerts](#weather-station-and-inumet-alerts)
+16. [NAVTEX and DSC](#navtex-and-dsc)
+17. [Cluster: activity alert on your band](#cluster-activity-alert-on-your-band)
+18. [Field operation (SOTA, POTA, WWBOTA, HOTA)](#field-operation-sota-pota-wwbota-hota)
+19. [The radio's web page](#the-radios-web-page)
+20. [Remoto+: the radio from your phone or PC](#remoto-the-radio-from-your-phone-or-pc)
+21. [Diagnostics and reporting a problem](#diagnostics-and-reporting-a-problem)
+22. [Privacy](#privacy)
+23. [Credits and licence](#credits-and-licence)
 
 ---
 
@@ -56,7 +57,7 @@ Main additions:
 | Bands | IARU regions 1, 2 and 3; Uruguay / Region 2 band plan |
 | Display | Own themes (Pro, styles of well-known rigs and *Deck* variants), 10 waterfall palettes, local/UTC clock |
 | Audio | Birdies with automatic notch; Bluetooth headphones with the built-in microphone |
-| Apps | HF air band, Internet radio, Zello, Weather with INUMET, CB by channel |
+| Apps | HF air band, Flights (Flightradar-style), Internet radio, Zello, Weather with INUMET, CB by channel |
 | Connectivity | The radio's own WiFi access point, Remoto+ (voice, FT8 and CW from a phone), phone GPS |
 | Maintenance | Update from the radio, diagnostics saved to the card, nothing sent to third-party servers |
 
@@ -326,6 +327,31 @@ From the radio too: typing the full address (`http://...`) in **Search** adds it
 
 ---
 
+## Flights (Flightradar-style)
+
+The aircraft flying over the area you choose, with data from the internet.
+
+**On the radio: APP → page 4 → Flights.** Needs WiFi.
+
+- On the left, a **radar** centred on the area: range rings, N at the top, each aircraft with a line showing
+  where it is heading and its flight number. The selected one is orange, one in an emergency is red and
+  those on the ground are grey.
+- On the right, the **list** sorted by distance: flight, aircraft type, altitude, speed and distance. Below,
+  the selected one in detail: registration, model, heading, climbing or descending, where it is and squawk.
+- **The MFK knob** goes through the list. **Center** (or pressing MFK) changes the centre: your position (GPS
+  or locator), Carrasco, Laguna del Sauce, Melilla, Durazno, Rivera, Salto, Aeroparque, Ezeiza or Porto
+  Alegre. **Range** changes the reach: 25, 50, 100, 200 or 400 km. It updates by itself every 15 seconds.
+
+**On the web: Operación → Vuelos** (Operation → Flights). The same on a map: tap the map to centre anywhere,
+choose the range, and tap an aircraft or a table row to see the detail.
+
+The data comes from open networks of volunteer ADS-B receivers (**airplanes.live** and, if it does not answer,
+**adsb.lol**), free for personal use. Only aircraft picked up by some nearby receiver are shown: coverage is
+good over Montevideo, there may be gaps inland, especially for low aircraft. To listen to them: **HF Air Band**
+and the Internet radio **Air band** list.
+
+---
+
 ## Zello
 
 Listen and talk on Zello channels from the radio, over the internet. **What you say on Zello does not go on
@@ -410,9 +436,9 @@ browser (shown in **Settings → Wireless**), for example `http://192.168.1.50`.
 |---|---|
 | **General** | radio overview |
 | **Frecuencias** (Frequencies) | Bandas (Bands), Modos digitales (Digital modes), Memorias (Memories) |
-| **Operación** (Operation) | Equipo (Rig), Remoto, Remoto+, Cluster, SOTA/POTA, Mensajes CW, Radio Internet, Zello, Birdies, Logs |
+| **Operación** (Operation) | Equipo (Rig), Remoto, Remoto+, Cluster, SOTA/POTA, Mensajes CW, Radio Internet, Zello, Birdies, Vuelos (Flights), Logs |
 | **Archivos** (Files) | Archivos (card files), Galería (Gallery), Respaldo (Backup) |
-| **Sistema** (System) | Pantalla (Display), Hora (Time), Ethernet, wfview |
+| **Sistema** (System) | Pantalla (Display), Hora (Time), Ethernet, wfview, Diagnóstico (Diagnostics) |
 
 **Equipo** (`/equipo`) is the radio on your PC: the live screen, all keys, the knobs, PTT (hold it; it
 releases by itself after 3 minutes) and the receive audio. Audio needs the page opened with `https://`

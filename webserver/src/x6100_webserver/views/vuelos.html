@@ -1,0 +1,111 @@
+% rebase('base.html', title='Vuelos')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  #fl-map { height: 440px; border-radius: 8px; margin-top: 8px; }
+  .fl-plane { color: #ffb040; font-size: 20px; line-height: 20px; text-align: center; text-shadow: 0 0 3px #000; }
+  .fl-plane.gnd { color: #90a0b0; }
+  .fl-plane.emg { color: #ff4040; }
+  .fl-tag { font: 11px/1.1 monospace; color: #fff; background: rgba(0,0,0,.55); padding: 1px 3px; border-radius: 3px; white-space: nowrap; }
+  #fl-table td, #fl-table th { padding: 3px 8px; text-align: left; }
+  #fl-table tr.sel { background: rgba(255,176,64,.18); }
+  #fl-table tbody tr { cursor: pointer; }
+</style>
+<h2><svg class="i"><use href="#i-globe"/></svg>Vuelos</h2>
+<p class="sub">Los aviones sobre la zona elegida, como en Flightradar: los mismos datos que <b>APP &rarr; Vuelos</b> en la radio.
+Vienen de redes abiertas de receptores ADS-B de voluntarios (airplanes.live, adsb.lol): solo se ven los aviones que capta
+algún receptor cercano. Se actualiza cada 15 segundos. <b>Tocá el mapa</b> para centrar ahí.</p>
+
+<section class="dp-card">
+<div class="dp-body">
+<div class="actions" style="margin-top: 0">
+  <label>Centro <select id="fl-center"></select></label>
+  <label>Radio <select id="fl-km"><option>25</option><option>50</option><option selected>100</option><option>200</option><option>400</option></select> km</label>
+  <button id="fl-upd">Actualizar</button>
+  <span class="status" id="fl-status"></span>
+</div>
+<div id="fl-map"></div>
+<table id="fl-table" style="width: 100%; margin-top: 10px">
+<thead><tr><th>Vuelo</th><th>Matrícula</th><th>Tipo</th><th>Altura</th><th>Velocidad</th><th>Rumbo</th><th>Distancia</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</section>
+
+<script>
+const CENTERS = [
+  ["Mi locator (QTH)", null, null],
+  ["SUMU Carrasco", -34.8384, -56.0308], ["SULS Laguna del Sauce", -34.8551, -55.0943],
+  ["SUAA Melilla", -34.7892, -56.2647], ["SUDU Durazno", -33.3589, -56.4992], ["SURV Rivera", -30.9746, -55.4762],
+  ["SUSO Salto", -31.4385, -57.9853], ["SABE Aeroparque", -34.5592, -58.4156], ["SAEZ Ezeiza", -34.8222, -58.5358],
+  ["SBPA Porto Alegre", -29.9939, -51.1714], ["Elegido en el mapa", null, null]
+];
+const fl = {lat: -34.8384, lon: -56.0308, home: null, sel: null, markers: {}, circle: null, timer: null, busy: false};
+const sel = document.getElementById("fl-center");
+CENTERS.forEach((c, i) => { const o = document.createElement("option"); o.value = i; o.textContent = c[0]; sel.appendChild(o); });
+
+const map = L.map("fl-map").setView([fl.lat, fl.lon], 8);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {maxZoom: 13, attribution: "&copy; OpenStreetMap"}).addTo(map);
+const layer = L.layerGroup().addTo(map);
+const home = L.circleMarker([fl.lat, fl.lon], {radius: 5, color: "#ffd24a"}).addTo(map);
+
+function flStatus(t, err) {
+  const el = $("#fl-status"); el.toggleClass("error", !!err);
+  el.html('<span class="dot"></span>').append(document.createTextNode(t));
+}
+function km() { return Number($("#fl-km").val()); }
+function setCenter(lat, lon, fit) {
+  fl.lat = lat; fl.lon = lon;
+  home.setLatLng([lat, lon]);
+  if (fl.circle) fl.circle.remove();
+  fl.circle = L.circle([lat, lon], {radius: km() * 1000, color: "#ffd24a", weight: 1, fill: false}).addTo(map);
+  if (fit) map.fitBounds(fl.circle.getBounds());
+  update();
+}
+function fmtAlt(a) { return a.ground ? "en tierra" : a.alt_m != null ? a.alt_m + " m" : "--"; }
+function ident(a) { return a.call || a.reg || a.hex; }
+function render(d) {
+  layer.clearLayers();
+  const tb = $("#fl-table tbody").empty();
+  d.ac.forEach((a) => {
+    const cls = "fl-plane" + (a.emerg ? " emg" : a.ground ? " gnd" : "");
+    const icon = L.divIcon({className: "", iconSize: [20, 20], iconAnchor: [10, 10],
+      html: '<div class="' + cls + '" style="transform: rotate(' + (a.trk || 0) + 'deg)">' +
+        '<svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 1 L16 18 L10 14 L4 18 Z" fill="currentColor" stroke="#000" stroke-width="1"/></svg></div>'});
+    const m = L.marker([a.lat, a.lon], {icon: icon}).addTo(layer);
+    m.bindTooltip('<span class="fl-tag">' + ident(a) + " " + fmtAlt(a) + "</span>",
+      {permanent: d.ac.length <= 30, direction: "right", offset: [8, 0], className: ""});
+    m.bindPopup("<b>" + ident(a) + "</b> " + (a.reg || "") + " " + (a.type || "") + "<br>" + (a.desc || "") +
+      "<br>" + fmtAlt(a) + (a.kmh != null ? " · " + a.kmh + " km/h" : "") + (a.trk != null ? " · rumbo " + a.trk + "°" : "") +
+      "<br>" + a.dist_km + " km a " + a.brg + "° · squawk " + (a.squawk || "--") + (a.emerg ? " · <b>EMERGENCIA</b>" : ""));
+    const tr = $("<tr>").toggleClass("sel", fl.sel === a.hex).on("click", () => { fl.sel = a.hex; m.openPopup(); map.panTo([a.lat, a.lon]); });
+    [ident(a), a.reg, a.type, fmtAlt(a), a.kmh != null ? a.kmh + " km/h" : "--", a.trk != null ? a.trk + "°" : "--", a.dist_km + " km"]
+      .forEach((v) => tr.append($("<td>").text(v || "")));
+    tb.append(tr);
+  });
+  if (!d.ac.length) tb.append($("<tr>").append($('<td colspan="7">').text("Ningún avión visto en esta zona ahora.")));
+}
+function update() {
+  if (fl.busy) return;
+  fl.busy = true;
+  flStatus("Buscando…");
+  $.ajax({url: "/api/flights", data: {lat: fl.lat.toFixed(4), lon: fl.lon.toFixed(4), km: km()}, dataType: "json", timeout: 45000,
+    success: (d) => { render(d); flStatus(d.ac.length + " aviones · " + d.time + " (" + d.src + ")"); },
+    error: (x) => flStatus(x.responseJSON ? x.responseJSON.msg : "Sin datos (¿hay internet?)", true),
+    complete: () => { fl.busy = false; }});
+}
+sel.addEventListener("change", () => {
+  const c = CENTERS[sel.value];
+  if (c[1] != null) setCenter(c[1], c[2], true);
+  else if (sel.value == 0 && fl.home) setCenter(fl.home[0], fl.home[1], true);
+});
+$("#fl-km").on("change", () => setCenter(fl.lat, fl.lon, true));
+$("#fl-upd").on("click", update);
+map.on("click", (e) => { sel.value = CENTERS.length - 1; setCenter(e.latlng.lat, e.latlng.lng, false); });
+$.get("/api/flights/home", {}, (h) => {
+  if (h.lat != null) { fl.home = [h.lat, h.lon]; CENTERS[0][0] = "Mi locator (" + h.qth + ")"; sel.options[0].textContent = CENTERS[0][0]; setCenter(h.lat, h.lon, true); }
+  else { sel.value = 1; setCenter(CENTERS[1][1], CENTERS[1][2], true); }
+}).fail(() => { sel.value = 1; setCenter(CENTERS[1][1], CENTERS[1][2], true); });
+fl.timer = setInterval(update, 15000);
+</script>

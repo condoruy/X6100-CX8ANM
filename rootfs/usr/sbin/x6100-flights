@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+# CX8ANM: vuelos sobre una zona (APP > Vuelos y la página web), tipo Flightradar.
+#
+#   x6100-flights update LAT LON KM   los aviones a menos de KM de LAT,LON -> /tmp/x6100-flights.json;
+#                                     imprime "ok N" o "error <motivo>"
+#
+# Los datos son de redes abiertas de receptores ADS-B de voluntarios, gratis y sin clave para uso
+# personal: airplanes.live y, si no responde, adsb.lol (mismo formato). Solo se ven los aviones que
+# capta algún receptor cercano.
+import json
+import math
+import os
+import sys
+import time
+import urllib.request
+
+OUT = os.environ.get("X6100_FLIGHTS_OUT", "/tmp/x6100-flights.json")   # la web usa otro
+SOURCES = [
+    ("airplanes.live", "https://api.airplanes.live/v2/point/%.4f/%.4f/%d"),
+    ("adsb.lol", "https://api.adsb.lol/v2/point/%.4f/%.4f/%d"),
+]
+UA = "X6100-CX8ANM flights (github.com/condoruy/X6100-CX8ANM)"
+KM_PER_NM = 1.852
+
+
+def dist_brg(lat1, lon1, lat2, lon2):
+    """Distancia (km) y rumbo (grados) de 1 a 2"""
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dl = math.radians(lon2 - lon1)
+    a = math.sin((p2 - p1) / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
+    d = 2 * 6371.0 * math.asin(min(1.0, math.sqrt(a)))
+    y = math.sin(dl) * math.cos(p2)
+    x = math.cos(p1) * math.sin(p2) - math.sin(p1) * math.cos(p2) * math.cos(dl)
+    return d, (math.degrees(math.atan2(y, x)) + 360) % 360
+
+
+def fetch(lat, lon, km):
+    nm = max(1, min(250, int(math.ceil(km / KM_PER_NM))))
+    last = "sin respuesta"
+    for name, url in SOURCES:
+        try:
+            req = urllib.request.Request(url % (lat, lon, nm), headers={"User-Agent": UA, "Accept": "application/json"})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                data = json.loads(r.read().decode("utf-8", "replace"))
+            ac = data.get("ac", data.get("aircraft"))
+            if isinstance(ac, list):
+                return name, ac
+            last = "%s: respuesta sin aviones" % name
+        except Exception as e:      # noqa: BLE001 (red, http, json: se prueba el siguiente)
+            last = "%s: %s" % (name, e)
+    raise RuntimeError(last)
+
+
+def clean(a, lat, lon, km):
+    if not isinstance(a.get("lat"), (int, float)) or not isinstance(a.get("lon"), (int, float)):
+        return None
+    d, b = dist_brg(lat, lon, a["lat"], a["lon"])
+    if d > km:
+        return None
+    alt = a.get("alt_baro", a.get("alt_geom"))
+    ground = alt == "ground"
+    alt_m = None if ground or not isinstance(alt, (int, float)) else int(round(alt * 0.3048))
+    gs = a.get("gs")
+    trk = a.get("track", a.get("true_heading"))
+    vr = a.get("baro_rate", a.get("geom_rate"))
+    return {
+        "hex": str(a.get("hex", "")).strip().upper().lstrip("~"),
+        "call": str(a.get("flight", "") or "").strip(),
+        "reg": str(a.get("r", "") or "").strip(),
+        "type": str(a.get("t", "") or "").strip(),
+        "desc": str(a.get("desc", "") or "").strip()[:40],
+        "lat": round(a["lat"], 5),
+        "lon": round(a["lon"], 5),
+        "alt_m": alt_m,
+        "ground": ground,
+        "kmh": int(round(gs * KM_PER_NM)) if isinstance(gs, (int, float)) else None,
+        "trk": int(round(trk)) % 360 if isinstance(trk, (int, float)) else None,
+        "vs": int(round(vr * 0.3048)) if isinstance(vr, (int, float)) else None,      # m/min
+        "squawk": str(a.get("squawk", "") or ""),
+        "emerg": str(a.get("emergency", "") or "") not in ("", "none"),
+        "dist_km": round(d, 1),
+        "brg": int(round(b)) % 360,
+    }
+
+
+def update(lat, lon, km):
+    src, ac = fetch(lat, lon, km)
+    out = [c for c in (clean(a, lat, lon, km) for a in ac if isinstance(a, dict)) if c]
+    out.sort(key=lambda c: c["dist_km"])
+    doc = {"time": time.strftime("%H:%M:%S"), "src": src, "lat": lat, "lon": lon, "km": km, "ac": out[:200]}
+    tmp = OUT + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(doc, f, separators=(",", ":"))
+    os.replace(tmp, OUT)
+    return len(out)
+
+
+def main():
+    if len(sys.argv) == 5 and sys.argv[1] == "update":
+        try:
+            lat, lon, km = float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4])
+            if not (-90 <= lat <= 90 and -180 <= lon <= 180 and 1 <= km <= 500):
+                raise ValueError("posición o radio fuera de rango")
+            print("ok %d" % update(lat, lon, km))
+        except Exception as e:      # noqa: BLE001
+            msg = str(e)
+            if "Name or service" in msg or "Temporary failure" in msg or "unreachable" in msg:
+                msg = "sin internet (WiFi)"
+            print("error %s" % msg[:110])
+        return
+    print("Uso: x6100-flights update LAT LON KM")
+    sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

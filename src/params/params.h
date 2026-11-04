@@ -76,6 +76,7 @@ typedef enum {
     ACTION_APP_CB,      /* 126, CX8ANM: canales de la Banda Ciudadana */
     ACTION_APP_AERO,    /* 127, CX8ANM: banda aérea de HF */
     ACTION_APP_ZELLO,   /* 128, CX8ANM: Zello */
+    ACTION_APP_FLIGHTS, /* 129, CX8ANM: vuelos sobre una zona */
 } press_action_t;
 
 typedef enum {

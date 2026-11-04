@@ -1522,3 +1522,17 @@ All ham bands	Tutte le bande
 one after the other; Search again stops it	una dopo l'altra; Cerca di nuovo la ferma
 searching %d%% - %d found - %d min left	ricerca %d%% - %d trovati - mancano %d min
 Searching all bands for birdies, about %d min (antenna off is best)...	Ricerca dei birdie su tutte le bande, circa %d min (meglio senza antenna)...
+Flights	Voli
+ APP Flights 	 APP Voli 
+FLIGHTS	VOLI
+Range	Raggio
+My position	La mia posizione
+aircraft	aerei
+ground	a terra
+heading	rotta
+at	a
+squawk	squawk
+EMERGENCY	EMERGENZA
+Getting the flights...	Ricerca dei voli...
+No aircraft seen in this zone right now	Nessun aereo visto in questa zona
+Only aircraft picked up by a volunteer receiver nearby are shown	Si vedono solo gli aerei captati da un ricevitore volontario vicino

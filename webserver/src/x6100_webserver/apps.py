@@ -1617,6 +1617,75 @@ def delete_iradio(kind, i):
     return get_iradio(kind)
 
 
+# ---------- Vuelos (rootfs/usr/sbin/x6100-flights) ----------
+# Los mismos datos que la app Vuelos de la radio, para verlos en un mapa.
+
+FLIGHTS_CMD = "/usr/sbin/x6100-flights"
+FLIGHTS_FILE = "/tmp/x6100-flights-web.json"   # aparte del de la radio
+
+
+def read_param(name):
+    try:
+        con = sqlite3.connect(f"file:{settings.DB_PATH}?mode=ro", uri=True)
+        try:
+            row = con.execute("SELECT val FROM params WHERE name = ?", (name,)).fetchone()
+        finally:
+            con.close()
+    except sqlite3.Error:
+        return ""
+    return str(row[0]) if row and row[0] else ""
+
+
+def grid_center(grid):
+    """Centro de un locator Maidenhead de 4 o 6 caracteres, o None"""
+    g = (grid or "").strip().upper()
+    if len(g) < 4 or not ("A" <= g[0] <= "R" and "A" <= g[1] <= "R" and g[2:4].isdigit()):
+        return None
+    lon = (ord(g[0]) - 65) * 20 - 180 + int(g[2]) * 2
+    lat = (ord(g[1]) - 65) * 10 - 90 + int(g[3])
+    if len(g) >= 6 and "A" <= g[4] <= "X" and "A" <= g[5] <= "X":
+        lon += (ord(g[4]) - 65) / 12 + 1 / 24
+        lat += (ord(g[5]) - 65) / 24 + 1 / 48
+    else:
+        lon += 1
+        lat += 0.5
+    return round(lat, 5), round(lon, 5)
+
+
+@app.route('/vuelos')
+def flights_page():
+    return bottle.template('vuelos')
+
+
+@app.get('/api/flights/home')
+def flights_home():
+    qth = read_param("qth")
+    c = grid_center(qth)
+    return {"qth": qth, "lat": c[0] if c else None, "lon": c[1] if c else None}
+
+
+@app.get('/api/flights')
+def flights_get():
+    q = bottle.request.query
+    try:
+        lat, lon, km = float(q.get("lat")), float(q.get("lon")), float(q.get("km", 100))
+    except (TypeError, ValueError):
+        bottle.response.status = 400
+        return {"msg": "Falta la posición"}
+    try:
+        r = subprocess.run([FLIGHTS_CMD, "update", "%.4f" % lat, "%.4f" % lon, "%d" % km],
+                           capture_output=True, text=True, timeout=40,
+                           env=dict(os.environ, X6100_FLIGHTS_OUT=FLIGHTS_FILE))
+        line = (r.stdout or "").strip().splitlines()[-1:] or [""]
+    except (OSError, subprocess.SubprocessError) as e:
+        line = ["error %s" % e]
+    if not line[0].startswith("ok"):
+        bottle.response.status = 502
+        return {"msg": line[0][6:] if line[0].startswith("error ") else "Sin datos (¿hay internet?)"}
+    with open(FLIGHTS_FILE, encoding="utf-8") as f:
+        return json.load(f)
+
+
 # ---------- Diagnóstico (rootfs/usr/sbin/x6100-diag) ----------
 # El mismo informe de Ajustes > Info > Diagnóstico, generado desde la web: queda en /mnt/diag y la
 # página permite bajarlo o abrir un reporte en GitHub con el resumen de errores. Nada sale de la radio

@@ -26,16 +26,17 @@ sigue funcionando igual; para eso, ver el [manual heredado (en inglés)](MANUAL.
 10. [Banda Ciudadana (CB) por canales](#banda-ciudadana-cb-por-canales)
 11. [Banda aérea](#banda-aérea)
 12. [Radio por Internet](#radio-por-internet)
-13. [Zello](#zello)
-14. [Estación meteorológica y alertas de INUMET](#estación-meteorológica-y-alertas-de-inumet)
-15. [NAVTEX y DSC](#navtex-y-dsc)
-16. [Cluster: aviso de actividad en tu banda](#cluster-aviso-de-actividad-en-tu-banda)
-17. [Operación de campo (SOTA, POTA, WWBOTA, HOTA)](#operación-de-campo-sota-pota-wwbota-hota)
-18. [La página web de la radio](#la-página-web-de-la-radio)
-19. [Remoto+: la radio desde el teléfono o la PC](#remoto-la-radio-desde-el-teléfono-o-la-pc)
-20. [Diagnóstico y cómo reportar un problema](#diagnóstico-y-cómo-reportar-un-problema)
-21. [Privacidad](#privacidad)
-22. [Créditos y licencia](#créditos-y-licencia)
+13. [Vuelos (tipo Flightradar)](#vuelos-tipo-flightradar)
+14. [Zello](#zello)
+15. [Estación meteorológica y alertas de INUMET](#estación-meteorológica-y-alertas-de-inumet)
+16. [NAVTEX y DSC](#navtex-y-dsc)
+17. [Cluster: aviso de actividad en tu banda](#cluster-aviso-de-actividad-en-tu-banda)
+18. [Operación de campo (SOTA, POTA, WWBOTA, HOTA)](#operación-de-campo-sota-pota-wwbota-hota)
+19. [La página web de la radio](#la-página-web-de-la-radio)
+20. [Remoto+: la radio desde el teléfono o la PC](#remoto-la-radio-desde-el-teléfono-o-la-pc)
+21. [Diagnóstico y cómo reportar un problema](#diagnóstico-y-cómo-reportar-un-problema)
+22. [Privacidad](#privacidad)
+23. [Créditos y licencia](#créditos-y-licencia)
 
 ---
 
@@ -55,7 +56,7 @@ Lo principal que agrega:
 | Bandas | Regiones IARU 1, 2 y 3; plan de banda de Uruguay / Región 2 |
 | Pantalla | Temas propios (Pro, estilos de equipos conocidos y variantes *Deck*), 10 paletas de cascada, reloj local/UTC |
 | Audio | Birdies con notch automático; auriculares Bluetooth con micrófono integrado |
-| Apps | Banda aérea HF, Radio por Internet, Zello, Meteo con INUMET, CB por canales |
+| Apps | Banda aérea HF, Vuelos (tipo Flightradar), Radio por Internet, Zello, Meteo con INUMET, CB por canales |
 | Conexión | Punto de acceso WiFi propio, Remoto+ (voz, FT8 y CW desde el teléfono), GPS del teléfono |
 | Mantenimiento | Actualizar desde la radio, diagnóstico guardado en la tarjeta, sin envíos a servidores ajenos |
 
@@ -325,6 +326,31 @@ Favoritas.
 
 ---
 
+## Vuelos (tipo Flightradar)
+
+Los aviones que están volando sobre la zona que elijas, con datos de internet.
+
+**En la radio: APP → página 4 → Vuelos.** Necesita WiFi.
+
+- A la izquierda, un **radar** centrado en la zona: anillos de distancia, la N arriba, cada avión con
+  una raya hacia donde va y su número de vuelo. El elegido se ve en naranja, uno en emergencia en rojo y
+  los que están en tierra en gris.
+- A la derecha, la **lista** ordenada por distancia: vuelo, tipo de avión, altura, velocidad y distancia.
+  Debajo, el detalle del elegido: matrícula, modelo, rumbo, si sube o baja, dónde está y su squawk.
+- **La perilla MFK** recorre la lista. **Centro** (o apretar la MFK) cambia el centro: tu posición (GPS o
+  locator), Carrasco, Laguna del Sauce, Melilla, Durazno, Rivera, Salto, Aeroparque, Ezeiza o Porto Alegre.
+  **Radio** cambia el alcance: 25, 50, 100, 200 o 400 km. Se actualiza solo cada 15 segundos.
+
+**En la web: Operación → Vuelos.** Lo mismo sobre un mapa: tocá el mapa para centrar en cualquier lugar,
+elegí el radio, y tocá un avión o una fila de la tabla para ver el detalle.
+
+Los datos son de redes abiertas de receptores ADS-B de voluntarios (**airplanes.live** y, si no responde,
+**adsb.lol**), gratis para uso personal. Solo se ven los aviones que capta algún receptor cercano: sobre
+Montevideo hay buena cobertura, en el interior puede haber huecos, sobre todo con aviones bajos. Para
+escuchar a los aviones: **Banda aérea HF** y la lista **Banda aérea** de la Radio por Internet.
+
+---
+
 ## Zello
 
 Escuchar y hablar en canales de Zello desde la radio, por internet. **Lo que se habla por Zello no sale al
@@ -410,9 +436,9 @@ radio (se ve en **Ajustes → Inalámbrico**), por ejemplo `http://192.168.1.50`
 |---|---|
 | **General** | resumen de la radio |
 | **Frecuencias** | Bandas, Modos digitales, Memorias |
-| **Operación** | Equipo, Remoto, Remoto+, Cluster, SOTA/POTA, Mensajes CW, Radio Internet, Zello, Birdies, Logs |
+| **Operación** | Equipo, Remoto, Remoto+, Cluster, SOTA/POTA, Mensajes CW, Radio Internet, Zello, Birdies, Vuelos, Logs |
 | **Archivos** | Archivos de la tarjeta, Galería, Respaldo |
-| **Sistema** | Pantalla, Hora, Ethernet, wfview |
+| **Sistema** | Pantalla, Hora, Ethernet, wfview, Diagnóstico |
 
 **Equipo** (`/equipo`) es la radio en la PC: la pantalla en vivo, todas las teclas, las perillas, el PTT
 (mantener apretado; se suelta solo a los 3 minutos) y el audio de recepción. El audio necesita abrir la

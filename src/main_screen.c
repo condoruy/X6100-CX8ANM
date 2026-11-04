@@ -52,6 +52,7 @@
 #include "dialog_navtex.h"
 #include "dialog_iradio.h"
 #include "dialog_zello.h"
+#include "dialog_flights.h"
 #include "dialog_meteo.h"
 #include "dialog_cb.h"
 #include "dialog_aero.h"
@@ -629,6 +630,7 @@ static const char *app_name(press_action_t a) {
         case ACTION_APP_JTTY:       return "JTTY";
         case ACTION_APP_IRADIO:     return "Internet Radio";
         case ACTION_APP_ZELLO:      return "Zello";
+        case ACTION_APP_FLIGHTS:    return "Flights";
         case ACTION_APP_METEO:      return "Weather";
         case ACTION_APP_CB:         return "CB";
         case ACTION_APP_AERO:       return "HF Air Band";
@@ -795,6 +797,10 @@ void main_screen_start_app(press_action_t app_action) {
             dialog_construct(dialog_zello, obj);
             break;
 
+        case ACTION_APP_FLIGHTS:
+            dialog_construct(dialog_flights, obj);
+            break;
+
         case ACTION_APP_METEO:
             dialog_construct(dialog_meteo, obj);
             break;
@@ -917,6 +923,7 @@ void main_screen_action(press_action_t action) {
         case ACTION_APP_CB:
         case ACTION_APP_AERO:
         case ACTION_APP_ZELLO:
+        case ACTION_APP_FLIGHTS:
             main_screen_start_app(action);
             break;
 
