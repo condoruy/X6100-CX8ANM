@@ -1713,7 +1713,7 @@ def get_birdies():
 def set_birdies():
     data = bottle.request.json if isinstance(bottle.request.json, dict) else {}
     items = []
-    for b in data.get("birdies", [])[:64]:
+    for b in data.get("birdies", [])[:512]:
         try:
             khz = float(str(b.get("khz", "")).replace(",", "."))
         except (TypeError, ValueError, AttributeError):

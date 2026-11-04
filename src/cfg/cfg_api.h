@@ -211,6 +211,8 @@ extern ComputedParamInt *cfg_mode_lo_offset;   // cp_mode_lo_offset
 
 /* CX8ANM (birdies.c): límites de la banda definida que contiene freq; false fuera de las bandas */
 bool cfg_band_limits(int32_t freq, int32_t *start, int32_t *stop);
+/* Las bandas de radioaficionado activas que la radio recibe, ordenadas: cantidad */
+int cfg_ham_bands(int32_t *start, int32_t *stop, int max);
 
 #ifdef __cplusplus
 } // extern "C"

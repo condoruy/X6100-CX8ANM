@@ -184,9 +184,11 @@ placed on it by itself. Once it is out of the filter, the DNF goes back to how y
 
 1. **Disconnect the antenna** (so only the radio's own whistles remain) and set USB, LSB or CW inside the
    band you want to check.
-2. **Settings → Audio → BIRDIES → Whole band → Search.**
+2. **Settings → Audio → BIRDIES → Whole band → Search** (the band you are on).
 3. The radio goes through the band one filter width at a time and saves every steady tone it finds (with
-   the note "auto"). Progress is shown alongside. A 300 kHz band takes about 4 minutes.
+   the note "auto"). Progress is shown alongside. A 300 kHz band takes about 2 minutes.
+   **All ham bands → Search** does the same on every amateur band, one after the other (2200 m to 6 m).
+   It takes a while (6 m alone is wide): the minutes left are shown alongside.
 4. When done it returns to your frequency and says how many it found. Tapping **Search** again, turning the
    dial, changing mode or pressing PTT stops it.
 

@@ -183,9 +183,11 @@ pone encima solo. Al salir del filtro, el DNF vuelve a como lo tenías.
 
 1. **Desconectá la antena** (así solo quedan los silbidos de la propia radio) y poné USB, LSB o CW dentro de
    la banda que querés revisar.
-2. **Ajustes → Audio → BIRDIES → Toda la banda → Buscar.**
+2. **Ajustes → Audio → BIRDIES → Toda la banda → Buscar** (la banda donde estás).
 3. La radio recorre la banda de a un filtro por vez y guarda cada tono fijo que encuentra (con la nota
-   "auto"). Al lado se ve el avance. Una banda de 300 kHz tarda unos 4 minutos.
+   "auto"). Al lado se ve el avance. Una banda de 300 kHz tarda unos 2 minutos.
+   **Todas las bandas → Buscar** hace lo mismo en todas las bandas de radioaficionado, una tras otra
+   (de 2200 m a 6 m). Tarda bastante (la de 6 m sola es grande): al lado se ven los minutos que faltan.
 4. Al terminar vuelve a tu frecuencia y avisa cuántos encontró. Tocar **Buscar** otra vez, girar el dial,
    cambiar de modo o apretar el PTT la detiene.
 

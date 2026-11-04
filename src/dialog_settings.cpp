@@ -4703,8 +4703,8 @@ static lv_obj_t *birdies_note;
 static void birdies_note_update(void) {
     if (!birdies_note) return;
     if (birdies_scanning()) {
-        lv_label_set_text_fmt(birdies_note, tr("searching %d%% - %d found"), birdies_scan_progress(),
-                              birdies_scan_found());
+        lv_label_set_text_fmt(birdies_note, tr("searching %d%% - %d found - %d min left"),
+                              birdies_scan_progress(), birdies_scan_found(), birdies_scan_minutes_left());
     } else {
         lv_label_set_text_fmt(birdies_note, tr("%d in the list"), birdies_count());
     }
@@ -4720,7 +4720,12 @@ static void birdies_mark_cb(lv_event_t *e) {
 }
 
 static void birdies_scan_cb(lv_event_t *e) {
-    birdies_scan();
+    birdies_scan(false);
+    birdies_note_update();
+}
+
+static void birdies_scan_all_cb(lv_event_t *e) {
+    birdies_scan(true);
     birdies_note_update();
 }
 
@@ -4770,6 +4775,11 @@ static uint8_t make_birdies(uint8_t row) {
     wl_row_label(row, "Whole band");
     wl_button(row, tr("Search"), birdies_scan_cb);
     lv_label_set_text(wl_note(row), tr("antenna off: only the radio's own whistles"));
+    row++;
+
+    wl_row_label(row, "All ham bands");
+    wl_button(row, tr("Search"), birdies_scan_all_cb);
+    lv_label_set_text(wl_note(row), tr("one after the other; Search again stops it"));
     row++;
 
     wl_row_label(row, "Birdie in the filter");

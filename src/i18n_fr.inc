@@ -1515,3 +1515,7 @@
 { "Birdies: search in USB, LSB or CW", "Birdies : chercher en USB, LSB ou CW" },
 { "Birdies: tune inside a band first", "Birdies : accordez d'abord dans une bande" },
 { "Searching the band for birdies (antenna off is best)...", "Recherche des birdies dans la bande (mieux sans antenne)..." },
+{ "All ham bands", "Toutes les bandes" },
+{ "one after the other; Search again stops it", "l'une après l'autre ; Chercher à nouveau arrête" },
+{ "searching %d%% - %d found - %d min left", "recherche %d%% - %d trouvés - reste %d min" },
+{ "Searching all bands for birdies, about %d min (antenna off is best)...", "Recherche des birdies sur toutes les bandes, environ %d min (mieux sans antenne)..." },

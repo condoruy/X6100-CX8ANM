@@ -28,7 +28,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define MAX_BIRDIES   64
+#define MAX_BIRDIES   512
 #define NOTE_LEN      40
 #define NOTCH_WIDTH   30          /* Hz: el birdie es una portadora fija, alcanza un notch angosto */
 #define SAME_HZ       25          /* dos marcas más cerca que esto son el mismo birdie */
@@ -55,6 +55,7 @@ static int32_t  notch_hz;     /* el birdie (RF) que tiene el notch */
 static volatile bool capturing;
 static float         cap_buf[FFT_N];
 static int           cap_n;
+static int           cap_len = FFT_N;   /* marcar: 1,5 s; buscar: 0,75 s por paso */
 static float         cap_acc;
 static int           cap_dec;
 
@@ -249,7 +250,7 @@ static void (*cap_done)(void *) = mark_done;
 
 void birdies_put_audio(size_t nsamples, const int16_t *samples) {
     if (!capturing) return;
-    for (size_t i = 0; i < nsamples && cap_n < FFT_N; i++) {
+    for (size_t i = 0; i < nsamples && cap_n < cap_len; i++) {
         cap_acc += samples[i];
         if (++cap_dec == DECIM) {
             cap_buf[cap_n++] = cap_acc / DECIM;
@@ -257,7 +258,7 @@ void birdies_put_audio(size_t nsamples, const int16_t *samples) {
             cap_dec = 0;
         }
     }
-    if (cap_n >= FFT_N) {
+    if (cap_n >= cap_len) {
         capturing = false;
         scheduler_put_noargs(cap_done);
     }
@@ -272,6 +273,7 @@ void birdies_mark(void) {
         return;
     }
     cap_done = mark_done;
+    cap_len  = FFT_N;
     cap_n = cap_dec = 0;
     cap_acc   = 0;
     capturing = true;
@@ -340,25 +342,37 @@ static void mark_done(void *arg) {
     birdies_refresh();
 }
 
-/* ---------- buscar en toda la banda ---------- */
-/* La radio recorre la banda de a un filtro por vez (unos 2,4 kHz), escucha 1,5 s en cada paso y guarda
- * los tonos fijos: un birdie es una portadora quieta, igual en la primera y la segunda mitad de la
- * escucha; la voz y los modos digitales cambian. Mejor con la antena desconectada: solo quedan los
- * silbidos de la propia radio. */
+/* ---------- buscar en una banda o en todas ---------- */
+/* La radio recorre la banda de a un filtro por vez (unos 2,4 kHz), escucha 0,75 s en cada paso y guarda
+ * los tonos fijos: un birdie es una portadora quieta, igual en los 8 trozos de la escucha; la voz, los
+ * modos digitales y las portadoras que se corren cambian. Mejor con la antena desconectada: solo quedan
+ * los silbidos de la propia radio. "Todas las bandas" recorre las de radioaficionado una tras otra. */
 
-#define SCAN_SETTLE_MS  250
+#define SCAN_SETTLE_MS  200
 #define SCAN_MAX_TONES  4
+#define SCAN_N          (FFT_N / 2)        /* 0,75 s, 1,35 Hz por punto */
+#define SCAN_SEGS       8                  /* la escucha en 8 trozos de 0,09 s */
+#define SEG_N           (SCAN_N / SCAN_SEGS)
+#define MAX_RANGES      32
 
-static int32_t     scan_dial, scan_end, scan_start, scan_restore;
-static int32_t     scan_a_lo, scan_a_hi;       /* ventana de audio usada en cada paso */
-static int         scan_found, scan_new;
-static lv_timer_t *scan_timer, *scan_guard;
+typedef struct {
+    int32_t first, last;    /* diales del primer y el último paso */
+} scan_range_t;
+
+static scan_range_t ranges[MAX_RANGES];
+static int          n_ranges, cur_range;
+static int64_t      steps_total, steps_done;
+static int32_t      scan_dial, scan_restore;
+static int32_t      scan_a_lo, scan_a_hi;       /* ventana de audio usada en cada paso */
+static int          scan_found, scan_new;
+static lv_timer_t  *scan_timer, *scan_guard;
 
 static void scan_step(void);
 
 static void scan_capture_cb(lv_timer_t *t) {
     scan_timer = NULL;
     if (!scanning) return;
+    cap_len = SCAN_N;
     cap_n = cap_dec = 0;
     cap_acc   = 0;
     capturing = true;
@@ -392,20 +406,17 @@ static float median(const float *p, int lo, int hi) {
     return tmp[n / 2];
 }
 
-#define SCAN_SEGS 8                    /* la escucha en 8 trozos de 0,19 s */
-#define SEG_N     (FFT_N / SCAN_SEGS)
-
 static void scan_done(void *arg) {
-    static float p[FFT_N / 2], seg[SCAN_SEGS][SEG_N / 2];
+    static float p[SCAN_N / 2], seg[SCAN_SEGS][SEG_N / 2];
     float        seg_med[SCAN_SEGS];
     rx_view_t    v = rx_view();
     int          lo, hi, tones = 0;
     float        med;
 
     if (!scanning) return;
-    lo  = (int)(scan_a_lo * FFT_N / FS) + 1;
-    hi  = (int)(scan_a_hi * FFT_N / FS) - 1;
-    power(cap_buf, FFT_N, p);
+    lo  = (int)(scan_a_lo * SCAN_N / FS) + 1;
+    hi  = (int)(scan_a_hi * SCAN_N / FS) - 1;
+    power(cap_buf, SCAN_N, p);
     med = median(p, lo, hi);
     for (int k = 0; k < SCAN_SEGS; k++) {
         power(cap_buf + k * SEG_N, SEG_N, seg[k]);
@@ -432,7 +443,7 @@ static void scan_done(void *arg) {
         float a = 10.0f * log10f(p[i - 1] + 1e-20f), b = 10.0f * log10f(p[i] + 1e-20f),
               c = 10.0f * log10f(p[i + 1] + 1e-20f);
         float d     = (a - 2 * b + c) != 0.0f ? 0.5f * (a - c) / (a - 2 * b + c) : 0.0f;
-        float audio = (i + d) * FS / FFT_N;
+        float audio = (i + d) * FS / SCAN_N;
         int32_t lo_hz = scan_dial + param_i_get(cfg_rit) + subject_i_get((SubjectInt *)cfg_mode_lo_offset);
         int32_t hz    = lo_hz + (v.sign < 0 ? -1 : 1) * (int32_t)lroundf(audio);
 
@@ -445,17 +456,21 @@ static void scan_done(void *arg) {
         scan_new += r;
         scan_found++;
         tones++;
-        i += 8;      /* los puntos de al lado del mismo tono */
+        i += 4;      /* los puntos de al lado del mismo tono */
     }
     if (tones) save();
 
+    steps_done++;
     scan_dial += scan_a_hi - scan_a_lo;
     scan_step();
 }
 
 static void scan_step(void) {
     if (!scanning) return;
-    if (scan_dial > scan_end) {
+    while (cur_range < n_ranges && scan_dial > ranges[cur_range].last) {
+        if (++cur_range < n_ranges) scan_dial = ranges[cur_range].first;
+    }
+    if (cur_range >= n_ranges) {
         char text[96];
         snprintf(text, sizeof(text), tr("Birdie search done: %d found, %d new"), scan_found, scan_new);
         scan_stop(text);
@@ -485,6 +500,7 @@ static void scan_stop(const char *why) {
         scan_guard = NULL;
     }
     cap_done = mark_done;
+    cap_len  = FFT_N;
     radio_set_freq(scan_restore);
     if (why) msg_update_text_fmt(why, MAX_BIRDIES);
     birdies_refresh();
@@ -495,15 +511,41 @@ bool birdies_scanning(void) {
 }
 
 int birdies_scan_progress(void) {
-    if (!scanning || scan_end <= scan_start) return 0;
-    return (int)(100LL * (scan_dial - scan_start) / (scan_end - scan_start));
+    if (!scanning || steps_total <= 0) return 0;
+    int p = (int)(100 * steps_done / steps_total);
+    return p > 99 ? 99 : p;
 }
 
 int birdies_scan_found(void) {
     return scan_found;
 }
 
-void birdies_scan(void) {
+/* Minutos que faltan, aproximados */
+int birdies_scan_minutes_left(void) {
+    if (!scanning) return 0;
+    int64_t left = steps_total - steps_done;
+    return (int)((left * (SCAN_SETTLE_MS + SCAN_N * 1000 / (int)FS + 60) / 1000 + 59) / 60);
+}
+
+/* Diales del primer y último paso para cubrir [start, stop] con la ventana de audio */
+static void add_range(const rx_view_t *v, int32_t start, int32_t stop) {
+    int32_t lo_off = param_i_get(cfg_rit) + subject_i_get((SubjectInt *)cfg_mode_lo_offset);
+    int32_t step   = scan_a_hi - scan_a_lo;
+
+    if (n_ranges >= MAX_RANGES || stop <= start) return;
+    scan_range_t *r = &ranges[n_ranges++];
+    if (v->sign < 0) {
+        r->first = start - lo_off + scan_a_hi;
+        r->last  = stop - lo_off + scan_a_lo;
+    } else {
+        r->first = start - lo_off - scan_a_lo;
+        r->last  = stop - lo_off - scan_a_hi;
+    }
+    if (r->last < r->first) r->last = r->first;
+    steps_total += (r->last - r->first) / step + 1;
+}
+
+void birdies_scan(bool all_bands) {
     x6100_mode_t mode = (x6100_mode_t)subject_i_get((SubjectInt *)cfg_cur_mode);
     int32_t      fg   = subject_i_get((SubjectInt *)cfg_fg_freq);
     int32_t      start, stop;
@@ -517,10 +559,6 @@ void birdies_scan(void) {
         msg_update_text_fmt("Birdies: search in USB, LSB or CW");
         return;
     }
-    if (!cfg_band_limits(fg, &start, &stop)) {
-        msg_update_text_fmt("Birdies: tune inside a band first");
-        return;
-    }
     rx_view_t v = rx_view();
     scan_a_lo = v.low < 200 ? 200 : v.low;
     scan_a_hi = v.high > MAX_AUDIO_HZ ? MAX_AUDIO_HZ : v.high;
@@ -528,23 +566,37 @@ void birdies_scan(void) {
         msg_update_text_fmt("Birdies: the filter is too narrow");
         return;
     }
-    /* el dial que pone el primer tono del filtro en el borde de la banda */
-    int32_t lo_off = param_i_get(cfg_rit) + subject_i_get((SubjectInt *)cfg_mode_lo_offset);
-    if (v.sign < 0) {
-        scan_start = start - lo_off + scan_a_hi;
-        scan_end   = stop - lo_off + scan_a_lo;
+
+    n_ranges = cur_range = 0;
+    steps_total = steps_done = 0;
+    if (all_bands) {
+        int32_t s[MAX_RANGES], e[MAX_RANGES];
+        int     n = cfg_ham_bands(s, e, MAX_RANGES);
+        for (int i = 0; i < n; i++) add_range(&v, s[i], e[i]);
     } else {
-        scan_start = start - lo_off - scan_a_lo;
-        scan_end   = stop - lo_off - scan_a_hi;
+        if (!cfg_band_limits(fg, &start, &stop)) {
+            msg_update_text_fmt("Birdies: tune inside a band first");
+            return;
+        }
+        add_range(&v, start, stop);
     }
-    if (scan_end < scan_start) scan_end = scan_start;
-    scan_dial    = scan_start;
+    if (n_ranges == 0) {
+        msg_update_text_fmt("Birdies: tune inside a band first");
+        return;
+    }
+
+    scan_dial    = ranges[0].first;
     scan_restore = fg;
     scan_found = scan_new = 0;
     scanning   = true;
     release();
     scan_guard = lv_timer_create(scan_guard_cb, 100, NULL);
-    msg_update_text_fmt("Searching the band for birdies (antenna off is best)...");
+    if (all_bands) {
+        msg_update_text_fmt("Searching all bands for birdies, about %d min (antenna off is best)...",
+                            birdies_scan_minutes_left());
+    } else {
+        msg_update_text_fmt("Searching the band for birdies (antenna off is best)...");
+    }
     scan_step();
 }
 

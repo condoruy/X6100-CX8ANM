@@ -1631,3 +1631,7 @@ Birdie search stopped: manual tuning	Búsqueda de birdies detenida: sintonía ma
 Birdies: search in USB, LSB or CW	Birdies: se buscan en USB, LSB o CW
 Birdies: tune inside a band first	Birdies: primero sintonizá dentro de una banda
 Searching the band for birdies (antenna off is best)...	Buscando birdies en la banda (mejor sin antena)...
+All ham bands	Todas las bandas
+one after the other; Search again stops it	una tras otra; Buscar otra vez la detiene
+searching %d%% - %d found - %d min left	buscando %d%% - %d encontrados - faltan %d min
+Searching all bands for birdies, about %d min (antenna off is best)...	Buscando birdies en todas las bandas, unos %d min (mejor sin antena)...

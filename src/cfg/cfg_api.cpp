@@ -1,5 +1,7 @@
 #include "cfg_api.h"
 
+#include <algorithm>
+
 #include "atu_cache_api.h"
 #include "settings_manager.h"
 
@@ -330,4 +332,21 @@ extern "C" bool cfg_band_limits(int32_t freq, int32_t *start, int32_t *stop) {
     *start = (int32_t)r.value.start_freq;
     *stop  = (int32_t)r.value.stop_freq;
     return true;
+}
+
+/* CX8ANM (birdies.c): bandas de radioaficionado (id 0..99; 100+ radiodifusión, 200+ CB) activas y
+ * dentro de lo que recibe la radio */
+extern "C" int cfg_ham_bands(int32_t *start, int32_t *stop, int max) {
+    std::vector<BandInfo> all = BandsTable::all_bands();
+    std::sort(all.begin(), all.end(), [](const BandInfo &a, const BandInfo &b) { return a.start_freq < b.start_freq; });
+    int n = 0;
+    for (const BandInfo &b : all) {
+        if (n >= max) break;
+        if (b.id < 0 || b.id >= 100 || b.type != BAND_ACTIVE) continue;
+        if (!cfg_is_valid_hw_freq((int32_t)b.start_freq) || !cfg_is_valid_hw_freq((int32_t)b.stop_freq)) continue;
+        start[n] = (int32_t)b.start_freq;
+        stop[n]  = (int32_t)b.stop_freq;
+        n++;
+    }
+    return n;
 }
