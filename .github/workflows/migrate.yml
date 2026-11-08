@@ -73,6 +73,14 @@ jobs:
         sort -u -o remove.list remove.list
         echo "== Se borrarán al primer arranque ($(wc -l < remove.list)):"; cat remove.list
 
+        # Lugar en la partición del sistema: lo viejo sigue ocupando hasta reiniciar (los archivos en
+        # uso no se liberan al reemplazarlos), así que en el peor caso hace falta viejo + nuevo
+        echo "== Lugar"
+        df -B1M n | tail -1
+        tar -tzvf old.tar.gz | awk '$1 !~ /^d/ {s+=$3} END {printf "viejo: %d MB\n", s/1048576}'
+        sudo du -sm --exclude=./lib/modules --exclude=./boot n | sed 's/^/nuevo (du): /'
+        echo "partición de la radio: $(( $(sudo blockdev --getsize64 ${LOOP}p2) / 1048576 )) MB"
+
         # Lo que va además del sistema: el script de migración y sus datos
         S=$PWD/extra
         mkdir -p $S/usr/share/cx8anm-migrate $S/etc/init.d
