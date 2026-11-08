@@ -1,0 +1,178 @@
+# Paso de las radios con X6100-CX8ANM (1.0.x) a OpenX6X00-CX8ANM.
+#
+# Las radios con 1.0.x bajan update.tar.gz del último release de este repositorio y lo descomprimen
+# sobre /. Este workflow arma ese paquete con el sistema (rootfs) de la imagen X6100 de
+# OpenX6X00-CX8ANM, sin tocar lo que el paquete no puede cambiar en la radio:
+#  - el kernel y sus módulos (/boot, /lib/modules): siguen los de la tarjeta;
+#  - el aviso que pone el driver WiFi nuevo (etc/modprobe.d/x6100-wifi.conf deja sin el driver
+#    rtl8xxxu, el único que tiene el kernel de la tarjeta vieja): la radio sigue con WiFi;
+#  - la marca de nivel de imagen (etc/openx6x00-image): sin ella la radio queda en nivel 1 y la
+#    pantalla de actualización recomienda grabar la tarjeta nueva cuando se pueda;
+#  - lo de cada radio: redes WiFi, Bluetooth, claves SSH, usuarios, /mnt (ajustes y logs).
+# Al primer arranque, /etc/init.d/S00_cx8anm_migrate borra los archivos de la 1.0.x que el sistema
+# nuevo no tiene (scripts de arranque viejos, programas), agrega los usuarios y grupos nuevos y
+# copia lo de /var/lib que falte, y después se borra.
+#
+# publish=false: solo arma el paquete (artefacto) y muestra la lista de archivos que se borrarán.
+name: Migrar a OpenX6X00-CX8ANM
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versión de OpenX6X00-CX8ANM (release del otro repositorio)"
+        default: "1.1.0"
+      publish:
+        description: "Publicar como release de este repositorio (las radios 1.0.x lo bajan)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  bridge:
+    runs-on: ubuntu-22.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VER: ${{ inputs.version }}
+    steps:
+    - name: Bajar la imagen nueva y el paquete viejo
+      run: |
+        set -e
+        mkdir -p w && cd w
+        gh release download v$VER -R condoruy/OpenX6X00-CX8ANM -p "OpenX6X00-CX8ANM-x6100-v$VER-sdcard.img.zip"
+        unzip -q *.zip && ls -l
+        OLD=$(gh api repos/${{ github.repository }}/releases/latest -q .tag_name)
+        echo "Paquete viejo: $OLD"
+        case "$OLD" in v1.0.*) ;; *) echo "el último release no es una 1.0.x ($OLD)"; exit 1 ;; esac
+        gh release download $OLD -R ${{ github.repository }} -p update.tar.gz -O old.tar.gz
+        tar -tzf old.tar.gz | sed 's|^\./||' | grep -v '/$' | sort -u > old.list
+        wc -l old.list
+
+    - name: Armar update.tar.gz
+      run: |
+        set -e
+        cd w
+        IMG=$(ls *.img)
+        LOOP=$(sudo losetup -P -f --show $IMG)
+        lsblk $LOOP
+        mkdir -p n
+        sudo mount -o ro ${LOOP}p2 n
+        test -x n/usr/sbin/x6100-update && test -f n/usr/share/x6100/update.pub
+        grep -q "OpenX6X00-CX8ANM" n/usr/sbin/x6100-update
+
+        # Lista de lo que tiene el sistema nuevo
+        (cd n && sudo find . ! -type d) | sed 's|^\./||' | sort -u > new.list
+        # Lo de la 1.0.x que no está en el nuevo, salvo kernel, firmware, configuración de /etc
+        # (menos sus scripts de arranque) y lo de cada radio
+        comm -23 old.list new.list \
+          | grep -Ev '^(boot/|lib/modules/|lib/firmware/|usr/lib/modules/|usr/lib/firmware/|mnt/|var/lib/|root/|dev/|proc/|sys/|tmp/|run/)' \
+          | grep -Ev '^etc/' > remove.list || true
+        comm -23 old.list new.list | grep '^etc/init.d/' >> remove.list || true
+        sort -u -o remove.list remove.list
+        echo "== Se borrarán al primer arranque ($(wc -l < remove.list)):"; cat remove.list
+
+        # Lo que va además del sistema: el script de migración y sus datos
+        S=$PWD/extra
+        mkdir -p $S/usr/share/cx8anm-migrate $S/etc/init.d
+        cp remove.list $S/usr/share/cx8anm-migrate/remove.list
+        sudo cp n/etc/passwd n/etc/group $S/usr/share/cx8anm-migrate/
+        sudo sh -c "cut -d: -f1 n/etc/shadow > $S/usr/share/cx8anm-migrate/shadow.users"
+        sudo mkdir -p $S/usr/share/cx8anm-migrate/var-lib
+        [ -d n/var/lib ] && sudo cp -a n/var/lib/. $S/usr/share/cx8anm-migrate/var-lib/
+        sudo rm -rf $S/usr/share/cx8anm-migrate/var-lib/bluetooth
+        cat > $S/etc/init.d/S00_cx8anm_migrate <<'EOF'
+        #!/bin/sh
+        # Primer arranque después de pasar de X6100-CX8ANM 1.0.x a OpenX6X00-CX8ANM (lo pone
+        # el paquete de migración, .github/workflows/migrate.yml de X6100-CX8ANM). Se borra al final.
+        [ "$1" = start ] || exit 0
+        M=/usr/share/cx8anm-migrate
+        [ -d $M ] || { rm -f "$0"; exit 0; }
+        LOG=/var/log/cx8anm-migrate.log
+        {
+        echo "migración $(date)"
+        # 1. Archivos de la 1.0.x que el sistema nuevo no tiene
+        while IFS= read -r f; do
+            case "$f" in ""|*..*) continue ;; esac
+            [ -e "/$f" ] || [ -L "/$f" ] || continue
+            rm -f "/$f" && echo "borrado /$f"
+        done < $M/remove.list
+        # 2. Usuarios y grupos que agrega el sistema nuevo (los de la radio quedan como estaban)
+        while IFS= read -r l; do
+            u=${l%%:*}
+            grep -q "^$u:" /etc/passwd || { echo "$l" >> /etc/passwd; echo "usuario $u"; }
+        done < $M/passwd
+        while IFS= read -r l; do
+            g=${l%%:*}
+            grep -q "^$g:" /etc/group || { echo "$l" >> /etc/group; echo "grupo $g"; }
+        done < $M/group
+        while IFS= read -r u; do
+            grep -q "^$u:" /etc/shadow || echo "$u:*:19000:0:99999:7:::" >> /etc/shadow
+        done < $M/shadow.users
+        # 3. /var/lib: lo que falta (nada de lo que ya hay se pisa)
+        (cd $M/var-lib && find . ! -type d) | while IFS= read -r f; do
+            [ -e "/var/lib/$f" ] || [ -L "/var/lib/$f" ] && continue
+            mkdir -p "$(dirname "/var/lib/$f")"
+            cp -a "$M/var-lib/$f" "/var/lib/$f" && echo "var/lib/$f"
+        done
+        (cd $M/var-lib && find . -type d) | while IFS= read -r d; do mkdir -p "/var/lib/$d"; done
+        # 4. El driver WiFi de la imagen nueva no está en el kernel de esta tarjeta
+        find /lib/modules -name 8723bu.ko | grep -q . || rm -f /etc/modprobe.d/x6100-wifi.conf
+        echo "listo"
+        } >> $LOG 2>&1
+        rm -rf $M
+        sync
+        rm -f "$0"
+        exit 0
+        EOF
+        chmod 755 $S/etc/init.d/S00_cx8anm_migrate
+        sh -n $S/etc/init.d/S00_cx8anm_migrate
+
+        sudo tar -C n -cf update.tar \
+          --exclude=./dev --exclude=./proc --exclude=./sys --exclude=./tmp --exclude=./run \
+          --exclude=./mnt --exclude=./lost+found --exclude=./var/lib --exclude=./boot --exclude=./lib/modules --exclude=./usr/lib/modules \
+          --exclude=./etc/NetworkManager/system-connections --exclude='./etc/ssh/ssh_host_*' \
+          --exclude=./etc/machine-id --exclude=./etc/shadow --exclude=./etc/passwd --exclude=./etc/group \
+          --exclude=./etc/openx6x00-image --exclude=./etc/modprobe.d/x6100-wifi.conf .
+        sudo tar -C $S -rf update.tar --owner=0 --group=0 ./usr/share/cx8anm-migrate ./etc/init.d/S00_cx8anm_migrate
+        sudo umount n; sudo losetup -d $LOOP
+        sudo chown $(id -u) update.tar
+        gzip -9 update.tar
+        sha256sum update.tar.gz | cut -d' ' -f1 > update.tar.gz.sha256
+        ls -l update.tar.gz; cat update.tar.gz.sha256
+        tar -tzvf update.tar.gz | grep -E "x6100-update$|S00_cx8anm_migrate|cx8anm-migrate/remove.list|usr/bin/x6100_gui$"
+        tar -tzf update.tar.gz | grep -c .
+
+    - name: Guardar el paquete
+      uses: actions/upload-artifact@v4
+      with:
+        name: migracion-v${{ inputs.version }}
+        path: |
+          w/update.tar.gz
+          w/update.tar.gz.sha256
+          w/remove.list
+        retention-days: 30
+
+    - name: Publicar
+      if: inputs.publish
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ inputs.version }}
+        name: Paso a OpenX6X00-CX8ANM v${{ inputs.version }}
+        make_latest: true
+        body: |
+          Esta actualización pasa la radio de X6100-CX8ANM 1.0.x a **OpenX6X00-CX8ANM v${{ inputs.version }}**
+          (basado en OpenX6X00, con las apps y el español de la edición CX8ANM, para X6100 y X6200).
+          Desde la radio: Ajustes > Info > Actualizar. Se conservan los ajustes, los logs, las redes WiFi,
+          el Bluetooth y las claves SSH. Las próximas actualizaciones llegan de
+          https://github.com/condoruy/OpenX6X00-CX8ANM
+
+          Para tener también el kernel y el driver WiFi nuevos, grabá cuando puedas la imagen de tarjeta
+          OpenX6X00-CX8ANM-x6100-v${{ inputs.version }}-sdcard.img.zip de
+          https://github.com/condoruy/OpenX6X00-CX8ANM/releases (la radio lo recomienda en Actualizar).
+          Si algo sale mal, grabar esa imagen (o la última 1.0.x) en la tarjeta deja la radio funcionando.
+          Sin garantía; se usa bajo tu propia responsabilidad.
+        files: |
+          w/update.tar.gz
+          w/update.tar.gz.sha256
